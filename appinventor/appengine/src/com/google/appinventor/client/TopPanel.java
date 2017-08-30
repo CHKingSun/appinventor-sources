@@ -126,7 +126,7 @@ public class TopPanel extends Composite {
         ode.switchToGalleryView();
       }
     });
-    links.add(gallery);
+    // links.add(gallery);
 
     Config config = ode.getSystemConfig();
     String guideUrl = config.getGuideUrl();
@@ -134,7 +134,7 @@ public class TopPanel extends Composite {
       TextButton guideLink = new TextButton(MESSAGES.guideTabName());
       guideLink.addClickHandler(new WindowOpenClickHandler(guideUrl));
       guideLink.setStyleName("ode-TopPanelButton");
-      links.add(guideLink);
+      // links.add(guideLink);
     }
 
     // Feedback Link
@@ -144,7 +144,7 @@ public class TopPanel extends Composite {
       feedbackLink.addClickHandler(
         new WindowOpenClickHandler(feedbackUrl));
       feedbackLink.setStyleName("ode-TopPanelButton");
-      links.add(feedbackLink);
+      // links.add(feedbackLink);
     }
 
   /*
