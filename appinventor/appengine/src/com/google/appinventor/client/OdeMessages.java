@@ -638,7 +638,7 @@ public interface OdeMessages extends Messages {
   @Description("Name of My Projects tab")
   String tabNameProjects();
 
-  @DefaultMessage("USB")
+  @DefaultMessage("Emulator/USB")
   @Description("Message providing details about starting a USB connection.")
   String usbMenuItem();
 

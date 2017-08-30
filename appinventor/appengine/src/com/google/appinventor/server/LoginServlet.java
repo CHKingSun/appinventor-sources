@@ -97,7 +97,7 @@ public class LoginServlet extends HttpServlet {
     // were not logged in.
     String locale = params.get("locale");
     if (locale == null) {
-      locale = "en";
+      locale = "zh_CN";
     }
     String repo = params.get("repo");
     String galleryId = params.get("galleryId");
@@ -279,7 +279,7 @@ public class LoginServlet extends HttpServlet {
     String redirect = params.get("redirect");
 
     if (locale == null) {
-      locale = "en";
+      locale = "zh_CN";
     }
 
     ResourceBundle bundle = ResourceBundle.getBundle("com/google/appinventor/server/loginmessages", new Locale(locale));

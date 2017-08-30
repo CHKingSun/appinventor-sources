@@ -10,7 +10,7 @@
    String repo = (String) request.getAttribute("repo");
    String galleryId = (String) request.getAttribute("galleryId");
    if (locale == null) {
-       locale = "en";
+       locale = "zh_CN";
    }
 
 %>
@@ -75,6 +75,7 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
                    .add("galleryId", galleryId)
                    .add("redirect", redirect).build() %>"  style="text-decoration:none;" >English</a></center>
 <p></p>
+<!--
 <center>
 <%    if (locale != null && locale.equals("zh_CN")) { %>
 <a href="http://www.weibo.com/mitappinventor" target="_blank"><img class="img-scale"
@@ -88,5 +89,6 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
                                               target="_blank"><img alt="Creative Commons License" src="/images/cc3.png"></a> <br>
   <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank"></a></p>
 </footer>
+-->
 </body></html>
 

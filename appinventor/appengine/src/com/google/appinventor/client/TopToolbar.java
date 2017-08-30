@@ -82,7 +82,7 @@ public class TopToolbar extends Composite {
   private static final String WIDGET_NAME_BUILD_YAIL = "Yail";
   private static final String WIDGET_NAME_CONNECT_TO = "ConnectTo";
   private static final String WIDGET_NAME_WIRELESS_BUTTON = "Wireless";
-  private static final String WIDGET_NAME_EMULATOR_BUTTON = "Emulator";
+  // private static final String WIDGET_NAME_EMULATOR_BUTTON = "Emulator";
   private static final String WIDGET_NAME_USB_BUTTON = "Usb";
   private static final String WIDGET_NAME_RESET_BUTTON = "Reset";
   private static final String WIDGET_NAME_HARDRESET_BUTTON = "HardReset";
@@ -198,8 +198,8 @@ public class TopToolbar extends Composite {
     // Connect -> {Connect to Companion; Connect to Emulator; Connect to USB; Reset Connections}
     connectItems.add(new DropDownItem(WIDGET_NAME_WIRELESS_BUTTON,
         MESSAGES.AICompanionMenuItem(), new WirelessAction()));
-    connectItems.add(new DropDownItem(WIDGET_NAME_EMULATOR_BUTTON,
-        MESSAGES.emulatorMenuItem(), new EmulatorAction()));
+    /* connectItems.add(new DropDownItem(WIDGET_NAME_EMULATOR_BUTTON,
+        MESSAGES.emulatorMenuItem(), new EmulatorAction())); */
     connectItems.add(new DropDownItem(WIDGET_NAME_USB_BUTTON, MESSAGES.usbMenuItem(),
         new UsbAction()));
     connectItems.add(null);
@@ -291,7 +291,7 @@ public class TopToolbar extends Composite {
     toolbar.add(buildDropDown);
 
     // Commented out language switching until we have a clean Chinese translation. (AFM)
-    toolbar.add(helpDropDown);
+    // toolbar.add(helpDropDown);
 
     //Only if logged in as an admin, add the Admin Button
     if (Ode.getInstance().getUser().getIsAdmin()) {
