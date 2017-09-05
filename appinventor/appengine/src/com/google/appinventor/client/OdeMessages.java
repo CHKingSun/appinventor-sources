@@ -750,6 +750,10 @@ public interface OdeMessages extends Messages {
   @Description("Link for Gallery")
   String galleryTabName();
 
+  @DefaultMessage("Modify account")
+  @Description("Modify account")
+  String modifyAccount();
+  
   //User email dropdown
   @DefaultMessage("Sign out")
   @Description("Label of the link for signing out")

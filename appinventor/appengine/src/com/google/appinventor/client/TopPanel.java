@@ -43,6 +43,8 @@ import java.util.List;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
+import com.google.appinventor.shared.rpc.user.*;
+
 /**
  * The top panel, which contains the main menu, various links plus ads.
  *
@@ -56,10 +58,12 @@ public class TopPanel extends Composite {
   private final String WIDGET_NAME_PRIVATE_USER_PROFILE = "Profile";
   private final TextButton gallery;
   private final TextButton moderation;
+  private final String WIDGET_NAME_MODIFY_ACCOUNT = "ModifyAccount";
   private final String WIDGET_NAME_SIGN_OUT = "Signout";
   private final String WIDGET_NAME_USER = "User";
   private static final String WIDGET_NAME_LANGUAGE = "Language";
 
+  private static final String MODIFY_ACCOUNT_URL = "/api/user/?action=modify";
   private static final String SIGNOUT_URL = "/ode/_logout";
   private static final String LOGO_IMAGE_URL = "/images/codi_long.png";
   private static final String LANGUAGES_IMAGE_URL = "/images/languages.svg";
@@ -185,6 +189,8 @@ public class TopPanel extends Composite {
 
     // Account Drop Down Button
     List<DropDownItem> userItems = Lists.newArrayList();
+	
+    userItems.add(new DropDownItem(WIDGET_NAME_MODIFY_ACCOUNT, MESSAGES.modifyAccount(), new ModifyAccountAction()));
 
     // Sign Out
     userItems.add(new DropDownItem(WIDGET_NAME_SIGN_OUT, MESSAGES.signOutLink(), new SignOutAction()));
@@ -332,6 +338,14 @@ public class TopPanel extends Composite {
     @Override
     public void onClick(ClickEvent clickEvent) {
       Window.open(url, WINDOW_OPEN_LOCATION, WINDOW_OPEN_FEATURES);
+    }
+  }
+  
+  private static class ModifyAccountAction implements Command {
+    @Override
+    public void execute() {
+	  User user = Ode.getInstance().getUser();
+      Window.Location.replace(MODIFY_ACCOUNT_URL + "&uid=" + user.getUserId());
     }
   }
 

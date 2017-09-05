@@ -376,4 +376,22 @@
     <servlet-name>componentService</servlet-name>
   </filter-mapping>
 
+  <servlet>
+    <servlet-name>UserServlet</servlet-name>
+    <servlet-class>com.google.appinventor.server.UserServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserServlet</servlet-name>
+    <url-pattern>/api/user/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>FileServlet</servlet-name>
+    <servlet-class>com.google.appinventor.server.FileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FileServlet</servlet-name>
+    <url-pattern>/api/file/*</url-pattern>
+  </servlet-mapping>
+  
 </web-app>

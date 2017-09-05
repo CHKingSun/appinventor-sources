@@ -49,6 +49,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
+import com.google.appinventor.shared.rpc.admin.AdminUser;
+
 /**
  * LoginServlet -- Handle logging someone in using an email address for a login
  * name and a password, which is stored hashed (and salted). Facilities are
@@ -336,13 +338,27 @@ public class LoginServlet extends HttpServlet {
     }
 
     String email = params.get("email");
+	String emailLower = email.toLowerCase();
+	
+	boolean found = false;
+	for(AdminUser user : storageIo.searchUsers("")){
+		if(email.equals(user.getEmail()) || emailLower.equals(user.getEmail())){
+			found = true;
+			break;
+		}
+	}
+	if(!found){
+		fail(req, resp, bundle.getString("nosuchaccount"));
+		return;
+    }
+	
     String password = params.get("password"); // We don't check it now
     User user = storageIo.getUserFromEmail(email);
     boolean validLogin = false;
 
     String hash = user.getPassword();
     if ((hash == null) || hash.equals("")) {
-      fail(req, resp, "No Password Set for User");
+      fail(req, resp, bundle.getString("nopassword"));
       return;
     }
 
@@ -427,7 +443,7 @@ public class LoginServlet extends HttpServlet {
   }
 
   private void fail(HttpServletRequest req, HttpServletResponse resp, String error) throws IOException {
-    resp.sendRedirect("/login/?error=" + sanitizer.sanitize(error));
+    resp.sendRedirect("/login/?error=" + URLEncoder.encode(error, "UTF-8"));
     return;
   }
 

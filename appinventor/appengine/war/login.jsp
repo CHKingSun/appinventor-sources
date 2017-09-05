@@ -55,7 +55,10 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
 <center><input type=Submit value="${login}" style="font-size: 300%;"></center>
 </form>
 <p></p>
+<center><p><a href="/api/user/?action=register">注册新账号</a></p></center>
+<!--
 <center><p><a href="/login/sendlink"  style="text-decoration:none;">${passwordclickhereLabel}</a></p></center>
+-->
 <%    if (useGoogleLabel != null && useGoogleLabel.equals("true")) { %>
 <center><p><a href="<%= new UriBuilder("/login/google")
                               .add("locale", locale)
@@ -63,6 +66,7 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
                               .add("galleryId", galleryId)
                               .add("redirect", redirect).build() %>" style="text-decoration:none;">Click Here to use your Google Account to login</a></p></center>
 <%    } %>
+<!--
 <footer>
 <center><a href="<%= new UriBuilder("/login")
                            .add("locale", "zh_CN")
@@ -75,7 +79,6 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
                    .add("galleryId", galleryId)
                    .add("redirect", redirect).build() %>"  style="text-decoration:none;" >English</a></center>
 <p></p>
-<!--
 <center>
 <%    if (locale != null && locale.equals("zh_CN")) { %>
 <a href="http://www.weibo.com/mitappinventor" target="_blank"><img class="img-scale"

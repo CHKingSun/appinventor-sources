@@ -811,7 +811,10 @@ public class Ode implements EntryPoint {
         // Initialize UI
         initializeUi();
 
-        topPanel.showUserEmail(user.getUserEmail());
+		if(user.getUserEmail().equals(user.getUserName()))
+			topPanel.showUserEmail(user.getUserEmail());
+		else
+			topPanel.showUserEmail(user.getUserName() + "<" + user.getUserEmail() + ">");
       }
 
       @Override
@@ -832,6 +835,8 @@ public class Ode implements EntryPoint {
               return;
             case Response.SC_PRECONDITION_FAILED:
               String locale = Window.Location.getParameter("locale");
+			  if(locale == null)
+				  locale = "zh_CN";
               String repo = Window.Location.getParameter("repo");
               galleryId = Window.Location.getParameter("galleryId");
               String separator = "?";
