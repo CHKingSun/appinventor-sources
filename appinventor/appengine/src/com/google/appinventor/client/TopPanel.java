@@ -341,13 +341,13 @@ public class TopPanel extends Composite {
     }
   }
   
-  private static class ModifyAccountAction implements Command {
-    @Override
-    public void execute() {
-	  User user = Ode.getInstance().getUser();
-      Window.Location.replace(MODIFY_ACCOUNT_URL + "&uid=" + user.getUserId());
-    }
-  }
+    private static class ModifyAccountAction implements Command {
+		@Override
+		public void execute() {
+			User user = Ode.getInstance().getUser();
+			Window.Location.replace(MODIFY_ACCOUNT_URL + "&uid=" + user.getUserId());
+		}
+	}
 
   private static class SignOutAction implements Command {
     @Override

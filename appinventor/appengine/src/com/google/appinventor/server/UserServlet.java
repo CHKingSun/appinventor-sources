@@ -73,33 +73,16 @@ public class UserServlet extends HttpServlet {
 					out.println("<p><h1>修改账号信息</h1></p>");
 					out.println("<form action=\"/api/user/?action=modify\" method=\"POST\">");
 					out.println("<input type=\"hidden\" name=\"uid\" value=\"" + uid + "\"></p>");
-					out.println("<p>账号:&nbsp;&nbsp; " + user.getUserEmail() + "</p>");
+					out.println("<p>账号: " + user.getUserEmail() + "</p>");
 					out.println("<p>显示名称: <input type=\"text\" name=\"name\" value=\"" + user.getUserName() + "\"></p>");
-					out.println("<p>旧密码: &nbsp;<input type=\"password\" name=\"old\"></p>");
-					out.println("<p>新密码: &nbsp;<input type=\"password\" name=\"new\"></p>");
+					out.println("<p>旧密码: <input type=\"password\" name=\"old\"></p>");
+					out.println("<p>新密码: <input type=\"password\" name=\"new\"></p>");
 					out.println("<p><input type=\"submit\" style=\"font-size: 300%;\"></p>");
 					out.println("</form>");
 					out.println("<a href=\"#\" onclick=\"window.history.back();\">返回</a>");
 					out.println("</center>");
 					out.println("</body>");
 					out.println("</html>");
-				}
-				break;
-			}
-			case "setPassword":{
-				String uid = req.getParameter("uid");
-				String password = req.getParameter("password");
-				if(password == null)
-					password = "";
-				if(uid != null){
-					User user = storageIo.getUser(uid);
-					String hashedPassword = "";
-					try {
-						hashedPassword = PasswordHash.createHash(password);
-					} catch (Exception e) {
-						resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-					}
-					storageIo.setUserPassword(uid, hashedPassword);
 				}
 				break;
 			}
@@ -110,7 +93,6 @@ public class UserServlet extends HttpServlet {
 					obj.put("uid", user.getId());
 					obj.put("email", user.getEmail());
 					obj.put("name", user.getName());
-					obj.put("isAdmin", user.getIsAdmin());
 					json.put(obj);
 				}
 				out.println(json);
@@ -176,7 +158,9 @@ public class UserServlet extends HttpServlet {
 						boolean validLogin = false;
 						try {
 							validLogin = PasswordHash.validatePassword(oldPassword, hash);
-						} catch (Exception e) {}
+						} catch (Exception e) {
+							resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+						}
 						if(validLogin){
 							if(!newPassword.equals("")){
 								String hashedPassword = "";
