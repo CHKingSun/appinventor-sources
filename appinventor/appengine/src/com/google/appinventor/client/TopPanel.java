@@ -239,27 +239,8 @@ public class TopPanel extends Composite {
 
   private String getDisplayName(String localeName){
     String nativeName=LocaleInfo.getLocaleNativeDisplayName(localeName);
-    if (localeName == "zh_CN") {
+    if (localeName == "zh_CN") 
       nativeName = MESSAGES.SwitchToSimplifiedChinese();
-    } else if (localeName == "zh_TW") {
-      nativeName = MESSAGES.SwitchToTraditionalChinese();
-    } else if (localeName == "es_ES") {
-      nativeName = MESSAGES.SwitchToSpanish();
-    } else if (localeName == "fr_FR") {
-      nativeName = MESSAGES.SwitchToFrench();
-    } else if (localeName == "it_IT") {
-      nativeName = MESSAGES.SwitchToItalian();
-    } else if (localeName == "ru") {
-      nativeName = MESSAGES.SwitchToRussian();
-    } else if (localeName == "ko_KR") {
-      nativeName = MESSAGES.SwitchToKorean();
-    } else if (localeName == "sv") {
-      nativeName = MESSAGES.SwitchToSwedish();
-    } else if (localeName == "pt_BR") {
-      nativeName = MESSAGES.switchToPortugueseBR();
-    } else if (localeName == "nl") {
-      nativeName = MESSAGES.switchToDutch();
-    }
     return nativeName;
   }
 
