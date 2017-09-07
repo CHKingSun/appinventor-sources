@@ -63,7 +63,7 @@ public class TopPanel extends Composite {
   private final String WIDGET_NAME_USER = "User";
   private static final String WIDGET_NAME_LANGUAGE = "Language";
 
-  private static final String MODIFY_ACCOUNT_URL = "/api/user/?action=modify";
+  private static final String MODIFY_ACCOUNT_URL = "/modify.jsp";
   private static final String SIGNOUT_URL = "/ode/_logout";
   private static final String LOGO_IMAGE_URL = "/images/codi_long.png";
   private static final String LANGUAGES_IMAGE_URL = "/images/languages.svg";
@@ -322,13 +322,20 @@ public class TopPanel extends Composite {
     }
   }
   
-    private static class ModifyAccountAction implements Command {
-		@Override
-		public void execute() {
-			User user = Ode.getInstance().getUser();
-			Window.Location.replace(MODIFY_ACCOUNT_URL + "&uid=" + user.getUserId());
-		}
-	}
+  private static class ModifyAccountAction implements Command {
+	  @Override
+	  public void execute() {
+          User user = Ode.getInstance().getUser();
+          String params = "?uid=" + user.getUserId();
+          params += "&email=" + user.getUserEmail();
+          params += "&name=" + user.getUserName();
+          try{
+              Window.Location.replace(MODIFY_ACCOUNT_URL + com.google.gwt.http.client.URL.encode(params));
+          }catch(Exception e){
+              e.printStackTrace();
+          }
+	  }
+  }
 
   private static class SignOutAction implements Command {
     @Override

@@ -13,7 +13,7 @@ import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 import javax.persistence.Id;
 
@@ -62,6 +62,8 @@ public class StoredData {
     // Path to template project passed as GET parameter
     String templatePath;
     boolean upgradedGCS;
+    
+    Set<Long> groups = new HashSet<Long>();
   }
 
   // Project properties
@@ -290,4 +292,10 @@ public class StoredData {
     public String email;            // Email of account in question
   }
 
+  @Unindexed
+  public static final class GroupData{
+      @Id public Long id;
+      public String name;
+      public Set<String> users = new HashSet<String>();
+  }
 }

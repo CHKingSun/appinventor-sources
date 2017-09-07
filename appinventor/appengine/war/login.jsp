@@ -24,6 +24,7 @@
   </head>
 <body>
   <center>
+    <img src="/images/codi_long.png"></img>
     <h1>${pleaselogin}</h1></center>
   </center>
 <% if (error != null) {
@@ -55,7 +56,7 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
 <center><input type=Submit value="${login}" style="font-size: 300%;"></center>
 </form>
 <p></p>
-<center><p><a href="/api/user/?action=register">注册新账号</a></p></center>
+<center><p><a href="/register.jsp">注册新账号</a></p></center>
 <!--
 <center><p><a href="/login/sendlink"  style="text-decoration:none;">${passwordclickhereLabel}</a></p></center>
 -->

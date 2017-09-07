@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import org.json.*;
 
@@ -25,77 +27,35 @@ public class UserServlet extends HttpServlet {
 		if(action == null)
 			action = "";
 		switch(action){
-			case "find":{
-				String email = req.getParameter("email");
-				if(email != null){
-					String emailLower = email.toLowerCase();
-					boolean found = false;
-					for(AdminUser user : storageIo.searchUsers(""))
-						if(email.equals(user.getEmail()) || emailLower.equals(user.getEmail())){
-							found = true;
-							break;
-						}
-					out.println(found ? "YES" : "NO");
-				}
-				break;
-			}
-			case "register":{
-				out.println("<html>");
-				out.println("<head>");
-				out.println("<meta charset=\"utf8\">");
-				out.println("<title>注册新账号</title>");
-				out.println("</head>");
-				out.println("<body>");
-				out.println("<center>");
-				out.println("<p><h1>注册新账号</h1></p>");
-				out.println("<form action=\"/api/user/?action=register\" method=\"POST\">");
-				out.println("<p>账号: <input type=\"text\" name=\"email\"></p>");
-				out.println("<p>密码: <input type=\"password\" name=\"password\"></p>");
-				out.println("<p><input type=\"submit\" style=\"font-size: 300%;\"></p>");
-				out.println("</form>");
-				out.println("<a href=\"#\" onclick=\"window.history.back();\">返回</a>");
-				out.println("</center>");
-				out.println("</body>");
-				out.println("</html>");
-				break;
-			}
-			case "modify":{
-				String uid = req.getParameter("uid");
-				if(uid != null){
-					User user = storageIo.getUser(uid);
-					out.println("<html>");
-					out.println("<head>");
-					out.println("<meta charset=\"utf8\">");
-					out.println("<title>修改账号信息</title>");
-					out.println("</head>");
-					out.println("<body>");
-					out.println("<center>");
-					out.println("<p><h1>修改账号信息</h1></p>");
-					out.println("<form action=\"/api/user/?action=modify\" method=\"POST\">");
-					out.println("<input type=\"hidden\" name=\"uid\" value=\"" + uid + "\"></p>");
-					out.println("<p>账号: " + user.getUserEmail() + "</p>");
-					out.println("<p>显示名称: <input type=\"text\" name=\"name\" value=\"" + user.getUserName() + "\"></p>");
-					out.println("<p>旧密码: <input type=\"password\" name=\"old\"></p>");
-					out.println("<p>新密码: <input type=\"password\" name=\"new\"></p>");
-					out.println("<p><input type=\"submit\" style=\"font-size: 300%;\"></p>");
-					out.println("</form>");
-					out.println("<a href=\"#\" onclick=\"window.history.back();\">返回</a>");
-					out.println("</center>");
-					out.println("</body>");
-					out.println("</html>");
-				}
-				break;
-			}
+            case "groups":{
+                JSONArray json = new JSONArray();
+                for(long gid : storageIo.getGroups()){
+                    JSONObject obj = new JSONObject();
+                    obj.put("gid", gid);
+                    obj.put("name", storageIo.getGroupName(gid));
+                    json.put(obj);
+                }
+                out.println(json);
+                break;
+            }
+            case "groupUsers":{
+                long gid = Long.parseLong(req.getParameter("gid"));
+                JSONArray json = new JSONArray();
+                for(String uid : storageIo.getGroupUsers(gid))
+                    json.put(getUserInfoJSON(uid));
+                out.println(json);
+                break;
+            }
 			default:{
-				JSONArray json = new JSONArray();
-				for(AdminUser user : storageIo.searchUsers("")){
-					JSONObject obj = new JSONObject();
-					obj.put("uid", user.getId());
-					obj.put("email", user.getEmail());
-					obj.put("name", user.getName());
-					json.put(obj);
-				}
-				out.println(json);
+                String uid = req.getParameter("uid");
+                if(uid != null)
+                    out.println(getUserInfoJSON(uid));
+                else{
+                    JSONArray json = new JSONArray();
+                    for(AdminUser user : storageIo.searchUsers(""))
+                        json.put(getUserInfoJSON(user.getId()));
+                    out.println(json);
+                }
 				break;
 			}
 		}
@@ -127,10 +87,8 @@ public class UserServlet extends HttpServlet {
 						out.println("<b>注册成功!</b> 正在跳转到登录页面...");
 						resp.setHeader("refresh", "3;url=/login");
 					}
-					else{
-						out.println("<b>此账号已被注册!</b> 正在跳转到注册页面...");
-						resp.setHeader("refresh", "3;url=/api/user?action=register");
-					}
+					else
+						resp.setHeader("refresh", "3;url=/register.jsp?error=" + URLEncoder.encode("此账号已被注册", "UTF-8"));
 				}
 				break;
 			}
@@ -174,30 +132,35 @@ public class UserServlet extends HttpServlet {
 							storageIo.setUserName(uid, name);
 							out.println("<b>账号信息修改成功!</b>");
 						}
-						else
-							out.println("<b>旧密码错误!</b>");
+						else{
+                            String params = "?uid=" + uid;
+                            params += "&email=" + user.getUserEmail();
+                            params += "&name=" + user.getUserName();
+                            params += "&error=旧密码错误";
+                            resp.setHeader("refresh", "3;url=/modify.jsp" + URLEncoder.encode(params, "UTF-8"));
+                            return;
+                        }
 					}
 				}
-				resp.setHeader("refresh", "3;url=/?locale=zh_CN");
-				break;
-			}
-			case "setPassword":{
-				String uid = req.getParameter("uid");
-				String password = req.getParameter("password");
-				if(password == null)
-					password = "";
-				if(uid != null){
-					User user = storageIo.getUser(uid);
-					String hashedPassword = "";
-					try {
-						hashedPassword = PasswordHash.createHash(password);
-					} catch (Exception e) {
-						resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-					}
-					storageIo.setUserPassword(uid, hashedPassword);
-				}
+				resp.setHeader("refresh", "3;url=/");
 				break;
 			}
 		}
 	}
+    
+    private JSONObject getUserInfoJSON(String uid){
+        User user = storageIo.getUser(uid);
+        
+        JSONObject json = new JSONObject();
+        json.put("uid", uid);
+        json.put("email", user.getUserEmail());
+        json.put("name", user.getUserName());
+        
+        JSONArray groups = new JSONArray();
+        for(long gid : storageIo.getUserGroups(uid))
+            groups.put(gid);
+        json.put("groups", groups);
+        
+        return json;
+    }
 }

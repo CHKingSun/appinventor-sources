@@ -38,6 +38,7 @@ import com.google.appinventor.server.storage.StoredData.UserFileData;
 import com.google.appinventor.server.storage.StoredData.UserProjectData;
 import com.google.appinventor.server.storage.StoredData.RendezvousData;
 import com.google.appinventor.server.storage.StoredData.WhiteListData;
+import com.google.appinventor.server.storage.StoredData.GroupData;
 import com.google.appinventor.shared.rpc.AdminInterfaceException;
 import com.google.appinventor.shared.rpc.BlocksTruncatedException;
 import com.google.appinventor.shared.rpc.Motd;
@@ -86,6 +87,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -193,6 +195,7 @@ public class ObjectifyStorageIo implements  StorageIo {
     ObjectifyService.register(CorruptionRecord.class);
     ObjectifyService.register(PWData.class);
     ObjectifyService.register(SplashData.class);
+    ObjectifyService.register(GroupData.class);
 
     // Learn GCS Bucket from App Configuration or App Engine Default
     String gcsBucket = Flag.createFlag("gcs.bucket", "").get();
@@ -372,6 +375,7 @@ public class ObjectifyStorageIo implements  StorageIo {
     userData.link = "";
     userData.emaillower = email == null ? "" : emaillower;
     userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
+    userData.groups = new HashSet<Long>();
     datastore.put(userData);
     return userData;
   }
@@ -2857,6 +2861,7 @@ public class ObjectifyStorageIo implements  StorageIo {
               userData.link = "";
               userData.name = User.getDefaultName(user.getEmail());
               userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
+              userData.groups = new HashSet<Long>();
               if (user.getIsModerator()) {
                 userData.type = User.MODERATOR;
               } else {
@@ -2877,7 +2882,228 @@ public class ObjectifyStorageIo implements  StorageIo {
       throw CrashReport.createAndLogError(LOG, null, null, e);
     }
   }
+  
+  @Override
+  public void removeUser(final String uid){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  UserData userData = datastore.find(userKey(uid));
+                  if(userData != null){
+                      for(long gid : userData.groups){
+                          Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                          GroupData groupData = datastore.find(key);
+                          if(groupData != null){
+                              groupData.users.remove(uid);
+                              datastore.put(groupData);
+                          }
+                      }
+                      datastore.delete(userKey(uid));
+                  }
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
 
+  @Override
+  public void createGroup(final String name){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  GroupData groupData = new GroupData();
+                  groupData.id = null;
+                  groupData.name = name;
+                  groupData.users = new HashSet<String>();
+                  datastore.put(groupData);
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
+  
+  @Override
+  public void removeGroup(final long gid){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null){
+                      for(String uid : groupData.users){
+                          UserData userData = datastore.find(userKey(uid));
+                          if(userData != null){
+                              userData.groups.remove(gid);
+                              datastore.put(userData);
+                          }
+                      }
+                      datastore.delete(key);
+                  }
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
+  
+  @Override
+  public List<Long> getGroups(){
+      final List<Long> result = new ArrayList<Long>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  for(GroupData groupData : datastore.query(GroupData.class))
+                      result.add(groupData.id);
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
+  }
+  
+  @Override
+  public List<Long> getUserGroups(final String uid){
+      final List<Long> result = new ArrayList<Long>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  UserData userData = datastore.find(userKey(uid));
+                  result.addAll(userData.groups);
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
+  }
+  
+  @Override
+  public String getGroupName(final long gid){
+      final StringBuffer result = new StringBuffer();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null)
+                      result.append(groupData.name);
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      String str = result.toString();
+      return str.equals("") ? null : str;
+  }
+  
+  @Override
+  public void setGroupName(final long gid, final String name){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null){
+                      groupData.name = name;
+                      datastore.put(groupData);
+                  }
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
+  
+  @Override
+  public List<String> getGroupUsers(final long gid){
+      final List<String> result = new ArrayList<String>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null)
+                      result.addAll(groupData.users);
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
+  }
+  
+  @Override
+  public void addUsersToGroup(final long gid, final List<String> users){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null){
+                      for(String uid : users){
+                          UserData userData = datastore.find(userKey(uid));
+                          if(userData != null){
+                              userData.groups.add(gid);
+                              groupData.users.add(uid);
+                              datastore.put(userData);
+                          }
+                      }
+                      datastore.put(groupData);
+                  }
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
+  
+  @Override
+  public void removeUsersFromGroup(final long gid, final List<String> users){
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(key);
+                  if(groupData != null){
+                      for(String uid : users){
+                          UserData userData = datastore.find(userKey(uid));
+                          if(userData != null){
+                              userData.groups.remove(gid);
+                              groupData.users.remove(uid);
+                              datastore.put(userData);
+                          }
+                      }
+                      datastore.put(groupData);
+                  }
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+  }
 }
 
 

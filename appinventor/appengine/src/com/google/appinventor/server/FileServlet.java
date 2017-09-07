@@ -7,11 +7,14 @@ import com.google.appinventor.shared.rpc.user.User;
 import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
 import com.google.appinventor.shared.rpc.project.RawFile;
+import com.google.appinventor.shared.rpc.Nonce;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
@@ -20,6 +23,7 @@ import org.json.*;
 
 public class FileServlet extends HttpServlet {
 	private final StorageIo storageIo = StorageIoInstanceHolder.INSTANCE;
+	private final FileImporter fileImporter = new FileImporterImpl();
 	private final FileExporter fileExporter = new FileExporterImpl();
 	
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -70,6 +74,17 @@ public class FileServlet extends HttpServlet {
 				attachDownloadData(resp, exportAllProjects());
 				break;
 			}
+            case "getSharedProject":{
+                String nonceValue = req.getParameter("nonce");
+                if(nonceValue != null){
+                    Nonce nonce = storageIo.getNoncebyValue(nonceValue);
+                    if(nonce != null)
+                        attachDownloadData(resp, exportProject(nonce.getUserId(), nonce.getProjectId()));
+                    else
+                        resp.getWriter().println("分享链接已过期或项目不存在");
+                }
+                break;
+            }
 			default:{
 				JSONObject json = new JSONObject();
 				for(AdminUser user : storageIo.searchUsers("")){
@@ -81,6 +96,41 @@ public class FileServlet extends HttpServlet {
 			}
 		}
 	}
+    
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		resp.setContentType("text/html; charset=utf-8");
+        PrintWriter out = resp.getWriter();
+        
+        String action = req.getParameter("action");
+		if(action == null)
+			action = "";
+        switch(action){
+            case "importProject":{
+                String uid = req.getParameter("uid");
+                String name = req.getParameter("name");
+                String encodedContent = req.getParameter("content");
+                try{
+                    byte content[] = Base64.decodeBase64(encodedContent);
+                    ByteArrayInputStream bin = new ByteArrayInputStream(content);
+                    fileImporter.importProject(uid, name, bin, null);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                out.println(getUserProjects(uid));
+                break;
+            }
+            case "shareProject":{
+                String uid = req.getParameter("uid");
+				long pid = Long.parseLong(req.getParameter("pid"));
+                String name = uid + pid;
+                String nonceValue = new String(Base64.encodeBase64(name.getBytes("UTF-8")), "UTF-8");
+                storageIo.storeNonce(nonceValue, uid, pid);
+                resp.getWriter().println(nonceValue);
+                break;
+            }
+        }
+    }
+    
 	private JSONArray getUserProjects(String uid){
 		JSONArray json = new JSONArray();
 		for(long pid : storageIo.getProjects(uid)){
@@ -94,6 +144,7 @@ public class FileServlet extends HttpServlet {
 		}
 		return json;
 	}
+    
 	private RawFile exportFile(String uid, long pid, String path){
 		RawFile file = null;
 		try{
@@ -103,6 +154,7 @@ public class FileServlet extends HttpServlet {
 		}
 		return file;
 	}
+    
 	private RawFile exportProject(String uid, long pid){
 		RawFile srcFile = null;
 		try{
@@ -113,6 +165,7 @@ public class FileServlet extends HttpServlet {
 		}
 		return srcFile;
 	}
+    
 	private RawFile exportAllProjectsForUser(String uid){
 		String email = storageIo.getUser(uid).getUserEmail();
 		RawFile file = null;
@@ -124,6 +177,7 @@ public class FileServlet extends HttpServlet {
 		}
 		return file;
 	}
+    
 	private RawFile exportAllProjects(){
 		ByteArrayOutputStream zipFile = new ByteArrayOutputStream();
 		try(ZipOutputStream out = new ZipOutputStream(zipFile)){
@@ -142,6 +196,7 @@ public class FileServlet extends HttpServlet {
 		}
 		return new RawFile("all-projects.zip", zipFile.toByteArray());
 	}
+    
 	private void attachDownloadData(HttpServletResponse resp, RawFile file){
 		if(file == null){
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
