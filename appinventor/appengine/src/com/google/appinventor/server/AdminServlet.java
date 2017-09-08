@@ -16,82 +16,83 @@ import java.util.*;
 import org.json.*;
 
 public class AdminServlet extends HttpServlet {
-	private final StorageIo storageIo = StorageIoInstanceHolder.INSTANCE;
-	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		resp.setContentType("text/html; charset=utf-8");
-		PrintWriter out = resp.getWriter();
-        
+    private final StorageIo storageIo = StorageIoInstanceHolder.INSTANCE;
+
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html; charset=utf-8");
+        PrintWriter out = resp.getWriter();
+
         String action = req.getParameter("action");
-        if(action == null)
+        if (action == null)
             action = "";
-        switch(action){
-            case "passwordReset":{
-				String uid = req.getParameter("uid");
-				String password = req.getParameter("password");
-				if(password == null)
-					password = "";
-				if(uid != null){
-					User user = storageIo.getUser(uid);
-					String hashedPassword = "";
-					try {
-						hashedPassword = PasswordHash.createHash(password);
-					} catch (Exception e) {
-						resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-					}
-					storageIo.setUserPassword(uid, hashedPassword);
+        switch (action) {
+            case "passwordReset": {
+                String uid = req.getParameter("uid");
+                String password = req.getParameter("password");
+                if (password == null)
+                    password = "";
+                if (uid != null) {
+                    User user = storageIo.getUser(uid);
+                    String hashedPassword = "";
+                    try {
+                        hashedPassword = PasswordHash.createHash(password);
+                    } catch (Exception e) {
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                    }
+                    storageIo.setUserPassword(uid, hashedPassword);
                     out.println("OK");
-				}
-				break;
-			}
-            case "removeUsers":{
+                }
+                break;
+            }
+            case "removeUsers": {
                 String users = req.getParameter("users");
-                if(users != null){
+                if (users != null) {
                     JSONArray json = new JSONArray(users);
-                    for(int i=0;i<json.length();i++){
+                    for (int i = 0; i < json.length(); i++) {
                         String uid = json.getString(i);
                         storageIo.removeUser(uid);
-                        for(long gid : storageIo.getGroups())
+                        for (long gid : storageIo.getGroups())
                             storageIo.removeUsersFromGroup(gid, Arrays.asList(uid));
                     }
                     out.println("OK");
                 }
                 break;
             }
-            case "createGroup":{
+            case "createGroup": {
                 String name = req.getParameter("name");
-                if(name != null){
+                if (name != null) {
                     storageIo.createGroup(name);
                     out.println("OK");
                 }
                 break;
             }
-            case "removeGroup":{
+            case "removeGroup": {
                 long gid = Long.parseLong(req.getParameter("gid"));
                 storageIo.removeGroup(gid);
                 out.println("OK");
                 break;
             }
-            case "addUsersToGroup":{
+            case "addUsersToGroup": {
                 long gid = Long.parseLong(req.getParameter("gid"));
                 String users = req.getParameter("users");
-                if(users != null){
+                if (users != null) {
                     JSONArray json = new JSONArray(users);
                     ArrayList<String> list = new ArrayList<String>();
-                    for(int i=0;i<json.length();i++)
+                    for (int i = 0; i < json.length(); i++)
                         list.add(json.getString(i));
                     storageIo.addUsersToGroup(gid, list);
                     out.println("OK");
                 }
                 break;
             }
-            case "removeUsersFromGroup":{
+            case "removeUsersFromGroup": {
                 long gid = Long.parseLong(req.getParameter("gid"));
                 String users = req.getParameter("users");
-                if(users != null){
+                if (users != null) {
                     JSONArray json = new JSONArray(users);
                     ArrayList<String> list = new ArrayList<String>();
-                    for(int i=0;i<json.length();i++)
+                    for (int i = 0; i < json.length(); i++)
                         list.add(json.getString(i));
                     storageIo.removeUsersFromGroup(gid, list);
                     out.println("OK");

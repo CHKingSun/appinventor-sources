@@ -375,7 +375,7 @@ public class ObjectifyStorageIo implements  StorageIo {
     userData.link = "";
     userData.emaillower = email == null ? "" : emaillower;
     userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
-    userData.groups = new HashSet<Long>();
+    userData.groups = new HashSet<Key<GroupData>>();
     datastore.put(userData);
     return userData;
   }
@@ -2861,7 +2861,7 @@ public class ObjectifyStorageIo implements  StorageIo {
               userData.link = "";
               userData.name = User.getDefaultName(user.getEmail());
               userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
-              userData.groups = new HashSet<Long>();
+              userData.groups = new HashSet<Key<GroupData>>();
               if (user.getIsModerator()) {
                 userData.type = User.MODERATOR;
               } else {
@@ -2892,9 +2892,8 @@ public class ObjectifyStorageIo implements  StorageIo {
                   datastore = ObjectifyService.begin();
                   UserData userData = datastore.find(userKey(uid));
                   if(userData != null){
-                      for(long gid : userData.groups){
-                          Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                          GroupData groupData = datastore.find(key);
+                      for(Key<GroupData> groupKey : userData.groups){
+                          GroupData groupData = datastore.find(groupKey);
                           if(groupData != null){
                               groupData.users.remove(uid);
                               datastore.put(groupData);
@@ -2919,7 +2918,7 @@ public class ObjectifyStorageIo implements  StorageIo {
                   GroupData groupData = new GroupData();
                   groupData.id = null;
                   groupData.name = name;
-                  groupData.users = new HashSet<String>();
+                  groupData.users = new HashSet<Key<UserData>>();
                   datastore.put(groupData);
               }
           }, true);
@@ -2935,17 +2934,17 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
                   if(groupData != null){
-                      for(String uid : groupData.users){
-                          UserData userData = datastore.find(userKey(uid));
+                      for(Key<UserData> userKey : groupData.users){
+                          UserData userData = datastore.find(userKey);
                           if(userData != null){
-                              userData.groups.remove(gid);
+                              userData.groups.remove(groupKey);
                               datastore.put(userData);
                           }
                       }
-                      datastore.delete(key);
+                      datastore.delete(groupKey);
                   }
               }
           }, true);
@@ -2965,7 +2964,7 @@ public class ObjectifyStorageIo implements  StorageIo {
                   for(GroupData groupData : datastore.query(GroupData.class))
                       result.add(groupData.id);
               }
-          }, true);
+          }, false);
       }catch(Exception e){
           e.printStackTrace();
       }
@@ -2981,9 +2980,13 @@ public class ObjectifyStorageIo implements  StorageIo {
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
                   UserData userData = datastore.find(userKey(uid));
-                  result.addAll(userData.groups);
+                  for(Key<GroupData> groupKey : userData.groups){
+                      GroupData groupData = datastore.find(groupKey);
+                      if(groupData != null)
+                          result.add(groupData.id);
+                  }
               }
-          }, true);
+          }, false);
       }catch(Exception e){
           e.printStackTrace();
       }
@@ -2998,17 +3001,16 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
                   if(groupData != null)
                       result.append(groupData.name);
               }
-          }, true);
+          }, false);
       }catch(Exception e){
           e.printStackTrace();
       }
-      String str = result.toString();
-      return str.equals("") ? null : str;
+      return result.toString();
   }
   
   @Override
@@ -3018,8 +3020,8 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
                   if(groupData != null){
                       groupData.name = name;
                       datastore.put(groupData);
@@ -3039,12 +3041,17 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
-                  if(groupData != null)
-                      result.addAll(groupData.users);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
+                  if(groupData != null){
+                      for(Key<UserData> userKey : groupData.users){
+                          UserData userData = datastore.find(userKey);
+                          if(userData != null)
+                              result.add(userData.id);
+                      }
+                  }
               }
-          }, true);
+          }, false);
       }catch(Exception e){
           e.printStackTrace();
       }
@@ -3058,14 +3065,15 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
                   if(groupData != null){
                       for(String uid : users){
-                          UserData userData = datastore.find(userKey(uid));
+                          Key<UserData> userKey = userKey(uid);
+                          UserData userData = datastore.find(userKey);
                           if(userData != null){
-                              userData.groups.add(gid);
-                              groupData.users.add(uid);
+                              userData.groups.add(groupKey);
+                              groupData.users.add(userKey);
                               datastore.put(userData);
                           }
                       }
@@ -3085,14 +3093,15 @@ public class ObjectifyStorageIo implements  StorageIo {
               @Override
               public void run(Objectify datastore) {
                   datastore = ObjectifyService.begin();
-                  Key<GroupData> key = new Key<GroupData>(GroupData.class, gid);
-                  GroupData groupData = datastore.find(key);
+                  Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
+                  GroupData groupData = datastore.find(groupKey);
                   if(groupData != null){
                       for(String uid : users){
-                          UserData userData = datastore.find(userKey(uid));
+                          Key<UserData> userKey = userKey(uid);
+                          UserData userData = datastore.find(userKey);
                           if(userData != null){
-                              userData.groups.remove(gid);
-                              groupData.users.remove(uid);
+                              userData.groups.remove(groupKey);
+                              groupData.users.remove(userKey);
                               datastore.put(userData);
                           }
                       }

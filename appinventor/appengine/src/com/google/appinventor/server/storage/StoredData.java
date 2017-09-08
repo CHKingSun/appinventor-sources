@@ -63,7 +63,7 @@ public class StoredData {
     String templatePath;
     boolean upgradedGCS;
     
-    Set<Long> groups = new HashSet<Long>();
+    public Set<Key<GroupData>> groups = new HashSet<Key<GroupData>>();
   }
 
   // Project properties
@@ -295,7 +295,7 @@ public class StoredData {
   @Unindexed
   public static final class GroupData{
       @Id public Long id;
-      public String name;
-      public Set<String> users = new HashSet<String>();
+      @Indexed public String name;
+      public Set<Key<UserData>> users = new HashSet<Key<UserData>>();
   }
 }
