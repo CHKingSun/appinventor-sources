@@ -20,6 +20,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("text/html; charset=utf-8");
         PrintWriter out = resp.getWriter();
 
@@ -48,7 +49,7 @@ public class UserServlet extends HttpServlet {
             }
             default: {
                 String uid = req.getParameter("uid");
-                if (uid != null)
+                if (!isNullOrEmpty(uid))
                     out.println(getUserInfoJSON(uid));
                 else {
                     JSONArray json = new JSONArray();
@@ -63,6 +64,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("text/html; charset=utf-8");
         PrintWriter out = resp.getWriter();
 
@@ -72,79 +74,100 @@ public class UserServlet extends HttpServlet {
         switch (action) {
             case "register": {
                 String email = req.getParameter("email");
+                String name = req.getParameter("name");
                 String password = req.getParameter("password");
-                if ((email != null) && (password != null)) {
-                    User user = storageIo.getUserFromEmail(email);
-                    String hash = user.getPassword();
-                    if ((hash == null) || hash.equals("")) {
-                        String hashedPassword = "";
-                        try {
-                            hashedPassword = PasswordHash.createHash(password);
-                        } catch (Exception e) {
-                            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-                        }
-                        storageIo.setUserPassword(user.getUserId(), hashedPassword);
-                        out.println("<b>注册成功!</b> 正在跳转到登录页面...");
-                        resp.setHeader("refresh", "3;url=/login");
-                    } else
-                        resp.setHeader("refresh", "3;url=/register.jsp?error=" + URLEncoder.encode("此账号已被注册", "UTF-8"));
+                if(isNullOrEmpty(email)){
+                    out.print("账号不能为空");
+                    return;
                 }
+                if(isNullOrEmpty(password)){
+                    out.print("密码不能为空");
+                    return;
+                }
+                
+                User user = storageIo.getUserFromEmail(email);
+                String hash = user.getPassword();
+                if ((hash == null) || hash.equals("")) {
+                    String hashedPassword = "";
+                    try {
+                        hashedPassword = PasswordHash.createHash(password);
+                    } catch (Exception e) {
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                        return;
+                    }
+                    storageIo.setUserPassword(user.getUserId(), hashedPassword);
+                    if(!isNullOrEmpty(name))
+                        storageIo.setUserName(user.getUserId(), name);
+                    out.print("OK");
+                }
+                else
+                    out.print("此账号已被注册");
                 break;
             }
             case "modify": {
                 String uid = req.getParameter("uid");
-                if (uid != null) {
-                    User user = storageIo.getUser(uid);
-                    String name = req.getParameter("name");
-                    String oldPassword = req.getParameter("old");
-                    String newPassword = req.getParameter("new");
-                    String hash = user.getPassword();
-
-                    if ((hash == null) || hash.equals("")) {
-                        String hashedPassword = "";
-                        try {
-                            hashedPassword = PasswordHash.createHash(newPassword);
-                        } catch (Exception e) {
-                            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                String name = req.getParameter("name");
+                String oldPassword = req.getParameter("old");
+                String newPassword = req.getParameter("new");
+                if(isNullOrEmpty(uid)){
+                    out.print("账号不能为空");
+                    return;
+                }
+                if(isNullOrEmpty(name)){
+                    out.print("显示名称不能为空");
+                    return;
+                }
+                if(isNullOrEmpty(oldPassword)){
+                    out.print("旧密码不能为空");
+                    return;
+                }
+                if(newPassword == null)
+                    newPassword = "";
+                
+                User user = storageIo.getUser(uid);
+                String hash = user.getPassword();
+                if ((hash == null) || hash.equals("")) {
+                    if(newPassword.equals(""))
+                        newPassword = "123456";
+                    
+                    String hashedPassword = "";
+                    try {
+                        hashedPassword = PasswordHash.createHash(newPassword);
+                    } catch (Exception e) {
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                    }
+                    storageIo.setUserName(uid, name);
+                    storageIo.setUserPassword(uid, hashedPassword);
+                    out.print("OK");
+                } else {
+                    boolean validLogin = false;
+                    try {
+                        validLogin = PasswordHash.validatePassword(oldPassword, hash);
+                    } catch (Exception e) {
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                        return;
+                    }
+                    if (validLogin) {
+                        if (!newPassword.equals("")) {
+                            String hashedPassword = "";
+                            try {
+                                hashedPassword = PasswordHash.createHash(newPassword);
+                            } catch (Exception e) {
+                                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                                return;
+                            }
+                            storageIo.setUserPassword(uid, hashedPassword);
                         }
                         storageIo.setUserName(uid, name);
-                        storageIo.setUserPassword(uid, hashedPassword);
-                        out.println("<b>账号信息修改成功!</b>");
-                    } else {
-                        boolean validLogin = false;
-                        try {
-                            validLogin = PasswordHash.validatePassword(oldPassword, hash);
-                        } catch (Exception e) {
-                            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-                        }
-                        if (validLogin) {
-                            if (!newPassword.equals("")) {
-                                String hashedPassword = "";
-                                try {
-                                    hashedPassword = PasswordHash.createHash(newPassword);
-                                } catch (Exception e) {
-                                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-                                }
-                                storageIo.setUserPassword(uid, hashedPassword);
-                            }
-                            storageIo.setUserName(uid, name);
-                            out.println("<b>账号信息修改成功!</b>");
-                        } else {
-                            String params = "?uid=" + uid;
-                            params += "&email=" + user.getUserEmail();
-                            params += "&name=" + user.getUserName();
-                            params += "&error=旧密码错误";
-                            resp.setHeader("refresh", "3;url=/modify.jsp" + URLEncoder.encode(params, "UTF-8"));
-                            return;
-                        }
-                    }
+                        out.print("OK");
+                    } else
+                        out.print("旧密码错误");
                 }
-                resp.setHeader("refresh", "3;url=/");
                 break;
             }
         }
     }
-
+    
     private JSONObject getUserInfoJSON(String uid) {
         User user = storageIo.getUser(uid);
 
@@ -152,6 +175,7 @@ public class UserServlet extends HttpServlet {
         json.put("uid", uid);
         json.put("email", user.getUserEmail());
         json.put("name", user.getUserName());
+        json.put("lastVisited", storageIo.getUserLastVisited(uid));
 
         JSONArray groups = new JSONArray();
         for (long gid : storageIo.getUserGroups(uid))
@@ -159,5 +183,9 @@ public class UserServlet extends HttpServlet {
         json.put("groups", groups);
 
         return json;
+    }
+    
+    private static boolean isNullOrEmpty(String str){
+        return (str == null) || str.equals("");
     }
 }

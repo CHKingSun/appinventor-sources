@@ -36,6 +36,8 @@
 
     <!-- don't serve the whitelist as a static file! -->
     <exclude path="/whitelist" />
+    
+    <include path="/jquery/**" />
 
   </static-files>
 

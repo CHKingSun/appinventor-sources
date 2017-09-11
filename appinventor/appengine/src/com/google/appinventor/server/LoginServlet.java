@@ -338,16 +338,11 @@ public class LoginServlet extends HttpServlet {
     }
 
     String email = params.get("email");
-	String emailLower = email.toLowerCase();
-	
-	boolean found = false;
-	for(AdminUser user : storageIo.searchUsers("")){
-		if(email.equals(user.getEmail()) || emailLower.equals(user.getEmail())){
-			found = true;
-			break;
-		}
-	}
-	if(!found){
+	String uid = null;
+    try{
+        uid = storageIo.findUserByEmail(email);
+	}catch(Exception e){}
+	if(uid == null){
 		fail(req, resp, bundle.getString("nosuchaccount"));
 		return;
     }

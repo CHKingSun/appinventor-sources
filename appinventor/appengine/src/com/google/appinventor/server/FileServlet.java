@@ -28,6 +28,7 @@ public class FileServlet extends HttpServlet {
     private final FileExporter fileExporter = new FileExporterImpl();
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("text/html; charset=utf-8");
 
         String action = req.getParameter("action");
@@ -36,54 +37,68 @@ public class FileServlet extends HttpServlet {
         switch (action) {
             case "userProjects": {
                 String uid = req.getParameter("uid");
-                if (uid != null)
-                    resp.getWriter().println(getUserProjects(uid));
+                if (isNullOrEmpty(uid))
+                    return;
+                
+                resp.getWriter().println(getUserProjects(uid));
                 break;
             }
             case "projectFiles": {
                 String uid = req.getParameter("uid");
                 long pid = Long.parseLong(req.getParameter("pid"));
-                if (uid != null) {
-                    JSONObject json = new JSONObject();
-                    json.put("uid", uid);
-                    json.put("pid", pid);
-                    json.put("sources", storageIo.getProjectSourceFiles(uid, pid));
-                    json.put("outputs", storageIo.getProjectOutputFiles(uid, pid));
-                    resp.getWriter().println(json);
-                }
+                if (isNullOrEmpty(uid))
+                    return;
+                
+                JSONObject json = new JSONObject();
+                json.put("uid", uid);
+                json.put("pid", pid);
+                json.put("sources", storageIo.getProjectSourceFiles(uid, pid));
+                json.put("outputs", storageIo.getProjectOutputFiles(uid, pid));
+                resp.getWriter().println(json);
                 break;
             }
             case "exportFile": {
                 String uid = req.getParameter("uid");
                 long pid = Long.parseLong(req.getParameter("pid"));
                 String path = req.getParameter("path");
+                if(isNullOrEmpty(uid)||isNullOrEmpty(path))
+                    return;
+                
                 attachDownloadData(resp, exportFile(uid, pid, path));
                 break;
             }
             case "exportProject": {
                 String uid = req.getParameter("uid");
                 long pid = Long.parseLong(req.getParameter("pid"));
+                if (isNullOrEmpty(uid))
+                    return;
+                
                 attachDownloadData(resp, exportProject(uid, pid));
                 break;
             }
             case "exportAllProjectsForUser": {
                 String uid = req.getParameter("uid");
+                if (isNullOrEmpty(uid))
+                    return;
+                
                 attachDownloadData(resp, exportAllProjectsForUser(uid));
                 break;
             }
             case "exportAllProjects": {
-                attachDownloadData(resp, exportAllProjects());
+                String users = req.getParameter("users");
+                attachDownloadData(resp, exportAllProjects(users));
                 break;
             }
             case "getSharedProject": {
                 String nonceValue = req.getParameter("nonce");
-                if (nonceValue != null) {
-                    Nonce nonce = storageIo.getNoncebyValue(nonceValue);
-                    if (nonce != null)
-                        attachDownloadData(resp, exportProject(nonce.getUserId(), nonce.getProjectId()));
-                    else
-                        resp.getWriter().println("分享链接已过期或项目不存在");
-                }
+                if(isNullOrEmpty(nonceValue))
+                    return;
+
+                Nonce nonce = storageIo.getNoncebyValue(nonceValue);
+                if (nonce != null)
+                    attachDownloadData(resp, exportProject(nonce.getUserId(), nonce.getProjectId()));
+                else
+                    resp.getWriter().print("分享链接已过期或项目不存在");
                 break;
             }
             default: {
@@ -99,6 +114,7 @@ public class FileServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("text/html; charset=utf-8");
         PrintWriter out = resp.getWriter();
 
@@ -107,26 +123,51 @@ public class FileServlet extends HttpServlet {
             action = "";
         switch (action) {
             case "importProject": {
-                String uid = req.getParameter("uid");
+                String users = req.getParameter("users");
                 String name = req.getParameter("name");
                 String encodedContent = req.getParameter("content");
+                if(isNullOrEmpty(users)||isNullOrEmpty(name)||(isNullOrEmpty(encodedContent)))
+                    return;
+                
+                byte content[] = null;
                 try {
-                    byte content[] = Base64.decodeBase64(encodedContent);
-                    ByteArrayInputStream bin = new ByteArrayInputStream(content);
-                    fileImporter.importProject(uid, name, bin, null);
+                    content = Base64.decodeBase64(encodedContent);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                    return;
                 }
-                out.println(getUserProjects(uid));
+                
+                JSONArray json = new JSONArray(users);
+                for(int i=0;i<json.length();i++){
+                    String uid = json.getString(i);
+                    String importName = name;
+                    for(long pid : storageIo.getProjects(uid))
+                        if(storageIo.getProjectName(uid, pid).equals(name))
+                            importName += "_copy";
+
+                    try{
+                        ByteArrayInputStream bin = new ByteArrayInputStream(content);
+                        fileImporter.importProject(uid, importName, bin, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                        return;
+                    }
+                }
+                out.print("OK");
                 break;
             }
             case "shareProject": {
                 String uid = req.getParameter("uid");
                 long pid = Long.parseLong(req.getParameter("pid"));
+                if(isNullOrEmpty(uid))
+                    return;
+                
                 String name = uid + pid;
                 String nonceValue = new String(Base64.encodeBase64(name.getBytes("UTF-8")), "UTF-8");
                 storageIo.storeNonce(nonceValue, uid, pid);
-                resp.getWriter().println(nonceValue);
+                out.print(nonceValue);
                 break;
             }
         }
@@ -179,11 +220,21 @@ public class FileServlet extends HttpServlet {
         return file;
     }
 
-    private RawFile exportAllProjects() {
+    private RawFile exportAllProjects(String users) {
+        List<String> targets = null;
+        if(!isNullOrEmpty(users)){
+            targets = new ArrayList<String>();
+            JSONArray json = new JSONArray(users);
+            for(int i=0;i<json.length();i++)
+                targets.add(json.getString(i));
+        }
+        
         ByteArrayOutputStream zipFile = new ByteArrayOutputStream();
         try (ZipOutputStream out = new ZipOutputStream(zipFile)) {
             for (AdminUser user : storageIo.searchUsers("")) {
                 String uid = user.getId();
+                if((targets != null) && (!targets.contains(uid)))
+                    continue;
                 String email = user.getEmail();
                 for (long pid : storageIo.getProjects(uid)) {
                     RawFile file = exportProject(uid, pid);
@@ -217,5 +268,9 @@ public class FileServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    private static boolean isNullOrEmpty(String str){
+        return (str == null) || str.equals("");
     }
 }

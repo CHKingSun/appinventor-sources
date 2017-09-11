@@ -375,6 +375,7 @@ public class ObjectifyStorageIo implements  StorageIo {
     userData.link = "";
     userData.emaillower = email == null ? "" : emaillower;
     userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
+    userData.visited = new Date();
     userData.groups = new HashSet<Key<GroupData>>();
     datastore.put(userData);
     return userData;
@@ -2841,6 +2842,7 @@ public class ObjectifyStorageIo implements  StorageIo {
               } else {
                 userData.type = User.USER;
               }
+              userData.visited = new Date();
               datastore.put(userData);
             } else {            // New User
               String emaillower = user.getEmail().toLowerCase();
@@ -2861,6 +2863,7 @@ public class ObjectifyStorageIo implements  StorageIo {
               userData.link = "";
               userData.name = User.getDefaultName(user.getEmail());
               userData.emailFrequency = User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY;
+              userData.visited = new Date();
               userData.groups = new HashSet<Key<GroupData>>();
               if (user.getIsModerator()) {
                 userData.type = User.MODERATOR;
@@ -2881,6 +2884,25 @@ public class ObjectifyStorageIo implements  StorageIo {
       }
       throw CrashReport.createAndLogError(LOG, null, null, e);
     }
+  }
+  
+  @Override
+  public long getUserLastVisited(final String uid){
+      final Result<Long> result = new Result<Long>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  UserData userData = datastore.find(userKey(uid));
+                  if((userData != null) && (userData.visited != null))
+                      result.t = userData.visited.getTime();
+              }
+          }, true);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return (result.t != null) ? result.t : 0;
   }
   
   @Override
@@ -2954,6 +2976,25 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
   
   @Override
+  public long getGroupByName(final String name){
+      final Result<Long> result = new Result<Long>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  GroupData groupData = datastore.query(GroupData.class).filter("name", name).get();
+                  if(groupData != null)
+                      result.t = groupData.id;
+              }
+          }, false);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return (result.t != null) ? result.t : 0;
+  }
+  
+  @Override
   public List<Long> getGroups(){
       final List<Long> result = new ArrayList<Long>();
       try{
@@ -2995,7 +3036,7 @@ public class ObjectifyStorageIo implements  StorageIo {
   
   @Override
   public String getGroupName(final long gid){
-      final StringBuffer result = new StringBuffer();
+      final Result<String> result = new Result<String>();
       try{
           runJobWithRetries(new JobRetryHelper() {
               @Override
@@ -3004,13 +3045,13 @@ public class ObjectifyStorageIo implements  StorageIo {
                   Key<GroupData> groupKey = new Key<GroupData>(GroupData.class, gid);
                   GroupData groupData = datastore.find(groupKey);
                   if(groupData != null)
-                      result.append(groupData.name);
+                      result.t = groupData.name;
               }
           }, false);
       }catch(Exception e){
           e.printStackTrace();
       }
-      return result.toString();
+      return result.t;
   }
   
   @Override
