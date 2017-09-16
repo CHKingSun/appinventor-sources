@@ -21,51 +21,77 @@
     <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate"/>
     <meta HTTP-EQUIV="expires" CONTENT="0"/>
     <title>MIT App Inventor</title>
+    <script src="/jquery/jquery-3.2.1.min.js"></script>
+    <script src="/jquery/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="/jquery/jquery-ui.min.css">
+    <style>
+        .btn-primary {
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+        }
+        .btn-primary:focus,
+        .btn-primary.focus {
+            color: #fff;
+            background-color: #286090;
+            border-color: #122b40;
+        }
+        .btn-primary:hover {
+            color: #fff;
+            background-color: #286090;
+            border-color: #204d74;
+        }
+    </style>
+    <script>
+        $(()=>{
+            $(":submit").button();
+            $("button").button();
+            $("#container").css({
+                left: ($(window).width() - $("#container").outerWidth())/2,
+                top: ($(window).height() - $("#container").outerHeight())/3,
+            });
+        });
+    </script>
   </head>
-<body>
-  <center>
-    <img src="/images/codi_long.png"></img>
-    <h1>${pleaselogin}</h1></center>
-  </center>
-<% if (error != null) {
-out.println("<center><font color=red><b>" + error + "</b></font></center><br/>");
-   } %>
-<form method=POST action="/login">
-<center><table>
-<tr><td>${emailAddressLabel}</td><td><input type=text name=email value="" size="35"></td></tr>
-<tr><td></td></td>
-<tr><td>${passwordLabel}</td><td><input type=password name=password value="" size="35"></td></tr>
-</table></center>
-<% if (locale != null && !locale.equals("")) {
-   %>
-<input type=hidden name=locale value="<%= locale %>">
-<% }
-   if (repo != null && !repo.equals("")) {
-   %>
-<input type=hidden name=repo value="<%= repo %>">
-<% }
-   if (galleryId != null && !galleryId.equals("")) {
-   %>
-<input type=hidden name=galleryId value="<%= galleryId %>">
-<% } %>
-<% if (redirect != null && !redirect.equals("")) {
-   %>
-<input type=hidden name=redirect value="<%= redirect %>">
-<% } %>
-<p></p>
-<center><input type=Submit value="${login}" style="font-size: 300%;"></center>
-</form>
-<p></p>
-<center><p><a href="/register.jsp">注册新账号</a></p></center>
+    <body style="background-image: url(/images/squairy_light.png);">
+        <div id="container" style="position: absolute; background: white; border: 24px solid white; text-align: center;">
+        <img src="/images/codi_long.png"></img>
+        <h1>${pleaselogin}</h1></center>
+        <% if (error != null) {
+        out.println("<center><font color=red><b>" + error + "</b></font></center><br/>");
+           } %>
+        <form method=POST action="/login">
+        <p>${emailAddressLabel}<input type=text name=email value="" size="35" class="text ui-widget-content ui-corner-all"></p>
+        <p>${passwordLabel}<input type=password name=password value="" size="35" class="text ui-widget-content ui-corner-all"></p>
+        <% if (locale != null && !locale.equals("")) {
+           %>
+        <input type=hidden name=locale value="<%= locale %>">
+        <% }
+           if (repo != null && !repo.equals("")) {
+           %>
+        <input type=hidden name=repo value="<%= repo %>">
+        <% }
+           if (galleryId != null && !galleryId.equals("")) {
+           %>
+        <input type=hidden name=galleryId value="<%= galleryId %>">
+        <% } %>
+        <% if (redirect != null && !redirect.equals("")) {
+           %>
+        <input type=hidden name=redirect value="<%= redirect %>">
+        <% } %>
+        <p><input type=Submit value="${login}" style="width:100%;" class="btn-primary"></p>
+        </form>
+        <p></p>
+        <p><button onclick="window.location.href='/register.jsp';" style="width:100%;">注册新账号</button></p>
 <!--
 <center><p><a href="/login/sendlink"  style="text-decoration:none;">${passwordclickhereLabel}</a></p></center>
 -->
 <%    if (useGoogleLabel != null && useGoogleLabel.equals("true")) { %>
-<center><p><a href="<%= new UriBuilder("/login/google")
+<p><a href="<%= new UriBuilder("/login/google")
                               .add("locale", locale)
                               .add("repo", repo)
                               .add("galleryId", galleryId)
-                              .add("redirect", redirect).build() %>" style="text-decoration:none;">Click Here to use your Google Account to login</a></p></center>
+                              .add("redirect", redirect).build() %>" style="text-decoration:none;">Click Here to use your Google Account to login</a></p>
 <%    } %>
 <!--
 <footer>
@@ -94,5 +120,7 @@ out.println("<center><font color=red><b>" + error + "</b></font></center><br/>")
   <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank"></a></p>
 </footer>
 -->
-</body></html>
+        </div>
+    </body>
+</html>
 

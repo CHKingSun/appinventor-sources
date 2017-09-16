@@ -28,9 +28,9 @@ public class UserServlet extends HttpServlet {
         if (action == null)
             action = "";
         switch (action) {
-            case "groups": {
+            case "listGroups": {
                 JSONArray json = new JSONArray();
-                for (long gid : storageIo.getGroups()) {
+                for (long gid : storageIo.listGroups()) {
                     JSONObject obj = new JSONObject();
                     obj.put("gid", gid);
                     obj.put("name", storageIo.getGroupName(gid));
@@ -39,7 +39,7 @@ public class UserServlet extends HttpServlet {
                 out.println(json);
                 break;
             }
-            case "groupUsers": {
+            case "listGroupUsers": {
                 long gid = Long.parseLong(req.getParameter("gid"));
                 JSONArray json = new JSONArray();
                 for (String uid : storageIo.getGroupUsers(gid))
@@ -53,8 +53,8 @@ public class UserServlet extends HttpServlet {
                     out.println(getUserInfoJSON(uid));
                 else {
                     JSONArray json = new JSONArray();
-                    for (AdminUser user : storageIo.searchUsers(""))
-                        json.put(getUserInfoJSON(user.getId()));
+                    for (String _uid : storageIo.listUsers())
+                        json.put(getUserInfoJSON(_uid));
                     out.println(json);
                 }
                 break;

@@ -656,18 +656,19 @@ public interface StorageIo {
   List<AdminUser> searchUsers(String partialEmail);
   void storeUser(AdminUser user) throws AdminInterfaceException;
 
+  List<String> listUsers();
   long getUserLastVisited(String uid);
   void removeUser(String uid);
   
   void createGroup(String name);
   void removeGroup(long gid);
-  long getGroupByName(String name);
-  List<Long> getGroups();
-  List<Long> getUserGroups(String uid);
-  
+  long findGroupByName(String name);
+  List<Long> listGroups();
+
   String getGroupName(long gid);
   void setGroupName(long gid, String name);
   
+  List<Long> getUserGroups(String uid);
   List<String> getGroupUsers(long gid);
   void addUsersToGroup(long gid, List<String> users);
   void removeUsersFromGroup(long gid, List<String> users);

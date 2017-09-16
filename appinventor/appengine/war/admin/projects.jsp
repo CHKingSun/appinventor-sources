@@ -1,15 +1,16 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!doctype html>
-<% String uid = request.getParameter("uid"); %>
+<%
+    String uid = request.getParameter("uid");
+    String gid = request.getParameter("gid");
+%>
 <html>
     <head>
         <meta charset="utf8">
-        <title></title>
+        <title>项目列表</title>
         <script src="../jquery/jquery-3.2.1.min.js"></script>
         <script src="../jquery/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="../jquery/jquery-ui.min.css">
-        <link rel="stylesheet" href="../jquery/jquery.dropdown.min.css">
-        <script src="../jquery/jquery.dropdown.min.js"></script>
         <style>
             .hover{background-color: #e9e9e9;}
             .selected{background-color: #0099cc;}
@@ -29,78 +30,162 @@
                 background-color: #286090;
                 border-color: #204d74;
             }
+            ul#nav{ width:100%; height:60px; background:#00A2CA;margin:0 auto} 
+            ul#nav li{display:inline; height:60px} 
+            ul#nav li a{display:inline-block; padding:0 20px; height:60px; line-height:60px;
+             color:#FFF; font-size:16px;  text-decoration:none;} 
+            ul#nav li a:hover{background:#0095BB}
         </style>
     </head>
     <body>
         <script>
             const root = "http://127.0.0.1:8888";
-            var username = "";
-            var selection;
+            var userData;
+            var cb = [];
+            var selection = new Set();
             
-            $(()=>{
-                $("button").button();
-                initUserName();
-
-                $("#deleteProject").click(()=>{
-                    if(!selection){
-                        alert("未选择项目");
-                        return;
+            function initUsers(){
+                $.ajax({
+                    url: root + "/api/user",
+                    type: "GET",
+                    success: (data)=>{
+                        userData = JSON.parse(data);
+                        initProjects();
                     }
-                    if(!confirm("确定删除项目?"))
-                        return;
-                    
+                });
+            }
+            
+            function initProjects(){
+                cb = [];
+                selection.clear();
+                $("#numberSelected").text(0);
+                $("#filterText").val("");
+                
+                // 如果指定了uid, 只显示该用户的项目
+                <% if(uid != null){ %>
                     $.ajax({
-                        url: root + "/api/admin?action=deleteProject&uid=<%=uid%>&pid=" + encodeURIComponent(selection),
-                        type: "POST",
+                        url: root + "/api/file?action=listUserProjects&uid=<%=uid%>",
+                        // JSON的内容:
+                        // [{"uid":"...","pid":...,"name":"...","dateCreated":...,"dateModified":"..."},...]
+                        type: "GET",
                         success: (data)=>{
-                            if(data == "OK")
-                                initUserProjects();
-                            else
-                                alert(data);
+                            var projectData = JSON.parse(data);
+                            $("#content").empty();
+                            for(var project of projectData)
+                                addRow(project);
                         }
                     });
-                });
-                
-                $("#confirmImportProject").click(()=>{
-                    var files = $("#fileImportProject").prop("files");
-                    if(files.length == 0){
-                        alert("未选择文件");
-                        return;
-                    }
-                    
-                    var parts = files[0].name.split(/\./);
-                    var name = parts[0];
-                    var extension = parts[1];
-                    if(extension != "aia"){
-                        alert("文件扩展名应为aia");
-                        return;
-                    }
-                    
-                    var reader = new FileReader();
-                    reader.readAsBinaryString(files[0]);
-                    reader.onload = (e)=>{
-                        var data = btoa(e.target.result);
-                        $.ajax({
-                            url: root + "/api/file?action=importProject",
-                            type: "POST",
-                            data: "users=" + encodeURIComponent("[\"<%=uid%>\"]") + "&name=" + encodeURIComponent(name) + "&content=" + encodeURIComponent(data),
-                            success: (data)=>{
-                                if(data == "OK"){
-                                    alert("上传成功");
-                                    initUserProjects();
-                                }
+                <% } else { %>
+                    $.ajax({
+                        url: root + "/api/file",
+                        // JSON的内容:
+                        // {"<uid>":[<project1>,<project2>,...],...}
+                        type: "GET",
+                        success: (data)=>{
+                            var projectData = JSON.parse(data);
+                            $("#content").empty();
+                            for(var user of userData){
+                                // 如果指定了gid参数, 仅显示分组内的用户和项目
+                                <% if(gid != null){ %>
+                                    if(user["groups"].indexOf(<%=gid%>) == -1)
+                                        continue;
+                                <% } %>
+                                
+                                var projects = projectData[user["uid"]];
+                                for(var project of projects)
+                                    addRow(project);
                             }
-                        });
-                    };
+                        }
+                    });
+                <% } %>
+            }
+            
+            function addRow(project){
+                var tr = $("<tr>");
+                tr.attr("name", project["name"]);
+                
+                var checkbox = $('<input type="checkbox" />');
+                checkbox.attr("param", JSON.stringify({"uid": project["uid"], "pid": project["pid"]}));
+                checkbox.change(function(){
+                    var _tr = $(this).closest("tr");
+                    if($(this).prop("checked")){
+                        selection.add($(this).attr("param"));
+                        _tr.addClass("selected");
+                    }
+                    else{
+                        selection.delete($(this).attr("param"));
+                        _tr.removeClass("selected");
+                    }
+                    $("#numberSelected").text(selection.size);
+                });
+                cb.push(checkbox);
+                
+                $("<td>").append(checkbox).appendTo(tr);
+                $("<td>").text(getUserEmail(project["uid"])).appendTo(tr);
+                $("<td>").text(project["name"]).appendTo(tr);
+                
+                /*var viewFileLink = $("<a>");
+                viewFileLink.attr("href", "/admin/files.jsp?uid=<%=uid%>&pid=" + project["pid"]);
+                viewFileLink.text("查看文件...");
+                viewFileLink.appendTo(tr);*/
+                
+                $("<td>").text(formatDate(project["dateCreated"])).appendTo(tr);
+                $("<td>").text(formatDate(project["dateModified"])).appendTo(tr);
+                
+                $("#content").append(tr);
+                
+                tr.click(function(){
+                    $(this).find(":checkbox").trigger("click");
                 });
                 
-                $("#exportProject").click(()=>{
-                    if(!selection){
-                        if(confirm("未选择用户, 是否导出所有项目?"))
-                            window.open("/api/file?action=exportAllProjectsForUser&uid=<%=uid%>");
+                tr.hover(function(){
+                        $(this).addClass("hover");
+                    }, 
+                    function(){
+                        $(this).removeClass("hover");
                     }
-                    else
-                        window.open(encodeURI("/api/file?action=exportProject&uid=<%=uid%>&pid=" + selection));
+                );
+            }
+            
+            function getUserEmail(uid){
+                for(var user of userData)
+                    if(user["uid"] == uid)
+                        return user["email"];
+            }
+            
+            function formatDate(time){
+                return (time == 0) ? "未知" : new Date(time).toLocaleString();
+            }
+            
+            function getSelectionJSON(){
+                var arr = [];
+                for(var x of selection)
+                    arr.push(JSON.parse(x));
+                return JSON.stringify(arr);
+            }
+            
+            $(()=>{
+                initUsers();
+                $("button").button();
+                
+                // 将当前所有可见的行选中
+                $("#selectAll").click(()=>{
+                    for(var i in cb)
+                        if(cb[i].is(":visible")){
+                            cb[i].prop("checked", true);
+                            cb[i].closest("tr").addClass("selected");
+                            selection.add(cb[i].attr("param"));
+                        }
+                    $("#numberSelected").text(selection.size);
+                });
+                
+                $("#deselectAll").click(()=>{
+                    for(var i in cb){
+                        cb[i].prop("checked", false);
+                        cb[i].closest("tr").removeClass("selected");
+                    }
+                    selection.clear();
+                    $("#numberSelected").text(0);
                 });
                 
                 $("#doTextFilter").click(()=>{
@@ -114,80 +199,42 @@
                 });
                 
                 $("#resetFilter").click(()=>{
-                    selection = null;
-                    $("tr").removeClass("selected");
+                    $("#deselectAll").trigger("click");
                     $("#filterText").val("");
+                    $("#useRegex").prop("checked", false)
                     $("#content").children().show();
+                });
+                
+                $("#deleteProject").click(()=>{
+                    if(selection.size == 0){
+                        alert("未选择项目");
+                        return;
+                    }
+                    if(confirm("确定删除" + selection.size + "个项目?")){
+                        $.ajax({
+                            url: root + "/api/admin?action=deleteProjects",
+                            type: "POST",
+                            data: "projects=" + encodeURIComponent(getSelectionJSON()),
+                            success: (data)=>{
+                                if(data == "OK")
+                                    initProjects();
+                            }
+                        });
+                    }
+                });
+                
+                $("#exportProject").click(()=>{
+                    if(selection.size == 0){
+                        if(confirm("未选择项目, 是否导出所有用户的项目?"))
+                            window.open("/api/file?action=exportAllProjects");
+                    }
+                    else
+                        window.open("/api/file?action=exportProjectsBatched&projects=" + encodeURIComponent(getSelectionJSON()));
                 });
             });
             
-            function initUserName(){
-                $.ajax({
-                    url: root + "/api/user",
-                    type: "GET",
-                    success: (data)=>{
-                        var json = JSON.parse(data);
-                        for(var user of json){
-                            if(user["uid"] == "<%=uid%>"){
-                                userName = user["email"];
-                                $("#title").text("用户" + userName + "的项目列表");
-                                break;
-                            }
-                        }
-                        if(userName)
-                            initUserProjects();
-                    }
-                });
-            }
-            
-            function initUserProjects(){
-                $.ajax({
-                    url: root + "/api/file?action=userProjects&uid=<%=uid%>",
-                    type: "GET",
-                    success: (data)=>{
-                        var json = JSON.parse(data);
-                        $("#content").empty();
-                        for(var project of json){
-                            var tr = $("<tr>");
-                            tr.attr("pid", project["pid"]);
-                            tr.attr("name", project["name"]);
-                            
-                            $("<td>").text(project["name"]).appendTo(tr);
-                            
-                            var viewFilesLink = $("<a>");
-                            viewFilesLink.attr("href", encodeURI("/admin/files.jsp?uid=<%=uid%>&pid=" + project["pid"]));
-                            viewFilesLink.text("查看文件...");
-                            $("<td>").append(viewFilesLink).appendTo(tr);
-                            
-                            $("<td>").text(formatDate(project["dateCreated"])).appendTo(tr);
-                            $("<td>").text(formatDate(project["dateModified"])).appendTo(tr);
-                            
-                            $("#content").append(tr);
-                            
-                            tr.click(function(){
-                                selection = $(this).attr("pid");
-                                $("tr").removeClass("selected");
-                                $(this).addClass("selected");
-                            });
-                            
-                            tr.hover(function(){
-                                    $(this).addClass("hover");
-                                }, 
-                                function(){
-                                    $(this).removeClass("hover");
-                                }
-                            );
-                        }
-                    }
-                });
-            }
-            
-            function formatDate(time){
-                return (time == 0) ? "未知" : new Date(time).toLocaleString();
-            }
-            
             function chainFilter(filterFunc){
-                $("tr").removeClass("selected");
+                $("#deselectAll").trigger("click");
                 var rows = $("#content").children();
                 for(var i=0;i<rows.length;i++){
                     var row = $(rows[i]);
@@ -200,47 +247,47 @@
                 }
             }
         </script>
-        <h1 id="title"></h1>
+        <ul id="nav">
+            <li><a href="/admin/users.jsp">用户列表</a></li> 
+            <li><a href="/admin/projects.jsp">项目列表</a></li> 
+            <li><a href="/admin/groups.jsp">分组列表</a></li> 
+        </ul>
+        <h1>项目列表</h1>
         <p>
             <button onclick="window.location.reload()">
                 <span class="ui-icon ui-icon-arrowrefresh-1-s"></span>刷新
             </button>
+            <button id="selectAll">全选</button>
+            <button id="deselectAll">取消选择</button>
+            已选择<span id="numberSelected">0</span>个项目
         </p>
         <p>
-            筛选项目名称:&nbsp;<input type="text" id="filterText" class="text ui-widget-content ui-corner-all" />
+            筛选项目名:&nbsp;<input type="text" id="filterText" class="text ui-widget-content ui-corner-all" />
             <input type="checkbox" id="useRegex"/>正则表达式
             <button id="doTextFilter" class="btn-primary">确定</button>
             <button id="resetFilter">重置</button>
         </p>
         <p>
             操作:
-            <button id="importProject" data-jq-dropdown="#dropdown_importProject">
-                <span class="ui-icon ui-icon-script"></span>导入项目
-            </button>
             <button id="deleteProject">
                 <span class="ui-icon ui-icon-minusthick"></span>删除项目
             </button>
             <button id="exportProject">
-                <span class="ui-icon ui-icon-copy"></span>导出项目
+                <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>导出项目
             </button>
         </p>
-        <div id="dropdown_importProject" class="jq-dropdown jq-dropdown-tip">
-            <div class="jq-dropdown-panel">
-                <input type="file" id="fileImportProject"/>
-                <button id="confirmImportProject" class="btn-primary">确定</button>
-            </div>
-        </div>
-        <table class="ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 100%;">
+        <table class="ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 80%;">
             <thead>
                 <tr class="ui-widget-header">
+                    <th style="width: 5%">选择</th>
+                    <th>账号</th>
                     <th>项目名</th>
-                    <th>文件</th>
+                    <!-- <th>文件</th> -->
                     <th>创建时间</th>
-                    <th>最后修改时间</th>
+                    <th>修改时间</th>
                 </tr>
             </thead>
             <tbody id="content"></tbody>
         </table>
-    </body>
     </body>
 </html>

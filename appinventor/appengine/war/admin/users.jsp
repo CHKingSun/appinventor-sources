@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% String gid = request.getParameter("gid"); %>
 <!doctype html>
 <html>
     <head>
@@ -28,6 +29,11 @@
                 background-color: #286090;
                 border-color: #204d74;
             }
+            ul#nav{ width:100%; height:60px; background:#00A2CA;margin:0 auto} 
+            ul#nav li{display:inline; height:60px} 
+            ul#nav li a{display:inline-block; padding:0 20px; height:60px; line-height:60px;
+             color:#FFF; font-size:16px; text-decoration:none;} 
+            ul#nav li a:hover{background:#0095BB}
         </style>
     </head>
     <body>
@@ -53,90 +59,12 @@
                         var json = JSON.parse(data);
                         $("#content").empty();
                         for(var user of json){
-                            var tr = $("<tr>");
-                            // user["email"]和user["groups"]的内容作为tr元素的属性值, 便于以后获取
-                            tr.attr("email", user["email"]);
-                            tr.attr("groups", JSON.stringify(user["groups"]));
-                            
-                            var checkbox = $('<input type="checkbox" />');
-                            checkbox.attr("uid", user["uid"]);
-                            
-                            // 使用"this"时, 不可以使用箭头函数
-                            checkbox.change(function(){
-                                // 由于javascript函数异步执行, 使用selection.add(user["uid"])会得到错误的结果
-                                // 只能将user["uid"]的值作为checkbox元素的属性值
-                                // 同理此处引用函数外变量tr也会得到错误的结果
-                                var _tr = $(this).closest("tr");
-                                if($(this).prop("checked")){
-                                    selection.add($(this).attr("uid"));
-                                    _tr.addClass("selected");
-                                }
-                                else{
-                                    selection.delete($(this).attr("uid"));
-                                    _tr.removeClass("selected");
-                                }
-                                $("#numberSelected").text(selection.size);
-                            });
-                            cb.push(checkbox);
-                            
-                            $("<td>").append(checkbox).appendTo(tr);
-                            $("<td>").text(user["email"]).appendTo(tr);
-                            $("<td>").text(user["name"]).appendTo(tr);
-                            
-                            // 重置密码链接
-                            var resetPasswordLink = $("<a>");
-                            resetPasswordLink.attr("href", "#");
-                            resetPasswordLink.attr("uid", user["uid"]);
-                            resetPasswordLink.attr("email", user["email"]);
-                            resetPasswordLink.text("重置...");
-                            resetPasswordLink.click(function(){
-                                resetPassword($(this).attr("uid"), $(this).attr("email"));
-                            });
-                            resetPasswordLink.appendTo(tr);
-                            
-                            // 用户所属分组
-                            var groupCell = $("<td>");
-                            for(var gid of user["groups"]){
-                                var a = $("<a>");
-                                a.attr("href", "#");
-                                a.attr("gid", gid);
-                                a.text(getGroupName(gid));
-                                
-                                // 点击分组时进行筛选, 只显示同一组的用户
-                                a.click(function(){
-                                    var gid = $(this).attr("gid");
-                                    chainFilter((row)=>row.attr("groups").indexOf(gid) != -1);
-                                });
-                                
-                                groupCell.append(a);
-                                groupCell.append("&nbsp;");
-                            }
-                            groupCell.appendTo(tr);
-                            
-                            // 查看用户项目链接
-                            var viewProjectLink = $("<a>");
-                            viewProjectLink.attr("href", "/admin/projects.jsp?uid=" + user["uid"]);
-                            viewProjectLink.attr("target", "_blank");
-                            viewProjectLink.text("查看项目...");
-                            viewProjectLink.appendTo(tr);
-                            
-                            $("<td>").text(formatDate(user["lastVisited"])).appendTo(tr);
-                            
-                            $("#content").append(tr);
-                            
-                            // 当前行被点击时, 触发对应checkbox的click事件
-                            tr.click(function(){
-                                $(this).find(":checkbox").trigger("click");
-                            });
-                            
-                            // 悬浮高亮
-                            tr.hover(function(){
-                                    $(this).addClass("hover");
-                                }, 
-                                function(){
-                                    $(this).removeClass("hover");
-                                }
-                            );
+                            <% if(gid != null){ %>
+                                if(user["groups"].indexOf(<%=gid%>)!=-1)
+                                    addRow(user);
+                            <% } else { %>
+                                addRow(user);
+                            <% } %>
                         }
                     }
                 });
@@ -144,7 +72,7 @@
             
             function initGroups(){
                 $.ajax({
-                    url: root + "/api/user?action=groups",
+                    url: root + "/api/user?action=listGroups",
                     type: "GET",
                     success: (data)=>{
                         groups = JSON.parse(data);
@@ -164,6 +92,86 @@
                         }
                     }
                 });
+            }
+            
+            function addRow(user){
+                var tr = $("<tr>");
+                // user["email"]和user["groups"]的内容作为tr元素的属性值, 便于以后获取
+                tr.attr("email", user["email"]);
+                tr.attr("groups", JSON.stringify(user["groups"]));
+                
+                var checkbox = $('<input type="checkbox" />');
+                checkbox.attr("uid", user["uid"]);
+                
+                // 使用"this"时, 不可以使用箭头函数
+                checkbox.change(function(){
+                    // 由于javascript函数异步执行, 使用selection.add(user["uid"])会得到错误的结果
+                    // 只能将user["uid"]的值作为checkbox元素的属性值
+                    // 同理此处引用函数外变量tr也会得到错误的结果
+                    var _tr = $(this).closest("tr");
+                    if($(this).prop("checked")){
+                        selection.add($(this).attr("uid"));
+                        _tr.addClass("selected");
+                    }
+                    else{
+                        selection.delete($(this).attr("uid"));
+                        _tr.removeClass("selected");
+                    }
+                    $("#numberSelected").text(selection.size);
+                });
+                cb.push(checkbox);
+                
+                $("<td>").append(checkbox).appendTo(tr);
+                $("<td>").text(user["email"]).appendTo(tr);
+                $("<td>").text(user["name"]).appendTo(tr);
+                
+                // 重置密码链接
+                var resetPasswordLink = $("<a>");
+                resetPasswordLink.attr("href", "#");
+                resetPasswordLink.attr("uid", user["uid"]);
+                resetPasswordLink.attr("email", user["email"]);
+                resetPasswordLink.text("重置...");
+                resetPasswordLink.click(function(){
+                    resetPassword($(this).attr("uid"), $(this).attr("email"));
+                });
+                resetPasswordLink.appendTo(tr);
+                
+                // 用户所属分组
+                var groupCell = $("<td>");
+                for(var gid of user["groups"]){
+                    var a = $("<a>");
+                    a.attr("href", "/admin/users.jsp?gid=" + gid);
+                    a.text(getGroupName(gid));
+                    
+                    groupCell.append(a);
+                    groupCell.append("&nbsp;");
+                }
+                groupCell.appendTo(tr);
+                
+                // 查看用户项目链接
+                var viewProjectLink = $("<a>");
+                viewProjectLink.attr("href", "/admin/projects.jsp?uid=" + user["uid"]);
+                viewProjectLink.attr("target", "_blank");
+                viewProjectLink.text("查看项目...");
+                viewProjectLink.appendTo(tr);
+                
+                $("<td>").text(formatDate(user["lastVisited"])).appendTo(tr);
+                
+                $("#content").append(tr);
+                
+                // 当前行被点击时, 触发对应checkbox的click事件
+                tr.click(function(){
+                    $(this).find(":checkbox").trigger("click");
+                });
+                
+                // 悬浮高亮
+                tr.hover(function(){
+                        $(this).addClass("hover");
+                    }, 
+                    function(){
+                        $(this).removeClass("hover");
+                    }
+                );
             }
             
             function getGroupName(gid){
@@ -423,6 +431,11 @@
                 });
             }
         </script>
+        <ul id="nav">
+            <li><a href="/admin/users.jsp">用户列表</a></li> 
+            <li><a href="/admin/projects.jsp">项目列表</a></li> 
+            <li><a href="/admin/groups.jsp">分组列表</a></li> 
+        </ul>
         <h1>用户列表</h1>
         <p>
             <button onclick="window.location.reload()">
@@ -481,10 +494,10 @@
                 <button id="confirmImportProject" class="btn-primary">确定</button>
             </div>
         </div>
-        <table class="ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 100%;">
+        <table class="ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 80%;">
             <thead>
                 <tr class="ui-widget-header">
-                    <th style="width: 10%">选择</th>
+                    <th style="width: 5%">选择</th>
                     <th>账号</th>
                     <th>显示名</th>
                     <th>密码</th>

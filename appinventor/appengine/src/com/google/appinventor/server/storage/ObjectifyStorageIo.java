@@ -2887,6 +2887,24 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
   
   @Override
+  public List<String> listUsers(){
+      final List<String> result = new ArrayList<String>();
+      try{
+          runJobWithRetries(new JobRetryHelper(){
+              @Override
+              public void run(Objectify datastore){
+                  datastore = ObjectifyService.begin();
+                  for(UserData userData: datastore.query(UserData.class))
+                      result.add(userData.id);
+              }
+          }, false);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
+  }
+  
+  @Override
   public long getUserLastVisited(final String uid){
       final Result<Long> result = new Result<Long>();
       try{
@@ -2976,7 +2994,7 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
   
   @Override
-  public long getGroupByName(final String name){
+  public long findGroupByName(final String name){
       final Result<Long> result = new Result<Long>();
       try{
           runJobWithRetries(new JobRetryHelper() {
@@ -2995,7 +3013,7 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
   
   @Override
-  public List<Long> getGroups(){
+  public List<Long> listGroups(){
       final List<Long> result = new ArrayList<Long>();
       try{
           runJobWithRetries(new JobRetryHelper() {
@@ -3004,28 +3022,6 @@ public class ObjectifyStorageIo implements  StorageIo {
                   datastore = ObjectifyService.begin();
                   for(GroupData groupData : datastore.query(GroupData.class))
                       result.add(groupData.id);
-              }
-          }, false);
-      }catch(Exception e){
-          e.printStackTrace();
-      }
-      return result;
-  }
-  
-  @Override
-  public List<Long> getUserGroups(final String uid){
-      final List<Long> result = new ArrayList<Long>();
-      try{
-          runJobWithRetries(new JobRetryHelper() {
-              @Override
-              public void run(Objectify datastore) {
-                  datastore = ObjectifyService.begin();
-                  UserData userData = datastore.find(userKey(uid));
-                  for(Key<GroupData> groupKey : userData.groups){
-                      GroupData groupData = datastore.find(groupKey);
-                      if(groupData != null)
-                          result.add(groupData.id);
-                  }
               }
           }, false);
       }catch(Exception e){
@@ -3072,6 +3068,28 @@ public class ObjectifyStorageIo implements  StorageIo {
       }catch(Exception e){
           e.printStackTrace();
       }
+  }
+  
+  @Override
+  public List<Long> getUserGroups(final String uid){
+      final List<Long> result = new ArrayList<Long>();
+      try{
+          runJobWithRetries(new JobRetryHelper() {
+              @Override
+              public void run(Objectify datastore) {
+                  datastore = ObjectifyService.begin();
+                  UserData userData = datastore.find(userKey(uid));
+                  for(Key<GroupData> groupKey : userData.groups){
+                      GroupData groupData = datastore.find(groupKey);
+                      if(groupData != null)
+                          result.add(groupData.id);
+                  }
+              }
+          }, false);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
   }
   
   @Override

@@ -35,7 +35,7 @@ public class FileServlet extends HttpServlet {
         if (action == null)
             action = "";
         switch (action) {
-            case "userProjects": {
+            case "listUserProjects": {
                 String uid = req.getParameter("uid");
                 if (isNullOrEmpty(uid))
                     return;
@@ -43,7 +43,7 @@ public class FileServlet extends HttpServlet {
                 resp.getWriter().println(getUserProjects(uid));
                 break;
             }
-            case "projectFiles": {
+            case "listProjectFiles": {
                 String uid = req.getParameter("uid");
                 long pid = Long.parseLong(req.getParameter("pid"));
                 if (isNullOrEmpty(uid))
@@ -85,8 +85,16 @@ public class FileServlet extends HttpServlet {
                 break;
             }
             case "exportAllProjects": {
-                String users = req.getParameter("users");
-                attachDownloadData(resp, exportAllProjects(users));
+                String usersJSON = req.getParameter("users");
+                attachDownloadData(resp, exportAllProjects(usersJSON));
+                break;
+            }
+            case "exportProjectsBatched": {
+                String projectsJSON = req.getParameter("projects");
+                if (isNullOrEmpty(projectsJSON))
+                    return;
+                
+                attachDownloadData(resp, exportProjectsBatched(projectsJSON));
                 break;
             }
             case "getSharedProject": {
@@ -103,10 +111,8 @@ public class FileServlet extends HttpServlet {
             }
             default: {
                 JSONObject json = new JSONObject();
-                for (AdminUser user : storageIo.searchUsers("")) {
-                    String uid = user.getId();
+                for (String uid : storageIo.listUsers()) 
                     json.put(uid, getUserProjects(uid));
-                }
                 resp.getWriter().println(json);
                 break;
             }
@@ -242,6 +248,28 @@ public class FileServlet extends HttpServlet {
                     out.write(file.getContent());
                     out.closeEntry();
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new RawFile("all-projects.zip", zipFile.toByteArray());
+    }
+    
+    private RawFile exportProjectsBatched(String projects){
+        ByteArrayOutputStream zipFile = new ByteArrayOutputStream();
+        try (ZipOutputStream out = new ZipOutputStream(zipFile)) {
+            JSONArray json = new JSONArray(projects);
+            for(int i=0;i<json.length();i++){
+                JSONObject obj = json.getJSONObject(i);
+                String uid = obj.getString("uid");
+                long pid = obj.getLong("pid");
+
+                User user = storageIo.getUser(uid);
+                String email = user.getUserEmail();
+                RawFile file = exportProject(uid, pid);
+                out.putNextEntry(new ZipEntry(email + "/" + file.getFileName()));
+                out.write(file.getContent());
+                out.closeEntry();
             }
         } catch (Exception e) {
             e.printStackTrace();

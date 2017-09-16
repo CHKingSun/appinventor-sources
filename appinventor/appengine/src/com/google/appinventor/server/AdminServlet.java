@@ -33,8 +33,10 @@ public class AdminServlet extends HttpServlet {
             case "exportUsersCSV": {
                 resp.setHeader("content-disposition", "attachment; filename=\"users.csv\"");
                 resp.setContentType("text/plain;charset=utf-8");
-                for (AdminUser user : storageIo.searchUsers(""))
-                    out.printf("%s,%s\n", user.getEmail(), user.getName());
+                for (String uid : storageIo.listUsers()){
+                    User user = storageIo.getUser(uid);
+                    out.printf("%s,%s\n", user.getUserEmail(), user.getUserName());
+                }
                 break;
             }
         }
@@ -101,13 +103,13 @@ public class AdminServlet extends HttpServlet {
                 break;
             }
             case "removeUsers": {
-                String users = req.getParameter("users");
-                if(isNullOrEmpty(users))
+                String usersJSON = req.getParameter("users");
+                if(isNullOrEmpty(usersJSON))
                     return;
                 
-                JSONArray json = new JSONArray(users);
-                for (int i = 0; i < json.length(); i++) {
-                    String uid = json.getString(i);
+                JSONArray users = new JSONArray(usersJSON);
+                for (int i = 0; i < users.length(); i++) {
+                    String uid = users.getString(i);
                     for(long pid : storageIo.getProjects(uid))
                         storageIo.deleteProject(uid, pid);
                     storageIo.removeUser(uid);
@@ -115,13 +117,16 @@ public class AdminServlet extends HttpServlet {
                 out.print("OK");
                 break;
             }
-            case "deleteProject": {
-                String uid = req.getParameter("uid");
-                long pid = Long.parseLong(req.getParameter("pid"));
-                if(isNullOrEmpty(uid))
+            case "deleteProjects": {
+                String projectsJSON = req.getParameter("projects");
+                if(isNullOrEmpty(projectsJSON))
                     return;
                 
-                storageIo.deleteProject(uid, pid);
+                JSONArray projects = new JSONArray(projectsJSON);
+                for(int i=0;i<projects.length();i++){
+                    JSONObject project = projects.getJSONObject(i);
+                    storageIo.deleteProject(project.getString("uid"), project.getLong("pid"));
+                }
                 out.print("OK");
                 break;
             }
@@ -129,7 +134,7 @@ public class AdminServlet extends HttpServlet {
                 String name = req.getParameter("name");
                 if(isNullOrEmpty(name))
                     return;
-                if(storageIo.getGroupByName(name) != 0){
+                if(storageIo.findGroupByName(name) != 0){
                     out.print("存在同名分组");
                     return;
                 }
@@ -145,28 +150,28 @@ public class AdminServlet extends HttpServlet {
             }
             case "addUsersToGroup": {
                 long gid = Long.parseLong(req.getParameter("gid"));
-                String users = req.getParameter("users");
-                if(isNullOrEmpty(users))
+                String usersJSON = req.getParameter("users");
+                if(isNullOrEmpty(usersJSON))
                     return;
 
-                JSONArray json = new JSONArray(users);
+                JSONArray users = new JSONArray(usersJSON);
                 ArrayList<String> list = new ArrayList<String>();
-                for (int i = 0; i < json.length(); i++)
-                    list.add(json.getString(i));
+                for (int i = 0; i < users.length(); i++)
+                    list.add(users.getString(i));
                 storageIo.addUsersToGroup(gid, list);
                 out.print("OK");
                 break;
             }
             case "removeUsersFromGroup": {
                 long gid = Long.parseLong(req.getParameter("gid"));
-                String users = req.getParameter("users");
-                if(isNullOrEmpty(users))
+                String usersJSON = req.getParameter("users");
+                if(isNullOrEmpty(usersJSON))
                     return;
                 
-                JSONArray json = new JSONArray(users);
+                JSONArray users = new JSONArray(usersJSON);
                 ArrayList<String> list = new ArrayList<String>();
-                for (int i = 0; i < json.length(); i++)
-                    list.add(json.getString(i));
+                for (int i = 0; i < users.length(); i++)
+                    list.add(users.getString(i));
                 storageIo.removeUsersFromGroup(gid, list);
                 out.print("OK");
                 break;
