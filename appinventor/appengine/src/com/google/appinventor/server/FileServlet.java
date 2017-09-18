@@ -132,7 +132,7 @@ public class FileServlet extends HttpServlet {
                 String users = req.getParameter("users");
                 String name = req.getParameter("name");
                 String encodedContent = req.getParameter("content");
-                if(isNullOrEmpty(users)||isNullOrEmpty(name)||(isNullOrEmpty(encodedContent)))
+                if(isNullOrEmpty(users)||isNullOrEmpty(name)||isNullOrEmpty(encodedContent))
                     return;
                 
                 byte content[] = null;
@@ -152,14 +152,51 @@ public class FileServlet extends HttpServlet {
                         if(storageIo.getProjectName(uid, pid).equals(name))
                             importName += "_copy";
 
-                    try{
-                        ByteArrayInputStream bin = new ByteArrayInputStream(content);
-                        fileImporter.importProject(uid, importName, bin, null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
-                        return;
+                    importProject(uid, importName, content);
+                }
+                out.print("OK");
+                break;
+            }
+            case "importProjectZip": {
+                String users = req.getParameter("users");
+                String encodedContent = req.getParameter("content");
+                if(isNullOrEmpty(users)||isNullOrEmpty(encodedContent))
+                    return;
+                
+                JSONArray json = new JSONArray(users);
+                byte content[] = null;
+                try {
+                    content = Base64.decodeBase64(encodedContent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+                    return;
+                }
+                
+                ByteArrayInputStream bin = new ByteArrayInputStream(content);
+                ZipInputStream zin = new ZipInputStream(bin);
+                ZipEntry entry = zin.getNextEntry();
+                while(entry != null){
+                    String file = entry.getName();
+                    if(file.split("\\.")[1].equals("aia")){
+                        String path = file.split("\\.")[0];
+                        path = path.replace("/", "_");
+                        
+                        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                        byte b[] = new byte[1024];
+                        int len = zin.read(b, 0, 1024);
+                        while(len != -1){
+                            buf.write(b, 0, len);
+                            len = zin.read(b, 0, 1024);
+                        }
+                        
+                        for(int i=0;i<json.length();i++){
+                            String uid = json.getString(i);
+                            importProject(uid, path, buf.toByteArray());
+                        }
                     }
+                    zin.closeEntry();
+                    entry = zin.getNextEntry();
                 }
                 out.print("OK");
                 break;
@@ -176,6 +213,15 @@ public class FileServlet extends HttpServlet {
                 out.print(nonceValue);
                 break;
             }
+        }
+    }
+    
+    private void importProject(String uid, String name, byte content[]){
+        try{
+            ByteArrayInputStream bin = new ByteArrayInputStream(content);
+            fileImporter.importProject(uid, name, bin, null);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -237,11 +283,11 @@ public class FileServlet extends HttpServlet {
         
         ByteArrayOutputStream zipFile = new ByteArrayOutputStream();
         try (ZipOutputStream out = new ZipOutputStream(zipFile)) {
-            for (AdminUser user : storageIo.searchUsers("")) {
-                String uid = user.getId();
+            for (String uid : storageIo.listUsers()) {
                 if((targets != null) && (!targets.contains(uid)))
                     continue;
-                String email = user.getEmail();
+                User user = storageIo.getUser(uid);
+                String email = user.getUserEmail();
                 for (long pid : storageIo.getProjects(uid)) {
                     RawFile file = exportProject(uid, pid);
                     out.putNextEntry(new ZipEntry(email + "/" + file.getFileName()));

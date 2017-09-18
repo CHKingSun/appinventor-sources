@@ -12,11 +12,29 @@
         <script src="jquery/jquery-3.2.1.min.js"></script>
         <script src="jquery/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="jquery/jquery-ui.min.css">
+        <style>
+            .btn-primary {
+                color: #fff;
+                background-color: #337ab7;
+                border-color: #2e6da4;
+            }
+            .btn-primary:focus,
+            .btn-primary.focus {
+                color: #fff;
+                background-color: #286090;
+                border-color: #122b40;
+            }
+            .btn-primary:hover {
+                color: #fff;
+                background-color: #286090;
+                border-color: #204d74;
+            }
+        </style>
     </head>
     <body style="background-image: url(images/squairy_light.png);">
         <script>
             $(()=>{
-                const root = "http://127.0.0.1:8888";
+                const root = "";
                 
                 $("button").button();
                 $("#container").css({
@@ -47,7 +65,7 @@
             <p>显示名称: <input type="text" id="name" value=<%=name%>></p>
             <p>旧密码: <input type="password" id="old" class="text ui-widget-content ui-corner-all"></p>
             <p>新密码: <input type="password" id="new" class="text ui-widget-content ui-corner-all"></p>
-            <p><button id="submit" style="width: 100%;">提交</button></p>
+            <p><button id="submit" class="btn-primary" style="width: 100%;">提交</button></p>
             <p><button onclick="window.history.back();" style="width: 100%;">返回</button></p>
         </div>
     </body>

@@ -29,7 +29,7 @@
     <body style="background-image: url(images/squairy_light.png);">
         <script>
             $(()=>{
-                const root = "http://127.0.0.1:8888";
+                const root = "";
                 
                 $("button").button();
                 $("#container").css({

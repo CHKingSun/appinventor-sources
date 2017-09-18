@@ -60,7 +60,7 @@
         <% if (error != null) {
         out.println("<center><font color=red><b>" + error + "</b></font></center><br/>");
            } %>
-        <form method=POST action="/login">
+        <form method=POST action="/login" autocomplete="new-password">
         <p>${emailAddressLabel}<input type=text name=email value="" size="35" class="text ui-widget-content ui-corner-all"></p>
         <p>${passwordLabel}<input type=password name=password value="" size="35" class="text ui-widget-content ui-corner-all"></p>
         <% if (locale != null && !locale.equals("")) {

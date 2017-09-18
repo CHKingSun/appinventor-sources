@@ -343,8 +343,8 @@
                     var parts = files[0].name.split(/\./);
                     var name = parts[0];
                     var extension = parts[1];
-                    if(extension != "aia"){
-                        alert("文件扩展名应为aia");
+                    if((extension != "aia") && (extension != "zip")){
+                        alert("文件扩展名应为aia或zip");
                         return;
                     }
                     
@@ -353,15 +353,29 @@
                     reader.onload = (e)=>{
                         var json = getSelectionJSON();
                         var data = btoa(e.target.result);
-                        $.ajax({
-                            url: root + "/api/file?action=importProject",
-                            type: "POST",
-                            data: "users=" + encodeURIComponent(json) + "&name=" + encodeURIComponent(name) + "&content=" + encodeURIComponent(data),
-                            success: (data)=>{
-                                if(data == "OK")
-                                    alert("上传成功");
-                            }
-                        });
+                        
+                        if(extension == "aia"){
+                            $.ajax({
+                                url: root + "/api/file?action=importProject",
+                                type: "POST",
+                                data: "users=" + encodeURIComponent(json) + "&name=" + encodeURIComponent(name) + "&content=" + encodeURIComponent(data),
+                                success: (data)=>{
+                                    if(data == "OK")
+                                        alert("上传成功");
+                                }
+                            });
+                        }
+                        else{
+                            $.ajax({
+                                url: root + "/api/file?action=importProjectZip",
+                                type: "POST",
+                                data: "users=" + encodeURIComponent(json) + "&content=" + encodeURIComponent(data),
+                                success: (data)=>{
+                                    if(data == "OK")
+                                        alert("上传成功");
+                                }
+                            });
+                        }
                     };
                 });
                 
@@ -490,7 +504,7 @@
         </div>
         <div id="dropdown_importProject" class="jq-dropdown jq-dropdown-tip">
             <div class="jq-dropdown-panel">
-                <input type="file" id="fileImportProject" accept=".aia"/>
+                <input type="file" id="fileImportProject" accept=".aia,.zip"/>
                 <button id="confirmImportProject" class="btn-primary">确定</button>
             </div>
         </div>
