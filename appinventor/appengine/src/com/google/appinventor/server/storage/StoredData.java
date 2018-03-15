@@ -298,4 +298,16 @@ public class StoredData {
       @Indexed public String name;
       public Set<Key<UserData>> users = new HashSet<Key<UserData>>();
   }
+  
+  // A Shared backpack. Shared backpacks are not associated with
+  // any one user. Instead they are stored independent of projects
+  // and users. At login time a shared backpack may be specified.
+  // This requires an SSO Login from an external system to provide
+  // it.
+  @Cached(expirationSeconds=120)
+  @Unindexed
+  public static final class Backpack {
+    @Id public String id;
+    public String content;
+  }
 }
