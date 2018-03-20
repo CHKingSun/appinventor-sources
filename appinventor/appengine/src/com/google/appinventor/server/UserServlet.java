@@ -4,6 +4,7 @@ import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
 import com.google.appinventor.shared.rpc.user.User;
+import com.google.appinventor.shared.rpc.project.UserProject;
 import com.google.appinventor.server.util.PasswordHash;
 
 import javax.servlet.http.HttpServlet;
@@ -45,6 +46,50 @@ public class UserServlet extends HttpServlet {
                 for (String uid : storageIo.getGroupUsers(gid))
                     json.put(getUserInfoJSON(uid));
                 out.println(json);
+                break;
+            }
+            case "openProject":{
+                String uid = req.getParameter("uid");
+                if(isNullOrEmpty(uid)){
+                    out.print("账号不能为空");
+                    return;
+                }
+                User user = storageIo.getUser(uid);
+                long pid = 0;
+                if(isNullOrEmpty(req.getParameter("pid"))){
+                    String pname = req.getParameter("pname");
+                    if(isNullOrEmpty(pname)){
+                        out.print("项目名不能为空");
+                        return;
+                    }
+                    for(long p : storageIo.getProjects(uid)){
+                        UserProject project = storageIo.getUserProject(uid, p);
+                        if(pname.equals(project.getProjectName())){
+                            pid = p;
+                            break;
+                        }
+                    }
+                }
+                else
+                    pid = Long.parseLong(req.getParameter("pid"));
+                if(storageIo.getUserProject(uid, pid) == null){
+                    out.print("项目不存在");
+                    return;
+                }
+                
+                String encodedSettings = storageIo.loadSettings(uid);
+                if(isNullOrEmpty(encodedSettings))
+                    encodedSettings = "{\"GeneralSettings\":{\"CurrentProjectId\":\"0\",\"DisabledUserUrl\":\"\",\"TemplateUrls\":\"\"},\"SimpleSettings\":{},\"SplashSettings\":{\"DeclinedSurvey\":\"\",\"ShowSurvey\":\"0\",\"SplashVersion\":\"0\"},\"BlocksSettings\":{\"Grid\":\"false\",\"Snap\":\"false\"}}";
+                
+                JSONObject obj = new JSONObject(encodedSettings);
+                JSONObject generalSettings = obj.getJSONObject("GeneralSettings");
+                if(generalSettings == null)
+                    generalSettings = new JSONObject();
+                generalSettings.put("CurrentProjectId", String.valueOf(pid));
+                obj.put("GeneralSettings", generalSettings);
+                
+                storageIo.storeSettings(uid, obj.toString());
+                resp.sendRedirect("/");
                 break;
             }
             default: {
