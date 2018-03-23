@@ -498,6 +498,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Delete keystore")
   @Description("Label of the button for delete keystore")
   String deleteKeystoreMenuItem();
+  
+  @DefaultMessage("RemoteProjectUpload")
+  @Description("RemoteProjectUpload")
+  String remoteProjectUploadMenuItem();
 
   //Component
   @DefaultMessage("Components")

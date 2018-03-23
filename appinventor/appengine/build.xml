@@ -173,7 +173,7 @@
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/google-http-client-jackson-1.22.0.jar" />
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/google-http-client-jackson2-1.22.0.jar" />
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/google-api-services-storage-v1-rev91-1.22.0.jar" />
-    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/httpclient-4.0.1.jar" />
+    <!-- <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/httpclient-4.0.1.jar" /> -->
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/gcs/joda-time-2.6.jar" />
     <!-- gwt libs -->
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
@@ -186,6 +186,16 @@
     <copy todir="${build.war.dir}/WEB-INF/lib" flatten="true">
       <fileset dir="${appengine.sdk}/lib/user" includes="**/*.jar"/>
     </copy>
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/commons-codec-1.10.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/commons-logging-1.2.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/fluent-hc-4.5.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/httpclient-4.5.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/httpclient-cache-4.5.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/httpclient-win-4.5.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/httpcore-4.4.9.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/httpmime-4.5.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/jna-4.4.0.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/httpclient/jna-platform-4.4.0.jar" />
   </target>
 
   <!-- =====================================================================

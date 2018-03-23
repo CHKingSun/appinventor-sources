@@ -56,6 +56,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.appinventor.shared.rpc.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,7 @@ public class TopToolbar extends Composite {
   private static final String WIDGET_NAME_SAVE_AS = "SaveAs";
   private static final String WIDGET_NAME_CHECKPOINT = "Checkpoint";
   private static final String WIDGET_NAME_MY_PROJECTS = "MyProjects";
+  private static final String WIDGET_NAME_REMOTE_PROJECT_UPLOAD = "RemoteProjectUpload";
   private static final String WIDGET_NAME_BUILD = "Build";
   private static final String WIDGET_NAME_BUILD_BARCODE = "Barcode";
   private static final String WIDGET_NAME_BUILD_DOWNLOAD = "Download";
@@ -194,6 +196,8 @@ public class TopToolbar extends Composite {
       fileItems.add(new DropDownItem(WIDGET_NAME_DELETE_KEYSTORE, MESSAGES.deleteKeystoreMenuItem(),
           new DeleteKeystoreAction()));
     }
+    fileItems.add(new DropDownItem(WIDGET_NAME_REMOTE_PROJECT_UPLOAD, MESSAGES.remoteProjectUploadMenuItem(),
+        new RemoteProjectUploadAction()));
 
     // Connect -> {Connect to Companion; Connect to Emulator; Connect to USB; Reset Connections}
     connectItems.add(new DropDownItem(WIDGET_NAME_WIRELESS_BUTTON,
@@ -225,7 +229,7 @@ public class TopToolbar extends Composite {
         new AboutAction()));
     helpItems.add(null);
     Config config = Ode.getInstance().getSystemConfig();
-    String libraryUrl = config.getLibraryUrl();
+    /*String libraryUrl = config.getLibraryUrl();
     if (!Strings.isNullOrEmpty(libraryUrl)) {
       helpItems.add(new DropDownItem(WIDGET_NAME_LIBRARY, MESSAGES.libraryMenuItem(),
           new WindowOpenAction(libraryUrl)));
@@ -261,13 +265,13 @@ public class TopToolbar extends Composite {
       helpItems.add(new DropDownItem(WIDGET_NAME_FEEDBACK, MESSAGES.feedbackMenuItem(),
           new WindowOpenAction(feedbackUrl)));
       helpItems.add(null);
-    }
+    }*/
     helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONINFO, MESSAGES.companionInformation(),
         new AboutCompanionAction()));
-    helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONUPDATE, MESSAGES.companionUpdate(),
+    /*helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONUPDATE, MESSAGES.companionUpdate(),
         new CompanionUpdateAction()));
     helpItems.add(new DropDownItem(WIDGET_NAME_SHOWSPLASH, MESSAGES.showSplashMenuItem(),
-        new ShowSplashAction()));
+        new ShowSplashAction()));*/
 
     // Create the TopToolbar drop down menus.
     fileDropDown = new DropDownButton(WIDGET_NAME_PROJECT, MESSAGES.projectsTabName(),
@@ -291,7 +295,7 @@ public class TopToolbar extends Composite {
     toolbar.add(buildDropDown);
 
     // Commented out language switching until we have a clean Chinese translation. (AFM)
-    // toolbar.add(helpDropDown);
+    toolbar.add(helpDropDown);
 
     //Only if logged in as an admin, add the Admin Button
     if (Ode.getInstance().getUser().getIsAdmin()) {
@@ -699,6 +703,16 @@ public class TopToolbar extends Composite {
               }
             }
           });
+    }
+  }
+  
+  private class RemoteProjectUploadAction implements Command {
+    @Override
+    public void execute() {
+      User user = Ode.getInstance().getUser();
+      try{
+          Window.Location.replace("/remoteProjectUpload.jsp?uid=" + user.getUserId());
+      }catch(Exception e){}
     }
   }
 
