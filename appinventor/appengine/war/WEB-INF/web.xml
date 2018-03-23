@@ -426,4 +426,13 @@
     <servlet-name>AdminServlet</servlet-name>
   </filter-mapping>
   
+  <servlet>
+    <servlet-name>RemoteUploadServlet</servlet-name>
+    <servlet-class>com.google.appinventor.server.RemoteUploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RemoteUploadServlet</servlet-name>
+    <url-pattern>/api/remoteUpload/*</url-pattern>
+  </servlet-mapping>
+  
 </web-app>
