@@ -408,11 +408,6 @@
     <url-pattern>/api/file/*</url-pattern>
   </servlet-mapping>
   
-  <filter>
-    <filter-name>AdminIPFilter</filter-name>
-    <filter-class>com.google.appinventor.server.AdminIPFilter</filter-class>
-  </filter>
-  
   <servlet>
     <servlet-name>AdminServlet</servlet-name>
     <servlet-class>com.google.appinventor.server.AdminServlet</servlet-class>
@@ -421,9 +416,18 @@
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/api/admin/*</url-pattern>
   </servlet-mapping>
+  
+  <filter>
+    <filter-name>LocalAccessFilter</filter-name>
+    <filter-class>com.google.appinventor.server.LocalAccessFilter</filter-class>
+  </filter>
   <filter-mapping>
-    <filter-name>AdminIPFilter</filter-name>
-    <servlet-name>AdminServlet</servlet-name>
+    <filter-name>LocalAccessFilter</filter-name>
+    <url-pattern>/admin/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>LocalAccessFilter</filter-name>
+    <url-pattern>/api/admin/*</url-pattern>
   </filter-mapping>
   
   <servlet>
