@@ -5,9 +5,6 @@
 
 package com.google.appinventor.server;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 import com.google.appinventor.server.flags.Flag;
 
 import com.google.appinventor.server.storage.StorageIo;
@@ -71,9 +68,8 @@ public class LoginServlet extends HttpServlet {
   private static final Logger LOG = Logger.getLogger(LoginServlet.class.getName());
   private static final Flag<String> mailServer = Flag.createFlag("localauth.mailserver", "");
   private static final Flag<String> password = Flag.createFlag("localauth.mailserver.password", "");
-  private static final Flag<Boolean> useGoogle = Flag.createFlag("auth.usegoogle", true);
-  private static final Flag<Boolean> useLocal = Flag.createFlag("auth.uselocal", false);
-  private static final UserService userService = UserServiceFactory.getUserService();
+  private static final Flag<Boolean> useGoogle = Flag.createFlag("auth.usegoogle", false);
+  private static final Flag<Boolean> useLocal = Flag.createFlag("auth.uselocal", true);
   private final PolicyFactory sanitizer = new HtmlPolicyBuilder().allowElements("p").toFactory();
   private static final boolean DEBUG = Flag.createFlag("appinventor.debugging", false).get();
 
@@ -109,74 +105,6 @@ public class LoginServlet extends HttpServlet {
       LOG.info("locale = " + locale + " bundle: " + new Locale(locale));
     }
     ResourceBundle bundle = ResourceBundle.getBundle("com/google/appinventor/server/loginmessages", new Locale(locale));
-
-    if (page.equals("google")) {
-      // We get here after we have gone through the Google Login page
-      // This is arranged via a security-constraint setup in web.xml
-      com.google.appengine.api.users.User apiUser = userService.getCurrentUser();
-      if (apiUser == null) {  // Hmmm. I don't think this should happen
-        fail(req, resp, "Google Authentication Failed"); // Not sure what else to do
-        return;
-      }
-      String email = apiUser.getEmail();
-      String userId = apiUser.getUserId();
-      User user = storageIo.getUser(userId, email);
-
-      userInfo = new OdeAuthFilter.UserInfo(); // Create a new userInfo object
-
-      userInfo.setUserId(user.getUserId()); // This effectively logs us in!
-      userInfo.setIsAdmin(user.getIsAdmin());
-      if (userService.isUserAdmin()) { // If we are a developer, we are always an admin
-        userInfo.setIsAdmin(true);
-      }
-
-      String newCookie = userInfo.buildCookie(false);
-      if (DEBUG) {
-        LOG.info("newCookie = " + newCookie);
-      }
-      if (newCookie != null) {
-        Cookie cook = new Cookie("AppInventor", newCookie);
-        cook.setPath("/");
-        resp.addCookie(cook);
-      }
-      // Remove the ACSID Cookie used by Google for Authentication
-      Cookie cook = new Cookie("ACSID", null);
-      cook.setPath("/");
-      cook.setMaxAge(0);
-      resp.addCookie(cook);
-      String uri = "/";
-      if (redirect != null) {
-        uri = redirect;
-      }
-      uri = new UriBuilder(uri)
-        .add("locale", locale)
-        .add("repo", repo)
-        .add("galleryId", galleryId).build();
-      resp.sendRedirect(uri);
-      return;
-    } else {
-      if (useLocal.get() == false) {
-        if (useGoogle.get() == false) {
-          out = setCookieOutput(userInfo, resp);
-          out.println("<html><head><title>Error</title></head>\n");
-          out.println("<body><h1>App Inventor is Mis-Configured</h1>\n");
-          out.println("<p>This instance of App Inventor has no authentication mechanism configured.</p>\n");
-          out.println("</body>\n");
-          out.println("</html>\n");
-          return;
-        }
-        String uri = new UriBuilder("/login/google")
-          .add("locale", locale)
-          .add("repo", repo)
-          .add("galleryId", galleryId)
-          .add("redirect", redirect).build();
-        resp.sendRedirect(uri);
-        return;
-      }
-    }
-
-    // If we get here, local accounts are supported
-
     if (page.equals("setpw")) {
       String uid = getParam(req);
       if (uid == null) {
@@ -233,11 +161,6 @@ public class LoginServlet extends HttpServlet {
     String passwordclickhere = bundle.getString("passwordclickhere");
 
     req.setCharacterEncoding("UTF-8");
-    if (useGoogle.get()) {
-      req.setAttribute("useGoogleLabel", "true");
-    } else {
-      req.setAttribute("useGoogleLabel", "false");
-    }
     req.setAttribute("emailAddressLabel", emailAddress);
     req.setAttribute("passwordLabel", password);
     req.setAttribute("loginLabel", login);

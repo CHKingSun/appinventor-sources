@@ -6,7 +6,6 @@
 
 package com.google.appinventor.server.project.youngandroid;
 
-import com.google.appengine.api.utils.SystemProperty;
 import com.google.apphosting.api.ApiProxy;
 import com.google.appinventor.common.utils.StringUtils;
 import com.google.appinventor.common.version.GitBuildId;
@@ -782,18 +781,7 @@ public final class YoungAndroidProjectService extends CommonProjectService {
   }
 
   private String getCurrentHost() {
-    if (Server.isProductionServer()) {
-      if (appengineHost.get()=="") {
-        String applicationVersionId = SystemProperty.applicationVersion.get();
-        String applicationId = SystemProperty.applicationId.get();
-        return applicationVersionId + "." + applicationId + ".appspot.com";
-      } else {
-        return appengineHost.get();
-      }
-    } else {
-      // TODO(user): Figure out how to make this more generic
-      return "localhost:8888";
-    }
+    return "localhost:8888";
   }
 
   /*

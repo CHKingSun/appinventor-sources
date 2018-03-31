@@ -15,7 +15,7 @@ package com.google.appinventor.server.storage;
  *
  */
 public class StorageIoInstanceHolder {
-  public static final StorageIo INSTANCE = new ObjectifyStorageIo();
+  public static final StorageIo INSTANCE = new SQLiteStorageIo();
   
   private StorageIoInstanceHolder() {} // not to be instantiated
     
