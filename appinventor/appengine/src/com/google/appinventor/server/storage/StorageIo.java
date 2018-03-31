@@ -668,7 +668,7 @@ public interface StorageIo {
   String getGroupName(long gid);
   void setGroupName(long gid, String name);
   
-  List<Long> getUserGroups(String uid);
+  List<Long> getUserJoinedGroups(String uid);
   List<String> getGroupUsers(long gid);
   void addUsersToGroup(long gid, List<String> users);
   void removeUsersFromGroup(long gid, List<String> users);

@@ -223,7 +223,7 @@ public class UserServlet extends HttpServlet {
         json.put("lastVisited", storageIo.getUserLastVisited(uid));
 
         JSONArray groups = new JSONArray();
-        for (long gid : storageIo.getUserGroups(uid))
+        for (long gid : storageIo.getUserJoinedGroups(uid))
             groups.put(gid);
         json.put("groups", groups);
 

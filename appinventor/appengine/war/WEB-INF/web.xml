@@ -73,8 +73,7 @@
 
   <!-- Servlets -->
 
-  <!-- Blob Conversion Servlet -->
-
+  <!-- Blob Conversion Servlet
   <servlet>
     <display-name>Blob Conversion Servlet</display-name>
     <servlet-name>BlobUpgradeServlet</servlet-name>
@@ -84,6 +83,7 @@
     <servlet-name>BlobUpgradeServlet</servlet-name>
     <url-pattern>/convert</url-pattern>
   </servlet-mapping>
+  -->
 
   <!-- Generate Login Page for OpenID -->
 
@@ -96,7 +96,7 @@
     <url-pattern>/login/*</url-pattern>
   </servlet-mapping>
 
-  <!-- Remote API -->
+  <!-- Remote API
   <servlet>
     <display-name>Remote API Servlet</display-name>
     <servlet-name>RemoteApiServlet</servlet-name>
@@ -107,6 +107,7 @@
     <servlet-name>RemoteApiServlet</servlet-name>
     <url-pattern>/remote_api</url-pattern>
   </servlet-mapping>
+  -->
 
   <!-- rendezvious -->
   <servlet>
@@ -180,7 +181,7 @@
     <servlet-name>projectService</servlet-name>
   </filter-mapping>
 
-  <!-- gallery -->
+  <!-- gallery
   <servlet>
     <servlet-name>galleryService</servlet-name>
     <servlet-class>com.google.appinventor.server.GalleryServiceImpl</servlet-class>
@@ -193,8 +194,9 @@
     <filter-name>odeAuthFilter</filter-name>
     <servlet-name>galleryService</servlet-name>
   </filter-mapping>
+  -->
 
-  <!-- gallery image upload servlet -->
+  <!-- gallery image upload servlet
   <servlet>
     <servlet-name>galleryServlet</servlet-name>
     <servlet-class>com.google.appinventor.server.GalleryServlet</servlet-class>
@@ -207,6 +209,7 @@
     <filter-name>odeAuthFilter</filter-name>
     <servlet-name>galleryServlet</servlet-name>
   </filter-mapping>
+  -->
 
   <!-- upload -->
   <servlet>
@@ -366,7 +369,7 @@
 
   <!-- TODO: Optionally add a <welcome-file-list> tag to display a welcome file. -->
 
-  <!-- appstats-->
+  <!-- appstats
   <servlet>
     <servlet-name>appstats</servlet-name>
     <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
@@ -375,6 +378,7 @@
     <servlet-name>appstats</servlet-name>
     <url-pattern>/appstats/*</url-pattern>
   </servlet-mapping>
+  -->
 
   <!-- components -->
   <servlet>
