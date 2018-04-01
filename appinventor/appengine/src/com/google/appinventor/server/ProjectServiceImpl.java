@@ -159,6 +159,7 @@ public class ProjectServiceImpl extends OdeRemoteServiceServlet implements Proje
   @Override
   public String retrieveTemplateData(String pathToTemplatesDir) {
     String json = "[";
+    pathToTemplatesDir = getServletContext().getRealPath(pathToTemplatesDir);
     File templatesRepository = new File(pathToTemplatesDir);
     File templateFolder[] = templatesRepository.listFiles();
     for (File file: templateFolder) {

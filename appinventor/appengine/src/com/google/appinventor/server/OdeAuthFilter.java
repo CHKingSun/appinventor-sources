@@ -124,6 +124,11 @@ public class OdeAuthFilter implements Filter {
     String userId = userInfo.userId;
     boolean isAdmin = userInfo.isAdmin;
     boolean isReadOnly = userInfo.isReadOnly;
+    
+    if(!storageIo.listUsers().contains(userId)){
+      ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+      return;
+    }
 
 //    Object oIsAdmin = httpRequest.getSession().getAttribute("isadmin");
 //    if (oIsAdmin != null) {
