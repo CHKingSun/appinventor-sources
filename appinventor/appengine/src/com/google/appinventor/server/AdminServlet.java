@@ -1,5 +1,6 @@
 package com.google.appinventor.server;
 
+import com.google.appinventor.server.storage.SQLiteStorageIo;
 import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
 import java.util.*;
 
 import org.json.*;
@@ -56,7 +58,13 @@ public class AdminServlet extends HttpServlet {
                 String content = req.getParameter("content");
                 if(isNullOrEmpty(content))
                     return;
-                
+
+                if(storageIo instanceof SQLiteStorageIo){
+                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
+                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                    sqLiteStorageIo.beginTransaction(conn);
+                }
+
                 int count = 0;
                 for(String row : content.split("\\n")){
                     String parts[] = row.split(",");
@@ -79,6 +87,16 @@ public class AdminServlet extends HttpServlet {
                         count++;
                     }
                 }
+
+                if(storageIo instanceof SQLiteStorageIo){
+                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
+                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                    try {
+                        conn.commit();
+                    }catch(Exception e){}
+                    sqLiteStorageIo.endTransaction(conn);
+                }
+
                 out.print("成功导入" + count + "条记录");
                 break;
             }
@@ -106,14 +124,30 @@ public class AdminServlet extends HttpServlet {
                 String usersJSON = req.getParameter("users");
                 if(isNullOrEmpty(usersJSON))
                     return;
+
+                if(storageIo instanceof SQLiteStorageIo){
+                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
+                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                    sqLiteStorageIo.beginTransaction(conn);
+                }
                 
                 JSONArray users = new JSONArray(usersJSON);
                 for (int i = 0; i < users.length(); i++) {
                     String uid = users.getString(i);
-                    for(long pid : storageIo.getProjects(uid))
-                        storageIo.deleteProject(uid, pid);
+                    /* for(long pid : storageIo.getProjects(uid))
+                        storageIo.deleteProject(uid, pid); */
                     storageIo.removeUser(uid);
                 }
+
+                if(storageIo instanceof SQLiteStorageIo){
+                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
+                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                    try {
+                        conn.commit();
+                    }catch(Exception e){}
+                    sqLiteStorageIo.endTransaction(conn);
+                }
+
                 out.print("OK");
                 break;
             }
