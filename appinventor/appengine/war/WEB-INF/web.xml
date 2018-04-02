@@ -181,7 +181,7 @@
     <servlet-name>projectService</servlet-name>
   </filter-mapping>
 
-  <!-- gallery
+  <!-- gallery -->
   <servlet>
     <servlet-name>galleryService</servlet-name>
     <servlet-class>com.google.appinventor.server.GalleryServiceImpl</servlet-class>
@@ -194,9 +194,8 @@
     <filter-name>odeAuthFilter</filter-name>
     <servlet-name>galleryService</servlet-name>
   </filter-mapping>
-  -->
 
-  <!-- gallery image upload servlet
+  <!-- gallery image upload servlet -->
   <servlet>
     <servlet-name>galleryServlet</servlet-name>
     <servlet-class>com.google.appinventor.server.GalleryServlet</servlet-class>
@@ -209,7 +208,6 @@
     <filter-name>odeAuthFilter</filter-name>
     <servlet-name>galleryServlet</servlet-name>
   </filter-mapping>
-  -->
 
   <!-- upload -->
   <servlet>

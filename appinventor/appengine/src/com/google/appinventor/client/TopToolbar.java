@@ -185,6 +185,8 @@ public class TopToolbar extends Composite {
         new ExportProjectAction()));
     fileItems.add(new DropDownItem(WIDGET_NAME_EXPORTALLPROJECTS, MESSAGES.exportAllProjectsMenuItem(),
         new ExportAllProjectsAction()));
+    fileItems.add(new DropDownItem(WIDGET_NAME_REMOTE_PROJECT_UPLOAD, MESSAGES.remoteProjectUploadMenuItem(),
+        new RemoteProjectUploadAction()));
     fileItems.add(null);
     if (!isReadOnly) {
       fileItems.add(new DropDownItem(WIDGET_NAME_UPLOAD_KEYSTORE, MESSAGES.uploadKeystoreMenuItem(),
@@ -196,8 +198,6 @@ public class TopToolbar extends Composite {
       fileItems.add(new DropDownItem(WIDGET_NAME_DELETE_KEYSTORE, MESSAGES.deleteKeystoreMenuItem(),
           new DeleteKeystoreAction()));
     }
-    fileItems.add(new DropDownItem(WIDGET_NAME_REMOTE_PROJECT_UPLOAD, MESSAGES.remoteProjectUploadMenuItem(),
-        new RemoteProjectUploadAction()));
 
     // Connect -> {Connect to Companion; Connect to Emulator; Connect to USB; Reset Connections}
     connectItems.add(new DropDownItem(WIDGET_NAME_WIRELESS_BUTTON,
