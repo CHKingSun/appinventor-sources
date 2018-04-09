@@ -656,6 +656,7 @@ public interface StorageIo {
   List<AdminUser> searchUsers(String partialEmail);
   void storeUser(AdminUser user) throws AdminInterfaceException;
 
+  boolean userExists(String uid);
   List<String> listUsers();
   long getUserLastVisited(String uid);
   void removeUser(String uid);

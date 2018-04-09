@@ -65,9 +65,7 @@ public class SQLiteStorageIo implements StorageIo {
 
             // groups
             statement.executeUpdate("create table groups(groupId integer primary key autoincrement, name string)");
-            statement.executeUpdate("create table gusers(groupId integer, userId string)");
-            statement.executeUpdate("create index index_ggroupId on gusers(groupId)");
-            statement.executeUpdate("create index index_guserId on gusers(userId)");
+            statement.executeUpdate("create table gusers(groupId integer, userId string, primary key(groupId, userId))");
 
             // backpack
             statement.executeUpdate("create table backpack(backpackId string primary key, content string)");
@@ -117,7 +115,6 @@ public class SQLiteStorageIo implements StorageIo {
                 conn.close();
             } catch (Exception e) {
             }
-            conn = null;
         }
     }
 
@@ -709,8 +706,7 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public int getMaxJobSizeBytes() {
-        // return 5242880;
-        return 20 * 1024 * 1024;
+        return 5 * 1024 * 1024;
     }
 
     @Override
@@ -958,6 +954,23 @@ public class SQLiteStorageIo implements StorageIo {
         ProjectSourceZip projectSourceZip = new ProjectSourceZip(zipName, buf.toByteArray(), fileCount);
         projectSourceZip.setMetadata(projectName);
         return projectSourceZip;
+    }
+
+    @Override
+    public boolean userExists(String uid){
+        Connection conn = getDatabaseConnection();
+        boolean r_exists = false;
+        try (PreparedStatement statement = conn.prepareStatement("select userId from users where id=?")) {
+            statement.setString(1, uid);
+            ResultSet result = statement.executeQuery();
+            if (result.next())
+                r_exists = uid.equals(result.getString("userId"));
+            result.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            closeConnection(conn);
+        }
+        return r_exists;
     }
 
     @Override
@@ -1341,7 +1354,7 @@ public class SQLiteStorageIo implements StorageIo {
         try {
             beginTransaction(conn);
             for (String userId : users) {
-                PreparedStatement statement = conn.prepareStatement("insert into gusers values (?, ?)");
+                PreparedStatement statement = conn.prepareStatement("insert or ignore into gusers values (?, ?)");
                 statement.setLong(1, gid);
                 statement.setString(2, userId);
                 statement.executeUpdate();
@@ -1351,6 +1364,9 @@ public class SQLiteStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            }catch(Exception ee){}
             closeConnection(conn);
         }
     }
@@ -1371,6 +1387,9 @@ public class SQLiteStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            }catch(Exception ee){}
             closeConnection(conn);
         }
     }
