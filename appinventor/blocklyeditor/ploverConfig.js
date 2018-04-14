@@ -7,16 +7,7 @@
     '../lib/blockly/core/blockly.js',
 
     //msg/js/*.js has to come next (for constants)
-    '../lib/blockly/msg/js/ko.js',
-    '../lib/blockly/msg/js/es.js',
-    '../lib/blockly/msg/js/zh-hant.js',
     '../lib/blockly/msg/js/zh-hans.js',
-    '../lib/blockly/msg/js/fr.js',
-    '../lib/blockly/msg/js/it.js',
-    '../lib/blockly/msg/js/ru.js',
-    '../lib/blockly/msg/js/sv.js',
-    '../lib/blockly/msg/js/nl.js',
-    '../lib/blockly/msg/js/pt-br.js',
     '../lib/blockly/msg/js/en.js',
     './src/msg/zh_cn/_messages.js',
     './src/msg/en/_messages.js',
