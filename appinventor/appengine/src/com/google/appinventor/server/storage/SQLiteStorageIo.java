@@ -960,7 +960,7 @@ public class SQLiteStorageIo implements StorageIo {
     public boolean userExists(String uid){
         Connection conn = getDatabaseConnection();
         boolean r_exists = false;
-        try (PreparedStatement statement = conn.prepareStatement("select userId from users where id=?")) {
+        try (PreparedStatement statement = conn.prepareStatement("select userId from users where userId=?")) {
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             if (result.next())
