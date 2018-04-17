@@ -1,6 +1,6 @@
 package com.google.appinventor.server;
 
-import com.google.appinventor.server.storage.SQLiteStorageIo;
+import com.google.appinventor.server.storage.SQLStorageIo;
 import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
@@ -59,10 +59,10 @@ public class AdminServlet extends HttpServlet {
                 if(isNullOrEmpty(content))
                     return;
 
-                if(storageIo instanceof SQLiteStorageIo){
-                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
-                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
-                    sqLiteStorageIo.beginTransaction(conn);
+                if(storageIo instanceof SQLStorageIo){
+                    SQLStorageIo sqlStorageIo = (SQLStorageIo)storageIo;
+                    Connection conn = sqlStorageIo.getConnection();
+                    sqlStorageIo.beginTransaction(conn);
                 }
 
                 int count = 0;
@@ -88,13 +88,13 @@ public class AdminServlet extends HttpServlet {
                     }
                 }
 
-                if(storageIo instanceof SQLiteStorageIo){
-                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
-                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                if(storageIo instanceof SQLStorageIo){
+                    SQLStorageIo sqlStorageIo = (SQLStorageIo)storageIo;
+                    Connection conn = sqlStorageIo.getConnection();
                     try {
                         conn.commit();
                     }catch(Exception e){}
-                    sqLiteStorageIo.endTransaction(conn);
+                    sqlStorageIo.endTransaction(conn);
                 }
 
                 out.print("成功导入" + count + "条记录");
@@ -125,10 +125,10 @@ public class AdminServlet extends HttpServlet {
                 if(isNullOrEmpty(usersJSON))
                     return;
 
-                if(storageIo instanceof SQLiteStorageIo){
-                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
-                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
-                    sqLiteStorageIo.beginTransaction(conn);
+                if(storageIo instanceof SQLStorageIo){
+                    SQLStorageIo sqlStorageIo = (SQLStorageIo)storageIo;
+                    Connection conn = sqlStorageIo.getConnection();
+                    sqlStorageIo.beginTransaction(conn);
                 }
                 
                 JSONArray users = new JSONArray(usersJSON);
@@ -139,13 +139,13 @@ public class AdminServlet extends HttpServlet {
                     storageIo.removeUser(uid);
                 }
 
-                if(storageIo instanceof SQLiteStorageIo){
-                    SQLiteStorageIo sqLiteStorageIo = (SQLiteStorageIo)storageIo;
-                    Connection conn = sqLiteStorageIo.getDatabaseConnection();
+                if(storageIo instanceof SQLStorageIo){
+                    SQLStorageIo sqlStorageIo = (SQLStorageIo)storageIo;
+                    Connection conn = sqlStorageIo.getConnection();
                     try {
                         conn.commit();
                     }catch(Exception e){}
-                    sqLiteStorageIo.endTransaction(conn);
+                    sqlStorageIo.endTransaction(conn);
                 }
 
                 out.print("OK");

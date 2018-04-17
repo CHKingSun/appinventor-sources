@@ -9,9 +9,11 @@ import com.google.appinventor.shared.rpc.admin.AdminUser;
 import com.google.appinventor.shared.rpc.project.*;
 import com.google.appinventor.shared.rpc.user.SplashConfig;
 import com.google.appinventor.shared.rpc.user.User;
-import org.sqlite.SQLiteConfig;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,51 +26,66 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class SQLiteStorageIo implements StorageIo {
-    static final Flag<Boolean> requireTos = Flag.createFlag("require.tos", false);
-    static final Flag<String> storageRoot = Flag.createFlag("storage.root", "");
-    static final String DATABASE = storageRoot.get() + "/data.sqlite";
-    private ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
+public class SQLStorageIo implements StorageIo {
+    private static final Flag<Boolean> requireTos = Flag.createFlag("require.tos", false);
+    private static final Flag<String> storageRoot = Flag.createFlag("storage.root", "");
+    static DataSource ds = null;
 
-    public SQLiteStorageIo() {
-        try {
+    public SQLStorageIo() {
+        try{
             Class.forName("org.sqlite.JDBC");
-            if (!new File(DATABASE).exists())
-                createDatabase();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }catch(Exception e){}
+
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/appinventor");
+        config.setUsername("root");
+        config.setPassword("123456");
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("useSSL", "true");
+        config.addDataSourceProperty("useServerPrepStmts", true);
+        config.addDataSourceProperty("useLocalSessionState", true);
+        config.addDataSourceProperty("useLocalTransactionState", true);
+        config.addDataSourceProperty("rewriteBatchedStatements", true);
+        config.addDataSourceProperty("cacheResultSetMetadata", true);
+        config.addDataSourceProperty("cacheServerConfiguration", true);
+        config.addDataSourceProperty("elideSetAutoCommits", true);
+        config.addDataSourceProperty("maintainTimeStats", false);
+        ds = new HikariDataSource(config);
+
+        // createDatabase();
     }
 
     private void createDatabase() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DATABASE)) {
+        try (Connection conn = ds.getConnection()) {
             beginTransaction(conn);
 
             Statement statement = conn.createStatement();
             // users
-            statement.executeUpdate("create table users(userId string primary key, email string, name string, "
-                    + "visited timestamp, settings string, tosAccepted boolean, isAdmin boolean, "
-                    + "sessionId string, password string)");
+            statement.executeUpdate("create table users(userId varchar(40) primary key, email varchar(255), name varchar(255), "
+                    + "visited timestamp, settings text, tosAccepted tinyint, isAdmin tinyint, "
+                    + "sessionId varchar(255), password varchar(255))");
             statement.executeUpdate("create index index_email on users(email)");
 
             // nonce
-            statement.executeUpdate("create table nonces(nonceValue string primary key, userId string, "
-                    + "projectId integer, timestamp timestamp)");
+            statement.executeUpdate("create table nonces(nonceValue varchar(255) primary key, userId varchar(40), "
+                    + "projectId int, timestamp timestamp)");
             statement.executeUpdate("create index index_ndate on nonces(timestamp)");
 
             // pwdata
-            statement.executeUpdate("create table pwdata(userId string, email string, timestamp timestamp)");
+            statement.executeUpdate("create table pwdata(userId varchar(40), email varchar(255), timestamp timestamp)");
             statement.executeUpdate("create index index_pdate on pwdata(timestamp)");
 
             // rendezvous
-            statement.executeUpdate("create table rendezvous(key string primary key, ipaddr string, timestamp timestamp)");
+            statement.executeUpdate("create table rendezvous(rkey varchar(16) primary key, ipaddr varchar(64), timestamp timestamp)");
 
             // groups
-            statement.executeUpdate("create table groups(groupId integer primary key autoincrement, name string)");
-            statement.executeUpdate("create table gusers(groupId integer, userId string, primary key(groupId, userId))");
+            statement.executeUpdate("create table groups(groupId int primary key autoincrement, name varchar(255))");
+            statement.executeUpdate("create table gusers(groupId int, userId varchar(40), primary key(groupId, userId))");
 
             // backpack
-            statement.executeUpdate("create table backpack(backpackId string primary key, content string)");
+            statement.executeUpdate("create table backpack(backpackId varchar(255) primary key, content text)");
 
             statement.close();
             conn.commit();
@@ -78,18 +95,11 @@ public class SQLiteStorageIo implements StorageIo {
         }
     }
 
-    public Connection getDatabaseConnection() {
-        Connection conn = connectionHolder.get();
-        if (conn == null) {
-            try {
-                SQLiteConfig config = new SQLiteConfig();
-                config.setSynchronous(SQLiteConfig.SynchronousMode.NORMAL);
-                conn = DriverManager.getConnection("jdbc:sqlite:" + DATABASE, config.toProperties());
-                connectionHolder.set(conn);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    public Connection getConnection(){
+        Connection conn = null;
+        try{
+            conn = ds.getConnection();
+        }catch(Exception e){}
         return conn;
     }
 
@@ -109,8 +119,6 @@ public class SQLiteStorageIo implements StorageIo {
 
     public void closeConnection(Connection conn) {
         if (conn != null) {
-            if (connectionHolder.get() == conn)
-                connectionHolder.remove();
             try {
                 conn.close();
             } catch (Exception e) {
@@ -120,8 +128,8 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public User getUser(String userId) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select * from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -133,15 +141,16 @@ public class SQLiteStorageIo implements StorageIo {
                 String r_sessionId = result.getString("sessionId");
                 String r_password = result.getString("password");
                 result.close();
+                statement.close();
 
                 User user = new User(r_userId, r_email, r_name, "", User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY,
                         r_tosAccepted, r_isAdmin, User.USER, r_sessionId);
                 user.setPassword(r_password);
                 return user;
             }
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return createUser(userId, null);
@@ -157,8 +166,8 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public User getUserFromEmail(String email) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select * from users where email=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from users where email=?");
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -170,15 +179,16 @@ public class SQLiteStorageIo implements StorageIo {
                 String r_sessionId = result.getString("sessionId");
                 String r_password = result.getString("password");
                 result.close();
+                statement.close();
 
                 User user = new User(r_userId, r_email, r_name, "", User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY,
                         r_tosAccepted, r_isAdmin, User.USER, r_sessionId);
                 user.setPassword(r_password);
                 return user;
             }
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return createUser(null, email);
@@ -190,8 +200,8 @@ public class SQLiteStorageIo implements StorageIo {
         User user = new User(userId, email, null, "", User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY,
                 false, false, User.USER, "");
 
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("insert into users values (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("insert into users values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             statement.setString(1, userId);
             statement.setString(2, email);
             statement.setString(3, null);
@@ -202,9 +212,9 @@ public class SQLiteStorageIo implements StorageIo {
             statement.setString(8, "");
             statement.setString(9, "");
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         File userDir = new File(storageRoot.get() + "/" + userId);
@@ -224,69 +234,69 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void setUserEmail(String userId, String email) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set email=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set email=? where userId=?");
             statement.setString(1, email);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void setTosAccepted(String userId) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set tosAccepted=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set tosAccepted=? where userId=?");
             statement.setBoolean(1, true);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void setUserSessionId(String userId, String sessionId) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set sessionId=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set sessionId=? where userId=?");
             statement.setString(1, sessionId);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void setUserPassword(String userId, String password) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set password=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set password=? where userId=?");
             statement.setString(1, password);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public String loadSettings(String userId) {
-        Connection conn = getDatabaseConnection();
         String r_settings = "";
-        try (PreparedStatement statement = conn.prepareStatement("select settings from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select settings from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_settings = result.getString("settings");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_settings;
@@ -294,30 +304,30 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void setUserName(String userId, String name) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set name=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set name=? where userId=?");
             statement.setString(1, name);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public String getUserName(String userId) {
-        Connection conn = getDatabaseConnection();
         String r_name = "user";
-        try (PreparedStatement statement = conn.prepareStatement("select name from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select name from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_name = result.getString("name");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_name;
@@ -345,14 +355,14 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void storeSettings(String userId, String settings) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update users set settings=? where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update users set settings=? where userId=?");
             statement.setString(1, settings);
             statement.setString(2, userId);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
@@ -957,35 +967,36 @@ public class SQLiteStorageIo implements StorageIo {
     }
 
     @Override
-    public boolean userExists(String uid){
-        Connection conn = getDatabaseConnection();
+    public boolean userExists(String uid) {
         boolean r_exists = false;
-        try (PreparedStatement statement = conn.prepareStatement("select userId from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select userId from users where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_exists = uid.equals(result.getString("userId"));
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
+
         return r_exists;
     }
 
     @Override
     public String findUserByEmail(String email) throws NoSuchElementException {
-        Connection conn = getDatabaseConnection();
         String r_userId = null;
-        try (PreparedStatement statement = conn.prepareStatement("select userId from users where email=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select userId from users where email=?");
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_userId = result.getString("userId");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         if (r_userId != null)
@@ -996,17 +1007,17 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public String findIpAddressByKey(String key) {
-        Connection conn = getDatabaseConnection();
         String r_ipaddr = null;
-        try (PreparedStatement statement = conn.prepareStatement("select ipaddr from rendezvous where key=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select ipaddr from rendezvous where rkey=?");
             statement.setString(1, key);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_ipaddr = result.getString("ipaddr");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_ipaddr;
@@ -1014,15 +1025,15 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void storeIpAddressByKey(String key, String ipAddress) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("insert or replace into rendezvous values (?, ?, ?)")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("replace into rendezvous values (?, ?, ?)");
             statement.setString(1, key);
             statement.setString(2, ipAddress);
             statement.setDate(3, new Date(System.currentTimeMillis()));
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
@@ -1038,9 +1049,9 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public Nonce getNoncebyValue(String nonceValue) {
-        Connection conn = getDatabaseConnection();
         Nonce nonce = null;
-        try (PreparedStatement statement = conn.prepareStatement("select * from nonces where nonceValue=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from nonces where nonceValue=?");
             statement.setString(1, nonceValue);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -1051,9 +1062,9 @@ public class SQLiteStorageIo implements StorageIo {
                 nonce = new Nonce(r_nonceValue, r_userId, r_projectId, r_timestamp);
             }
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return nonce;
@@ -1061,28 +1072,28 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void storeNonce(String nonceValue, String userId, long projectId) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("insert into nonces values (?, ?, ?, ?)")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("insert into nonces values (?, ?, ?, ?)");
             statement.setString(1, nonceValue);
             statement.setString(2, userId);
             statement.setLong(3, projectId);
             statement.setDate(4, new Date(System.currentTimeMillis()));
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void cleanupNonces() {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("delete from nonces where timestamp<?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("delete from nonces where timestamp<?");
             statement.setDate(1, new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
@@ -1103,20 +1114,20 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public StoredData.PWData createPWData(String email) {
-        Connection conn = getDatabaseConnection();
-
         StoredData.PWData pwData = new StoredData.PWData();
         pwData.id = UUID.randomUUID().toString();
         pwData.email = email;
         pwData.timestamp = new Date(System.currentTimeMillis());
-        try (PreparedStatement statement = conn.prepareStatement("insert into pwdata values (?, ?, ?)")) {
+
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("insert into pwdata values (?, ?, ?)");
             statement.setString(1, pwData.id);
             statement.setString(2, pwData.email);
             statement.setDate(3, (java.sql.Date) pwData.timestamp);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return pwData;
@@ -1124,9 +1135,9 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public StoredData.PWData findPWData(String uid) {
-        Connection conn = getDatabaseConnection();
         StoredData.PWData pwData = null;
-        try (PreparedStatement statement = conn.prepareStatement("select * from pwdata where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from pwdata where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -1136,9 +1147,9 @@ public class SQLiteStorageIo implements StorageIo {
                 pwData.timestamp = result.getDate("timestamp");
             }
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return pwData;
@@ -1146,13 +1157,13 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void cleanuppwdata() {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("delete from pwdata where timestamp<?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("delete from pwdata where timestamp<?");
             statement.setDate(1, new Date(System.currentTimeMillis() - 60 * 60 * 1000L));
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
@@ -1169,15 +1180,15 @@ public class SQLiteStorageIo implements StorageIo {
     @Override
     public List<String> listUsers() {
         List<String> users = new LinkedList<>();
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select userId from users")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select userId from users");
             ResultSet result = statement.executeQuery();
             while (result.next())
                 users.add(result.getString("userId"));
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return users;
@@ -1185,17 +1196,17 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public long getUserLastVisited(String uid) {
-        Connection conn = getDatabaseConnection();
         long r_visited = System.currentTimeMillis();
-        try (PreparedStatement statement = conn.prepareStatement("select visited from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select visited from users where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_visited = result.getDate("visited").getTime();
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_visited;
@@ -1203,62 +1214,62 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void removeUser(String uid) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("delete from users where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("delete from users where userId=?");
             statement.setString(1, uid);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void createGroup(String name) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("insert into groups(name) values (?)")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("insert into groups(name) values (?)");
             statement.setString(1, name);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public void removeGroup(long gid) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("delete from gusers where groupId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("delete from gusers where groupId=?");
             statement.setLong(1, gid);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
-        conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("delete from groups where groupId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("delete from groups where groupId=?");
             statement.setLong(1, gid);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public long findGroupByName(String name) {
-        Connection conn = getDatabaseConnection();
         long r_groupId = 0;
-        try (PreparedStatement statement = conn.prepareStatement("select groupId from groups where name=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select groupId from groups where name=?");
             statement.setString(1, name);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_groupId = result.getLong("groupId");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_groupId;
@@ -1267,15 +1278,15 @@ public class SQLiteStorageIo implements StorageIo {
     @Override
     public List<Long> listGroups() {
         List<Long> groups = new LinkedList<>();
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select groupId from groups")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select groupId from groups");
             ResultSet result = statement.executeQuery();
             while (result.next())
                 groups.add(result.getLong("groupId"));
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return groups;
@@ -1283,17 +1294,17 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public String getGroupName(long gid) {
-        Connection conn = getDatabaseConnection();
         String r_name = null;
-        try (PreparedStatement statement = conn.prepareStatement("select name from groups where groupId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select name from groups where groupId=?");
             statement.setLong(1, gid);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_name = result.getString("name");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_name;
@@ -1301,30 +1312,30 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void setGroupName(long gid, String name) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("update groups set name=? where groupId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("update groups set name=? where groupId=?");
             statement.setString(1, name);
             statement.setLong(2, gid);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 
     @Override
     public List<Long> getUserJoinedGroups(String uid) {
         List<Long> groups = new LinkedList<>();
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select groupId from gusers where userId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select groupId from gusers where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             while (result.next())
                 groups.add(result.getLong("groupId"));
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return groups;
@@ -1333,16 +1344,16 @@ public class SQLiteStorageIo implements StorageIo {
     @Override
     public List<String> getGroupUsers(long gid) {
         List<String> users = new LinkedList<>();
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("select userId from gusers where groupId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select userId from gusers where groupId=?");
             statement.setLong(1, gid);
             ResultSet result = statement.executeQuery();
             while (result.next())
                 users.add(result.getString("userId"));
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return users;
@@ -1350,11 +1361,12 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void addUsersToGroup(long gid, List<String> users) {
-        Connection conn = getDatabaseConnection();
+        Connection conn = null;
         try {
+            conn = ds.getConnection();
             beginTransaction(conn);
             for (String userId : users) {
-                PreparedStatement statement = conn.prepareStatement("insert or ignore into gusers values (?, ?)");
+                PreparedStatement statement = conn.prepareStatement("insert ignore into gusers values (?, ?)");
                 statement.setLong(1, gid);
                 statement.setString(2, userId);
                 statement.executeUpdate();
@@ -1364,17 +1376,22 @@ public class SQLiteStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            }catch(Exception ee){}
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ee) {
+                }
+            }
+        } finally {
             closeConnection(conn);
         }
     }
 
     @Override
     public void removeUsersFromGroup(long gid, List<String> users) {
-        Connection conn = getDatabaseConnection();
+        Connection conn = null;
         try {
+            conn = ds.getConnection();
             beginTransaction(conn);
             for (String userId : users) {
                 PreparedStatement statement = conn.prepareStatement("delete from gusers where userId=?");
@@ -1387,26 +1404,30 @@ public class SQLiteStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            }catch(Exception ee){}
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ee) {
+                }
+            }
+        } finally {
             closeConnection(conn);
         }
     }
 
     @Override
     public String downloadBackpack(String backPackId) {
-        Connection conn = getDatabaseConnection();
         String r_content = "";
-        try (PreparedStatement statement = conn.prepareStatement("select content from backpack where backPackId=?")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select content from backpack where backPackId=?");
             statement.setString(1, backPackId);
             ResultSet result = statement.executeQuery();
             if (result.next())
                 r_content = result.getString("content");
             result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
 
         return r_content;
@@ -1414,14 +1435,14 @@ public class SQLiteStorageIo implements StorageIo {
 
     @Override
     public void uploadBackpack(String backPackId, String content) {
-        Connection conn = getDatabaseConnection();
-        try (PreparedStatement statement = conn.prepareStatement("insert or replace into backpack values (?, ?)")) {
+        try (Connection conn = ds.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("replace into backpack values (?, ?)");
             statement.setString(1, backPackId);
             statement.setString(2, content);
             statement.executeUpdate();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
-            closeConnection(conn);
         }
     }
 }
