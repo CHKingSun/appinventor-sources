@@ -19,8 +19,8 @@ import com.google.appinventor.shared.rpc.user.SplashConfig;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
@@ -656,16 +656,15 @@ public interface StorageIo {
   List<AdminUser> searchUsers(String partialEmail);
   void storeUser(AdminUser user) throws AdminInterfaceException;
 
-  boolean userExists(String uid);
   List<String> listUsers();
+  boolean userExists(String uid);
   long getUserLastVisited(String uid);
-  void removeUser(String uid);
-  
+  void removeUsers(List<String> users);
+
+  List<Long> listGroups();
   void createGroup(String name);
   void removeGroup(long gid);
   long findGroupByName(String name);
-  List<Long> listGroups();
-
   String getGroupName(long gid);
   void setGroupName(long gid, String name);
   

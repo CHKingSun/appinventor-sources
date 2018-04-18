@@ -58,7 +58,7 @@ public class SQLStorageIo implements StorageIo {
     }
 
     private void createDatabase() {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             beginTransaction(conn);
 
             Statement statement = conn.createStatement();
@@ -95,12 +95,8 @@ public class SQLStorageIo implements StorageIo {
         }
     }
 
-    public Connection getConnection(){
-        Connection conn = null;
-        try{
-            conn = ds.getConnection();
-        }catch(Exception e){}
-        return conn;
+    public Connection getConnection() throws Exception{
+        return ds.getConnection();
     }
 
     public void beginTransaction(Connection conn) {
@@ -128,7 +124,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public User getUser(String userId) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select * from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
@@ -166,7 +162,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public User getUserFromEmail(String email) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select * from users where email=?");
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
@@ -200,7 +196,7 @@ public class SQLStorageIo implements StorageIo {
         User user = new User(userId, email, null, "", User.DEFAULT_EMAIL_NOTIFICATION_FREQUENCY,
                 false, false, User.USER, "");
 
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("insert into users values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             statement.setString(1, userId);
             statement.setString(2, email);
@@ -234,7 +230,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setUserEmail(String userId, String email) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set email=? where userId=?");
             statement.setString(1, email);
             statement.setString(2, userId);
@@ -247,7 +243,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setTosAccepted(String userId) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set tosAccepted=? where userId=?");
             statement.setBoolean(1, true);
             statement.setString(2, userId);
@@ -260,7 +256,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setUserSessionId(String userId, String sessionId) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set sessionId=? where userId=?");
             statement.setString(1, sessionId);
             statement.setString(2, userId);
@@ -273,7 +269,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setUserPassword(String userId, String password) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set password=? where userId=?");
             statement.setString(1, password);
             statement.setString(2, userId);
@@ -287,7 +283,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String loadSettings(String userId) {
         String r_settings = "";
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select settings from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
@@ -304,7 +300,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setUserName(String userId, String name) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set name=? where userId=?");
             statement.setString(1, name);
             statement.setString(2, userId);
@@ -318,7 +314,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String getUserName(String userId) {
         String r_name = "user";
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select name from users where userId=?");
             statement.setString(1, userId);
             ResultSet result = statement.executeQuery();
@@ -355,7 +351,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void storeSettings(String userId, String settings) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update users set settings=? where userId=?");
             statement.setString(1, settings);
             statement.setString(2, userId);
@@ -969,7 +965,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public boolean userExists(String uid) {
         boolean r_exists = false;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select userId from users where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
@@ -987,7 +983,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String findUserByEmail(String email) throws NoSuchElementException {
         String r_userId = null;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select userId from users where email=?");
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
@@ -1008,7 +1004,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String findIpAddressByKey(String key) {
         String r_ipaddr = null;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select ipaddr from rendezvous where rkey=?");
             statement.setString(1, key);
             ResultSet result = statement.executeQuery();
@@ -1025,7 +1021,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void storeIpAddressByKey(String key, String ipAddress) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("replace into rendezvous values (?, ?, ?)");
             statement.setString(1, key);
             statement.setString(2, ipAddress);
@@ -1050,7 +1046,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public Nonce getNoncebyValue(String nonceValue) {
         Nonce nonce = null;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select * from nonces where nonceValue=?");
             statement.setString(1, nonceValue);
             ResultSet result = statement.executeQuery();
@@ -1072,7 +1068,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void storeNonce(String nonceValue, String userId, long projectId) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("insert into nonces values (?, ?, ?, ?)");
             statement.setString(1, nonceValue);
             statement.setString(2, userId);
@@ -1087,7 +1083,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void cleanupNonces() {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from nonces where timestamp<?");
             statement.setDate(1, new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
             statement.executeUpdate();
@@ -1119,7 +1115,7 @@ public class SQLStorageIo implements StorageIo {
         pwData.email = email;
         pwData.timestamp = new Date(System.currentTimeMillis());
 
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("insert into pwdata values (?, ?, ?)");
             statement.setString(1, pwData.id);
             statement.setString(2, pwData.email);
@@ -1136,7 +1132,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public StoredData.PWData findPWData(String uid) {
         StoredData.PWData pwData = null;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select * from pwdata where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
@@ -1157,7 +1153,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void cleanuppwdata() {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from pwdata where timestamp<?");
             statement.setDate(1, new Date(System.currentTimeMillis() - 60 * 60 * 1000L));
             statement.executeUpdate();
@@ -1180,7 +1176,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public List<String> listUsers() {
         List<String> users = new LinkedList<>();
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select userId from users");
             ResultSet result = statement.executeQuery();
             while (result.next())
@@ -1197,7 +1193,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public long getUserLastVisited(String uid) {
         long r_visited = System.currentTimeMillis();
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select visited from users where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
@@ -1213,20 +1209,61 @@ public class SQLStorageIo implements StorageIo {
     }
 
     @Override
-    public void removeUser(String uid) {
-        try (Connection conn = ds.getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("delete from users where userId=?");
-            statement.setString(1, uid);
-            statement.executeUpdate();
-            statement.close();
+    public void removeUsers(List<String> users) {
+        Connection conn = null;
+        try{
+            conn = getConnection();
+            beginTransaction(conn);
+            for(String uid : users) {
+                PreparedStatement statement = conn.prepareStatement("delete from users where userId=?");
+                statement.setString(1, uid);
+                statement.executeUpdate();
+                statement.close();
+
+                statement = conn.prepareStatement("delete from gusers where userId=?");
+                statement.setString(1, uid);
+                statement.executeUpdate();
+                statement.close();
+            }
+            conn.commit();
+            endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
+            if(conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ee) {
+                }
+            }
+            return;
+        }
+        finally {
+            closeConnection(conn);
+        }
+
+        for(String uid : users){
+            Path path = Paths.get(storageRoot.get(), uid);
+            try {
+                Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.deleteIfExists(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        Files.deleteIfExists(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            }catch(Exception e){}
         }
     }
 
     @Override
     public void createGroup(String name) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("insert into groups(name) values (?)");
             statement.setString(1, name);
             statement.executeUpdate();
@@ -1238,7 +1275,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void removeGroup(long gid) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from gusers where groupId=?");
             statement.setLong(1, gid);
             statement.executeUpdate();
@@ -1247,7 +1284,7 @@ public class SQLStorageIo implements StorageIo {
             e.printStackTrace();
         }
 
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from groups where groupId=?");
             statement.setLong(1, gid);
             statement.executeUpdate();
@@ -1260,7 +1297,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public long findGroupByName(String name) {
         long r_groupId = 0;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select groupId from groups where name=?");
             statement.setString(1, name);
             ResultSet result = statement.executeQuery();
@@ -1278,7 +1315,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public List<Long> listGroups() {
         List<Long> groups = new LinkedList<>();
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select groupId from groups");
             ResultSet result = statement.executeQuery();
             while (result.next())
@@ -1295,7 +1332,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String getGroupName(long gid) {
         String r_name = null;
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select name from groups where groupId=?");
             statement.setLong(1, gid);
             ResultSet result = statement.executeQuery();
@@ -1312,7 +1349,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void setGroupName(long gid, String name) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("update groups set name=? where groupId=?");
             statement.setString(1, name);
             statement.setLong(2, gid);
@@ -1326,7 +1363,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public List<Long> getUserJoinedGroups(String uid) {
         List<Long> groups = new LinkedList<>();
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select groupId from gusers where userId=?");
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
@@ -1344,7 +1381,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public List<String> getGroupUsers(long gid) {
         List<String> users = new LinkedList<>();
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select userId from gusers where groupId=?");
             statement.setLong(1, gid);
             ResultSet result = statement.executeQuery();
@@ -1363,7 +1400,7 @@ public class SQLStorageIo implements StorageIo {
     public void addUsersToGroup(long gid, List<String> users) {
         Connection conn = null;
         try {
-            conn = ds.getConnection();
+            conn = getConnection();
             beginTransaction(conn);
             for (String userId : users) {
                 PreparedStatement statement = conn.prepareStatement("insert ignore into gusers values (?, ?)");
@@ -1391,7 +1428,7 @@ public class SQLStorageIo implements StorageIo {
     public void removeUsersFromGroup(long gid, List<String> users) {
         Connection conn = null;
         try {
-            conn = ds.getConnection();
+            conn = getConnection();
             beginTransaction(conn);
             for (String userId : users) {
                 PreparedStatement statement = conn.prepareStatement("delete from gusers where userId=?");
@@ -1418,7 +1455,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String downloadBackpack(String backPackId) {
         String r_content = "";
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("select content from backpack where backPackId=?");
             statement.setString(1, backPackId);
             ResultSet result = statement.executeQuery();
@@ -1435,7 +1472,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void uploadBackpack(String backPackId, String content) {
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("replace into backpack values (?, ?)");
             statement.setString(1, backPackId);
             statement.setString(2, content);
