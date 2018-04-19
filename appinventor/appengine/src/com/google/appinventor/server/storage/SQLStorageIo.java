@@ -11,11 +11,11 @@ import com.google.appinventor.shared.rpc.user.SplashConfig;
 import com.google.appinventor.shared.rpc.user.User;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -32,10 +32,6 @@ public class SQLStorageIo implements StorageIo {
     static DataSource ds = null;
 
     public SQLStorageIo() {
-        try{
-            Class.forName("org.sqlite.JDBC");
-        }catch(Exception e){}
-
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:mysql://localhost:3306/appinventor");
         config.setUsername("root");
@@ -64,7 +60,7 @@ public class SQLStorageIo implements StorageIo {
             Statement statement = conn.createStatement();
             // users
             statement.executeUpdate("create table users(userId varchar(40) primary key, email varchar(255), name varchar(255), "
-                    + "visited timestamp, settings text, tosAccepted tinyint, isAdmin tinyint, "
+                    + "visited timestamp, settings text, tosAccepted tinyint(1), isAdmin tinyint(1), "
                     + "sessionId varchar(255), password varchar(255))");
             statement.executeUpdate("create index index_email on users(email)");
 
@@ -95,7 +91,7 @@ public class SQLStorageIo implements StorageIo {
         }
     }
 
-    public Connection getConnection() throws Exception{
+    public Connection getConnection() throws Exception {
         return ds.getConnection();
     }
 
@@ -213,14 +209,11 @@ public class SQLStorageIo implements StorageIo {
             e.printStackTrace();
         }
 
-        File userDir = new File(storageRoot.get() + "/" + userId);
-        if (!userDir.exists())
-            userDir.mkdir();
-        try (Connection pc = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = pc.prepareStatement("create table projects (projectId integer primary key "
-                    + "autoincrement, name string, settings string, created date, modified date, history string)");
-            statement.executeUpdate();
-            statement.close();
+        try {
+            Path userDir = Paths.get(storageRoot.get(), userId);
+            Files.createDirectory(userDir);
+            String data = "{\"nextProjectId\": 1}";
+            Files.write(userDir.resolve("projects.json"), data.getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -365,23 +358,22 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public long createProject(String userId, Project project, String projectSettings) {
         long r_projectId = 0;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement insertStatement = conn.prepareStatement("insert into projects (name, settings, "
-                    + "created, modified, history) values (?, ?, ?, ?, ?)");
-            insertStatement.setString(1, project.getProjectName());
-            insertStatement.setString(2, projectSettings);
-            insertStatement.setDate(3, new Date(System.currentTimeMillis()));
-            insertStatement.setDate(4, new Date(System.currentTimeMillis()));
-            insertStatement.setString(5, project.getProjectHistory());
-            insertStatement.executeUpdate();
-            insertStatement.close();
+        try {
+            Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            r_projectId = json.getInt("nextProjectId");
 
-            PreparedStatement queryStatement = conn.prepareStatement("select max(projectId) from projects");
-            ResultSet result = queryStatement.executeQuery();
-            if (result.next())
-                r_projectId = result.getLong(1);
-            result.close();
-            queryStatement.close();
+            JSONObject newProject = new JSONObject();
+            newProject.put("name", project.getProjectName());
+            newProject.put("settings", projectSettings);
+            newProject.put("created", System.currentTimeMillis());
+            newProject.put("modified", System.currentTimeMillis());
+            newProject.put("history", project.getProjectHistory());
+
+            json.put(String.valueOf(r_projectId), newProject);
+            json.increment("nextProjectId");
+            Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -407,16 +399,18 @@ public class SQLStorageIo implements StorageIo {
                 }
             }
         }
+
         return r_projectId;
     }
 
     @Override
     public void deleteProject(String userId, long projectId) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("delete from projects where projectId=?");
-            statement.setLong(1, projectId);
-            statement.executeUpdate();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            json.remove(String.valueOf(projectId));
+            Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -444,13 +438,15 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public List<Long> getProjects(String userId) {
         List<Long> projects = new LinkedList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select projectId from projects");
-            ResultSet result = statement.executeQuery();
-            while (result.next())
-                projects.add(result.getLong("projectId"));
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            for (Object obj : json.keySet()) {
+                String key = (String) obj;
+                if (!key.equals("nextProjectId"))
+                    projects.add(Long.parseLong(key));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -471,14 +467,12 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String loadProjectSettings(String userId, long projectId) {
         String r_settings = "";
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select settings from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next())
-                r_settings = result.getString("settings");
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            r_settings = project.getString("settings");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -488,12 +482,13 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public void storeProjectSettings(String userId, long projectId, String settings) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("update projects set settings=? where projectId=?");
-            statement.setString(1, settings);
-            statement.setLong(2, projectId);
-            statement.executeUpdate();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            project.put("settings", settings);
+            Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -506,60 +501,58 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public UserProject getUserProject(String userId, long projectId) {
-        UserProject project = null;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select * from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                long r_projectId = result.getLong("projectId");
-                String r_name = result.getString("name");
-                long r_created = result.getDate("created").getTime();
-                long r_modified = result.getDate("modified").getTime();
-                project = new UserProject(r_projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0);
-            }
-            result.close();
-            statement.close();
+        UserProject userProject = null;
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            String r_name = project.getString("name");
+            long r_created = project.getLong("created");
+            long r_modified = project.getLong("modified");
+            userProject = new UserProject(projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return project;
+        return userProject;
     }
 
     @Override
     public List<UserProject> getUserProjects(String userId, List<Long> projectIds) {
-        List<UserProject> projects = new LinkedList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select * from projects");
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                long r_projectId = result.getLong("projectId");
-                String r_name = result.getString("name");
-                long r_created = result.getDate("created").getTime();
-                long r_modified = result.getDate("modified").getTime();
-                projects.add(new UserProject(r_projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0));
+        List<UserProject> userProjects = new LinkedList<>();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            for (Object obj : json.keySet()) {
+                String key = (String) obj;
+                if (key.equals("nextProjectId"))
+                    continue;
+
+                JSONObject project = json.getJSONObject(key);
+                long r_projectId = Long.parseLong(key);
+                String r_name = project.getString("name");
+                long r_created = project.getLong("created");
+                long r_modified = project.getLong("modified");
+                userProjects.add(new UserProject(r_projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0));
             }
-            result.close();
-            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return projects;
+        return userProjects;
     }
 
     @Override
     public String getProjectName(String userId, long projectId) {
         String r_name = null;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select name from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next())
-                r_name = result.getString("name");
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            r_name = project.getString("name");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -570,14 +563,12 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public long getProjectDateModified(String userId, long projectId) {
         long r_time = 0;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select modified from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next())
-                r_time = result.getDate("modified").getTime();
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            r_time = project.getLong("modified");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -586,12 +577,13 @@ public class SQLStorageIo implements StorageIo {
     }
 
     private void setProjectDateModified(String userId, long projectId, long dateModified) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("update projects set modified=? where projectId=?");
-            statement.setLong(1, dateModified);
-            statement.setLong(2, projectId);
-            statement.executeUpdate();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            project.put("modified", dateModified);
+            Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -600,14 +592,12 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public String getProjectHistory(String userId, long projectId) {
         String r_history = null;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select history from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next())
-                r_history = result.getString("history");
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            r_history = project.getString("history");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -618,14 +608,12 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public long getProjectDateCreated(String userId, long projectId) {
         long r_time = 0;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storageRoot.get() + "/" + userId + "/projects.sqlite")) {
-            PreparedStatement statement = conn.prepareStatement("select modified from projects where projectId=?");
-            statement.setLong(1, projectId);
-            ResultSet result = statement.executeQuery();
-            if (result.next())
-                r_time = result.getDate("modified").getTime();
-            result.close();
-            statement.close();
+        Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
+        try {
+            String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+            JSONObject json = new JSONObject(data);
+            JSONObject project = json.getJSONObject(String.valueOf(projectId));
+            r_time = project.getLong("created");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1211,10 +1199,10 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public void removeUsers(List<String> users) {
         Connection conn = null;
-        try{
+        try {
             conn = getConnection();
             beginTransaction(conn);
-            for(String uid : users) {
+            for (String uid : users) {
                 PreparedStatement statement = conn.prepareStatement("delete from users where userId=?");
                 statement.setString(1, uid);
                 statement.executeUpdate();
@@ -1229,19 +1217,18 @@ public class SQLStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
-            if(conn != null) {
+            if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (Exception ee) {
                 }
             }
             return;
-        }
-        finally {
+        } finally {
             closeConnection(conn);
         }
 
-        for(String uid : users){
+        for (String uid : users) {
             Path path = Paths.get(storageRoot.get(), uid);
             try {
                 Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -1257,7 +1244,8 @@ public class SQLStorageIo implements StorageIo {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-            }catch(Exception e){}
+            } catch (Exception e) {
+            }
         }
     }
 
