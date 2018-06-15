@@ -172,7 +172,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_FOR_INPUT_TO = '到';
     Blockly.Msg.LANG_CONTROLS_FOR_INPUT_DO = '执行';
 
-    Blockly.Msg.LANG_CONTROLS_FOR_TOOLTIP = '从一个数值开始取数，到另一个数结束。\n' +
+    Blockly.Msg.LANG_CONTROLS_FOR_TOOLTIP = '循环从一个数值开始取数，到另一个数结束。\n' +
         '每取一个数，都将其值赋给\n' +
         '变量 %1 ，并执行语句块。';
 
