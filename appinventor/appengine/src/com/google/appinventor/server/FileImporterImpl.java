@@ -127,6 +127,9 @@ public final class FileImporterImpl implements FileImporter {
               // in. Adjust the fileName so that it corresponds to this project's package.
               fileName = srcDirectory + '/' + StorageUtil.basename(fileName);
             }
+            
+            if (fileName.endsWith(".backup"))
+                continue;
 
             // Get the file content from the ZipEntry.
             ByteArrayOutputStream contentStream = new ByteArrayOutputStream();
