@@ -145,7 +145,7 @@ public class SQLStorageIo implements StorageIo {
             }
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return createUser(userId, null);
@@ -183,7 +183,7 @@ public class SQLStorageIo implements StorageIo {
             }
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return createUser(null, email);
@@ -209,7 +209,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         try {
@@ -218,7 +218,7 @@ public class SQLStorageIo implements StorageIo {
             String data = "{\"nextProjectId\": 1}";
             Files.write(userDir.resolve("projects.json"), data.getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return user;
@@ -233,7 +233,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -246,7 +246,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -259,7 +259,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -272,7 +272,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -288,7 +288,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_settings;
@@ -303,7 +303,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -319,7 +319,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_name;
@@ -354,7 +354,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -378,7 +378,7 @@ public class SQLStorageIo implements StorageIo {
             json.increment("nextProjectId");
             Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         if (r_projectId != 0) {
@@ -389,7 +389,7 @@ public class SQLStorageIo implements StorageIo {
                     Files.createDirectories(path.getParent());
                     Files.write(path, textFile.getContent().getBytes("UTF-8"));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
             for (RawFile rawFile : project.getRawSourceFiles()) {
@@ -398,7 +398,7 @@ public class SQLStorageIo implements StorageIo {
                     Files.createDirectories(path.getParent());
                     Files.write(path, rawFile.getContent());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -415,7 +415,7 @@ public class SQLStorageIo implements StorageIo {
             json.remove(String.valueOf(projectId));
             Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         Path projectDir = Paths.get(storageRoot.get(), userId, String.valueOf(projectId));
@@ -434,7 +434,7 @@ public class SQLStorageIo implements StorageIo {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -451,7 +451,7 @@ public class SQLStorageIo implements StorageIo {
                     projects.add(Long.parseLong(key));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return projects;
@@ -477,7 +477,7 @@ public class SQLStorageIo implements StorageIo {
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             r_settings = project.getString("settings");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_settings;
@@ -493,7 +493,7 @@ public class SQLStorageIo implements StorageIo {
             project.put("settings", settings);
             Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -515,7 +515,7 @@ public class SQLStorageIo implements StorageIo {
             long r_modified = project.getLong("modified");
             userProject = new UserProject(projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return userProject;
@@ -541,7 +541,7 @@ public class SQLStorageIo implements StorageIo {
                 userProjects.add(new UserProject(r_projectId, r_name, "YoungAndroid", r_created, r_modified, 0, 0));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return userProjects;
@@ -557,7 +557,7 @@ public class SQLStorageIo implements StorageIo {
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             r_name = project.getString("name");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_name;
@@ -573,7 +573,7 @@ public class SQLStorageIo implements StorageIo {
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             r_time = project.getLong("modified");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_time;
@@ -588,7 +588,7 @@ public class SQLStorageIo implements StorageIo {
             project.put("modified", dateModified);
             Files.write(projectsJSON, json.toString().getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -602,7 +602,7 @@ public class SQLStorageIo implements StorageIo {
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             r_history = project.getString("history");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_history;
@@ -618,7 +618,7 @@ public class SQLStorageIo implements StorageIo {
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             r_time = project.getLong("created");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_time;
@@ -643,7 +643,7 @@ public class SQLStorageIo implements StorageIo {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return files;
     }
@@ -653,7 +653,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             uploadRawUserFile(userId, fileId, content.getBytes(encoding));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -664,7 +664,7 @@ public class SQLStorageIo implements StorageIo {
             Files.createDirectories(path.getParent());
             Files.write(path, content);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -674,7 +674,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             content = new String(downloadRawUserFile(userId, fileId), encoding);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return content;
     }
@@ -686,7 +686,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             content = Files.readAllBytes(path);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return content;
     }
@@ -697,7 +697,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             Files.deleteIfExists(path);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -726,7 +726,7 @@ public class SQLStorageIo implements StorageIo {
             if (anyFilesDeleted && changeModDate)
                 setProjectDateModified(userId, projectId, System.currentTimeMillis());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -737,7 +737,7 @@ public class SQLStorageIo implements StorageIo {
             for (String file : fileIds)
                 Files.deleteIfExists(path.resolve(file));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -758,7 +758,7 @@ public class SQLStorageIo implements StorageIo {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return files;
     }
@@ -780,7 +780,7 @@ public class SQLStorageIo implements StorageIo {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return files;
     }
@@ -800,9 +800,8 @@ public class SQLStorageIo implements StorageIo {
         try {
             return uploadRawFile(projectId, fileId, userId, false, content.getBytes(encoding));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return 0;
     }
 
     @Override
@@ -810,9 +809,8 @@ public class SQLStorageIo implements StorageIo {
         try {
             return uploadRawFile(projectId, fileId, userId, true, content.getBytes(encoding));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return 0;
     }
 
     @Override
@@ -823,7 +821,7 @@ public class SQLStorageIo implements StorageIo {
             Files.write(path, content);
             setProjectDateModified(userId, projectId, System.currentTimeMillis());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return System.currentTimeMillis();
     }
@@ -833,9 +831,8 @@ public class SQLStorageIo implements StorageIo {
         try {
             return uploadRawFile(projectId, fileId, userId, true, content);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return 0;
     }
 
     @Override
@@ -845,7 +842,7 @@ public class SQLStorageIo implements StorageIo {
             if (Files.deleteIfExists(path))
                 setProjectDateModified(userId, projectId, System.currentTimeMillis());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return System.currentTimeMillis();
     }
@@ -856,7 +853,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             content = new String(downloadRawFile(userId, projectId, fileId), encoding);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return content;
     }
@@ -873,7 +870,7 @@ public class SQLStorageIo implements StorageIo {
         try {
             content = Files.readAllBytes(path);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return content;
     }
@@ -965,7 +962,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_exists;
@@ -983,7 +980,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         if (r_userId != null)
@@ -1004,7 +1001,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_ipaddr;
@@ -1020,7 +1017,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1051,7 +1048,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return nonce;
@@ -1068,7 +1065,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1080,7 +1077,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1114,7 +1111,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return pwData;
@@ -1136,7 +1133,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return pwData;
@@ -1150,7 +1147,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1175,7 +1172,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return users;
@@ -1193,7 +1190,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_visited;
@@ -1219,14 +1216,13 @@ public class SQLStorageIo implements StorageIo {
             conn.commit();
             endTransaction(conn);
         } catch (Exception e) {
-            e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (Exception ee) {
                 }
             }
-            return;
+            throw new RuntimeException(e);
         } finally {
             closeConnection(conn);
         }
@@ -1248,6 +1244,7 @@ public class SQLStorageIo implements StorageIo {
                     }
                 });
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -1260,7 +1257,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1272,7 +1269,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         try (Connection conn = getConnection()) {
@@ -1281,7 +1278,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1297,7 +1294,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_groupId;
@@ -1314,7 +1311,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return groups;
@@ -1332,7 +1329,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_name;
@@ -1347,7 +1344,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1363,7 +1360,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return groups;
@@ -1381,7 +1378,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return users;
@@ -1403,13 +1400,13 @@ public class SQLStorageIo implements StorageIo {
             conn.commit();
             endTransaction(conn);
         } catch (Exception e) {
-            e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (Exception ee) {
                 }
             }
+            throw new RuntimeException(e);
         } finally {
             closeConnection(conn);
         }
@@ -1431,13 +1428,13 @@ public class SQLStorageIo implements StorageIo {
             conn.commit();
             endTransaction(conn);
         } catch (Exception e) {
-            e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (Exception ee) {
                 }
             }
+            throw new RuntimeException(e);
         } finally {
             closeConnection(conn);
         }
@@ -1455,7 +1452,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_content;
@@ -1470,7 +1467,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1483,7 +1480,7 @@ public class SQLStorageIo implements StorageIo {
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -1499,7 +1496,7 @@ public class SQLStorageIo implements StorageIo {
             result.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return r_progress;
