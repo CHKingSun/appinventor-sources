@@ -683,6 +683,9 @@ public class SQLStorageIo implements StorageIo {
     public byte[] downloadRawUserFile(String userId, String fileName) {
         byte content[] = null;
         Path path = Paths.get(storageRoot.get(), userId, fileName);
+        if (Files.notExists(path))
+            return null;
+
         try {
             content = Files.readAllBytes(path);
         } catch (Exception e) {
@@ -867,6 +870,9 @@ public class SQLStorageIo implements StorageIo {
     public byte[] downloadRawFile(String userId, long projectId, String fileId) {
         byte content[] = null;
         Path path = Paths.get(storageRoot.get(), userId, String.valueOf(projectId), fileId);
+        if (Files.notExists(path))
+            return null;
+
         try {
             content = Files.readAllBytes(path);
         } catch (Exception e) {
