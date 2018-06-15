@@ -59,29 +59,32 @@ public class SQLStorageIo implements StorageIo {
 
             Statement statement = conn.createStatement();
             // users
-            statement.executeUpdate("create table users(userId varchar(40) primary key, email varchar(255), name varchar(255), "
+            statement.executeUpdate("create table users(userId varchar(64) primary key, email varchar(255), name varchar(255), "
                     + "visited timestamp, settings text, tosAccepted tinyint(1), isAdmin tinyint(1), "
                     + "sessionId varchar(255), password varchar(255))");
             statement.executeUpdate("create index index_email on users(email)");
 
             // nonce
-            statement.executeUpdate("create table nonces(nonceValue varchar(255) primary key, userId varchar(40), "
+            statement.executeUpdate("create table nonces(nonceValue varchar(255) primary key, userId varchar(64), "
                     + "projectId int, timestamp timestamp)");
             statement.executeUpdate("create index index_ndate on nonces(timestamp)");
 
             // pwdata
-            statement.executeUpdate("create table pwdata(userId varchar(40), email varchar(255), timestamp timestamp)");
+            statement.executeUpdate("create table pwdata(userId varchar(64), email varchar(255), timestamp timestamp)");
             statement.executeUpdate("create index index_pdate on pwdata(timestamp)");
 
             // rendezvous
-            statement.executeUpdate("create table rendezvous(rkey varchar(16) primary key, ipaddr varchar(64), timestamp timestamp)");
+            statement.executeUpdate("create table rendezvous(rkey varchar(64) primary key, ipaddr varchar(64), timestamp timestamp)");
 
             // groups
             statement.executeUpdate("create table groups(groupId int primary key autoincrement, name varchar(255))");
-            statement.executeUpdate("create table gusers(groupId int, userId varchar(40), primary key(groupId, userId))");
+            statement.executeUpdate("create table gusers(groupId int, userId varchar(64), primary key(groupId, userId))");
 
             // backpack
             statement.executeUpdate("create table backpack(backpackId varchar(255) primary key, content text)");
+
+            // buildStatus
+            statement.executeUpdate("create table build_status(userId varchar(64), projectId int, progress tinyint, primary key(userId, projectId))");
 
             statement.close();
             conn.commit();
@@ -1469,5 +1472,36 @@ public class SQLStorageIo implements StorageIo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void storeBuildStatus(String userId, long projectId, int progress) {
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("replace into build_status values (?, ?, ?)");
+            statement.setString(1, userId);
+            statement.setLong(2, projectId);
+            statement.setInt(3, progress);
+            statement.executeUpdate();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getBuildStatus(String userId, long projectId) {
+        int r_progress = 0;
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select progress from build_status where userId=? and projectId=?");
+            statement.setString(1, userId);
+            statement.setLong(2, projectId);
+            ResultSet result = statement.executeQuery();
+            if (result.next())
+                r_progress = result.getInt("progress");
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return r_progress;
     }
 }

@@ -1035,7 +1035,7 @@ Blockly.ReplMgr.getFromRendezvous = function() {
     var poller = function() {                                     // So "this" is correct when called
         context.rendPoll.call(context);                           // from setTimeout
     };
-    xmlhttp.open('GET', 'http://' + top.rendezvousServer + '/rendezvous/' + rs.rendezvouscode, true);
+    xmlhttp.open('GET', '/rendezvous/' + rs.rendezvouscode, true);
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && this.status == 200) {
             try {
@@ -1117,11 +1117,12 @@ Blockly.ReplMgr.rendPoll = function() {
 
 Blockly.ReplMgr.makeDialogMessage = function(code) {
     var scancode;
-    if (top.rendezvousServer != 'rendezvous.appinventor.mit.edu') { // Should really get this from YAV
+    /*if (top.rendezvousServer != 'rendezvous.appinventor.mit.edu') { // Should really get this from YAV
         scancode = top.rendezvousServer + ";" + code;
     } else {
         scancode = code;
-    }
+    }*/
+    scancode = top.location.host + ";" + code;
     var qr = this.qrcode(2, 'L');
     qr.addData(scancode);
     try {
