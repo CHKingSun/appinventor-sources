@@ -200,7 +200,7 @@ public class SQLStorageIo implements StorageIo {
             statement.setString(1, userId);
             statement.setString(2, email);
             statement.setString(3, null);
-            statement.setDate(4, new Date(System.currentTimeMillis()));
+            statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
             statement.setString(5, "{}");
             statement.setBoolean(6, false);
             statement.setBoolean(7, false);
@@ -1019,7 +1019,7 @@ public class SQLStorageIo implements StorageIo {
             PreparedStatement statement = conn.prepareStatement("replace into rendezvous values (?, ?, ?)");
             statement.setString(1, key);
             statement.setString(2, ipAddress);
-            statement.setDate(3, new Date(System.currentTimeMillis()));
+            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1048,8 +1048,8 @@ public class SQLStorageIo implements StorageIo {
                 String r_nonceValue = result.getString("nonceValue");
                 String r_userId = result.getString("userId");
                 long r_projectId = result.getLong("projectId");
-                Date r_timestamp = result.getDate("timestamp");
-                nonce = new Nonce(r_nonceValue, r_userId, r_projectId, r_timestamp);
+                Timestamp r_timestamp = result.getTimestamp("timestamp");
+                nonce = new Nonce(r_nonceValue, r_userId, r_projectId, new Date(r_timestamp.getTime()));
             }
             result.close();
             statement.close();
@@ -1067,7 +1067,7 @@ public class SQLStorageIo implements StorageIo {
             statement.setString(1, nonceValue);
             statement.setString(2, userId);
             statement.setLong(3, projectId);
-            statement.setDate(4, new Date(System.currentTimeMillis()));
+            statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1079,7 +1079,7 @@ public class SQLStorageIo implements StorageIo {
     public void cleanupNonces() {
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from nonces where timestamp<?");
-            statement.setDate(1, new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
+            statement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1107,13 +1107,13 @@ public class SQLStorageIo implements StorageIo {
         StoredData.PWData pwData = new StoredData.PWData();
         pwData.id = UUID.randomUUID().toString();
         pwData.email = email;
-        pwData.timestamp = new Date(System.currentTimeMillis());
+        pwData.timestamp = new Timestamp(System.currentTimeMillis());
 
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("insert into pwdata values (?, ?, ?)");
             statement.setString(1, pwData.id);
             statement.setString(2, pwData.email);
-            statement.setDate(3, (java.sql.Date) pwData.timestamp);
+            statement.setTimestamp(3, (Timestamp) pwData.timestamp);
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1134,7 +1134,7 @@ public class SQLStorageIo implements StorageIo {
                 pwData = new StoredData.PWData();
                 pwData.id = result.getString("userId");
                 pwData.email = result.getString("email");
-                pwData.timestamp = result.getDate("timestamp");
+                pwData.timestamp = result.getTimestamp("timestamp");
             }
             result.close();
             statement.close();
@@ -1149,7 +1149,7 @@ public class SQLStorageIo implements StorageIo {
     public void cleanuppwdata() {
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement("delete from pwdata where timestamp<?");
-            statement.setDate(1, new Date(System.currentTimeMillis() - 60 * 60 * 1000L));
+            statement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - 60 * 60 * 1000L));
             statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1192,7 +1192,7 @@ public class SQLStorageIo implements StorageIo {
             statement.setString(1, uid);
             ResultSet result = statement.executeQuery();
             if (result.next())
-                r_visited = result.getDate("visited").getTime();
+                r_visited = result.getTimestamp("visited").getTime();
             result.close();
             statement.close();
         } catch (Exception e) {
