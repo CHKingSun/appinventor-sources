@@ -29,13 +29,16 @@ import java.util.zip.ZipOutputStream;
 public class SQLStorageIo implements StorageIo {
     private static final Flag<Boolean> requireTos = Flag.createFlag("require.tos", false);
     private static final Flag<String> storageRoot = Flag.createFlag("storage.root", "");
+    private static final Flag<String> dbAddress = Flag.createFlag("db.address", "");
+    private static final Flag<String> dbUsername = Flag.createFlag("db.username", "");
+    private static final Flag<String> dbPassword = Flag.createFlag("db.password", "");
     static DataSource ds = null;
 
     public SQLStorageIo() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/appinventor");
-        config.setUsername("root");
-        config.setPassword("123456");
+        config.setJdbcUrl("jdbc:mysql://" + dbAddress.get());
+        config.setUsername(dbUsername.get());
+        config.setPassword(dbPassword.get());
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
