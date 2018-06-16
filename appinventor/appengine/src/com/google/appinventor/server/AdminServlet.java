@@ -55,9 +55,10 @@ public class AdminServlet extends HttpServlet {
                 String content = req.getParameter("content");
                 if (isNullOrEmpty(content))
                     return;
+                content = content.replace("\r", "");
 
                 int count = 0;
-                for (String row : content.split("\\n")) {
+                for (String row : content.split("\n")) {
                     String parts[] = row.split(",");
                     String email = parts[0];
                     String name = ((parts.length > 1) && (!parts[1].equals(""))) ? parts[1] : parts[0];
