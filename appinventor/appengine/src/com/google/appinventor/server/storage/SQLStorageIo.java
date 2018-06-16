@@ -53,10 +53,10 @@ public class SQLStorageIo implements StorageIo {
         config.addDataSourceProperty("maintainTimeStats", false);
         ds = new HikariDataSource(config);
 
-        // createDatabase();
+        // createTables();
     }
 
-    private void createDatabase() {
+    private void createTables() {
         try (Connection conn = getConnection()) {
             beginTransaction(conn);
 
@@ -69,15 +69,15 @@ public class SQLStorageIo implements StorageIo {
 
             // nonce
             statement.executeUpdate("create table nonces(nonceValue varchar(255) primary key, userId varchar(64), "
-                    + "projectId int, timestamp timestamp)");
-            statement.executeUpdate("create index index_ndate on nonces(timestamp)");
+                    + "projectId int, time timestamp)");
+            statement.executeUpdate("create index index_ndate on nonces(time)");
 
             // pwdata
-            statement.executeUpdate("create table pwdata(userId varchar(64), email varchar(255), timestamp timestamp)");
-            statement.executeUpdate("create index index_pdate on pwdata(timestamp)");
+            statement.executeUpdate("create table pwdata(userId varchar(64), email varchar(255), time timestamp)");
+            statement.executeUpdate("create index index_pdate on pwdata(time)");
 
             // rendezvous
-            statement.executeUpdate("create table rendezvous(rkey varchar(64) primary key, ipaddr varchar(64), timestamp timestamp)");
+            statement.executeUpdate("create table rendezvous(rkey varchar(64) primary key, ipaddr varchar(64), time timestamp)");
 
             // groups
             statement.executeUpdate("create table groups(groupId int primary key autoincrement, name varchar(255))");
@@ -1051,7 +1051,7 @@ public class SQLStorageIo implements StorageIo {
                 String r_nonceValue = result.getString("nonceValue");
                 String r_userId = result.getString("userId");
                 long r_projectId = result.getLong("projectId");
-                Timestamp r_timestamp = result.getTimestamp("timestamp");
+                Timestamp r_timestamp = result.getTimestamp("time");
                 nonce = new Nonce(r_nonceValue, r_userId, r_projectId, new Date(r_timestamp.getTime()));
             }
             result.close();
@@ -1081,7 +1081,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public void cleanupNonces() {
         try (Connection conn = getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("delete from nonces where timestamp<?");
+            PreparedStatement statement = conn.prepareStatement("delete from nonces where time<?");
             statement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
             statement.executeUpdate();
             statement.close();
@@ -1137,7 +1137,7 @@ public class SQLStorageIo implements StorageIo {
                 pwData = new StoredData.PWData();
                 pwData.id = result.getString("userId");
                 pwData.email = result.getString("email");
-                pwData.timestamp = result.getTimestamp("timestamp");
+                pwData.timestamp = result.getTimestamp("time");
             }
             result.close();
             statement.close();
@@ -1151,7 +1151,7 @@ public class SQLStorageIo implements StorageIo {
     @Override
     public void cleanuppwdata() {
         try (Connection conn = getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("delete from pwdata where timestamp<?");
+            PreparedStatement statement = conn.prepareStatement("delete from pwdata where time<?");
             statement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - 60 * 60 * 1000L));
             statement.executeUpdate();
             statement.close();
