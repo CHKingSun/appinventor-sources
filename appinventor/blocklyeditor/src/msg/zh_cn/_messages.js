@@ -57,7 +57,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.DISABLE_BLOCK = '禁用代码块';
     Blockly.Msg.ENABLE_BLOCK = '启用代码块';
     Blockly.Msg.HELP = '帮助';    
-    Blockly.Msg.EXPORT_IMAGE = '下载模块图像';
+    Blockly.Msg.EXPORT_IMAGE = '导出模块图像';
     Blockly.Msg.COLLAPSE_ALL = '折叠所有块';
     Blockly.Msg.EXPAND_ALL = '展开所有块';
     Blockly.Msg.ARRANGE_H = '横向排列所有块';
@@ -79,8 +79,12 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.SHOW_BACKPACK_DOCUMENTATION = "显示背包介绍";
     Blockly.Msg.BACKPACK_DOCUMENTATION = "背包具有备份功能。它允许你从项目或屏幕中复制代码块到另一个项目或屏幕。复制时，将代码块从工作区域拖放入背包；粘贴时，单击背包图标将背包中的代码块拖放入工作区域。"
     + "</p><p>如果你退出 MIT App Inventor 时将代码块留在背包中，背包会保存代码块直到你下次登录。"
-    + "</p><p>想要了解更多有关背包的介绍，请前往："
+    + "</p><p>若要了解更多有关背包的介绍，请前往："
     + '</p><p><a href="http://ai2.appinventor.mit.edu/reference/other/backpack.html" target="_blank">http://ai2.appinventor.mit.edu/reference/other/backpack.html</a>';
+    Blockly.Msg.ENABLE_GRID = '显示工作区网格';
+    Blockly.Msg.DISABLE_GRID = '隐藏工作区网格';
+    Blockly.Msg.ENABLE_SNAPPING = '启用网格自动对齐';
+    Blockly.Msg.DISABLE_SNAPPING = '禁用网格自动对齐';
 
 // Variable renaming.
     Blockly.MSG_CHANGE_VALUE_TITLE = '修改数值:';
@@ -121,7 +125,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_COLOUR_GRAY = '灰色';
     Blockly.Msg.LANG_COLOUR_SPLIT_COLOUR = '分解色值';
     Blockly.Msg.LANG_COLOUR_SPLIT_COLOUR_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/colors#split';
-    Blockly.Msg.LANG_COLOUR_SPLIT_COLOUR_TOOLTIP = '返回含红、绿、蓝色值以及透明度值（0-255）的列表';
+    Blockly.Msg.LANG_COLOUR_SPLIT_COLOUR_TOOLTIP = '返回含红、绿、蓝色值以及透明度值（范围[0, 255]）的列表';
     Blockly.Msg.LANG_COLOUR_MAKE_COLOUR = '合成颜色';
     Blockly.Msg.LANG_COLOUR_MAKE_COLOUR_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/colors#make';
     Blockly.Msg.LANG_COLOUR_MAKE_COLOUR_TOOLTIP = '返回由指定红、绿、蓝色值以及透明度值合成的颜色。';
@@ -168,9 +172,9 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_FOR_INPUT_TO = '到';
     Blockly.Msg.LANG_CONTROLS_FOR_INPUT_DO = '执行';
 
-    Blockly.Msg.LANG_CONTROLS_FOR_TOOLTIP = '从一个数字开始取数，到另一个数结束。\n' +
+    Blockly.Msg.LANG_CONTROLS_FOR_TOOLTIP = '循环从一个数值开始取数，到另一个数结束。\n' +
         '每取一个数，都将其值赋给\n' +
-        '变量 "%1"，并执行语句块。';
+        '变量 %1 ，并执行语句块。';
 
     Blockly.Msg.LANG_CONTROLS_FORRANGE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#forrange';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_ITEM = '对于任意';
@@ -179,12 +183,12 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_END = '到';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_STEP = '每次增加';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_DO = '执行';
-    Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_COLLAPSED_TEXT = '对一定范围内的数字';
+    Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_COLLAPSED_TEXT = '对一定范围内的数值';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_COLLAPSED_PREFIX = '对于 ';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_INPUT_COLLAPSED_SUFFIX = ' 范围内的';
     Blockly.Msg.LANG_CONTROLS_FORRANGE_TOOLTIP = '按指定范围和增量循环取值，'
 	+ '每次循环均将数值赋予指定变量，'
-	+ '并运行“执行”区域所包含的代码块';
+	+ '然后执行“执行”区域所包含的代码块';
 
     Blockly.Msg.LANG_CONTROLS_FOREACH_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#foreach';
     Blockly.Msg.LANG_CONTROLS_FOREACH_INPUT_ITEM = '对于任意';
@@ -194,37 +198,37 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_FOREACH_INPUT_COLLAPSED_TEXT = '对列表中每一项';
     Blockly.Msg.LANG_CONTROLS_FOREACH_INPUT_COLLAPSED_PREFIX = '对于 ';
     Blockly.Msg.LANG_CONTROLS_FOREACH_INPUT_COLLAPSED_SUFFIX = ' 列表中的';
-    Blockly.Msg.LANG_CONTROLS_FOREACH_TOOLTIP = '针对列表中的每一项运行“执行”区域所包含的代码块，'
-    + ' 采用指定变量名引用当前列表项。';
+    Blockly.Msg.LANG_CONTROLS_FOREACH_TOOLTIP = '对列表中的每一项，执行“执行”区域所包含的代码块，'
+    + '采用指定变量名引用当前列表项。';
 
     Blockly.Msg.LANG_CONTROLS_GET_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#get';
 
 
     Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_HELPURL = 'http://en.wikipedia.org/wiki/Control_flow';
     Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_INPUT_OFLOOP = '循环';
-    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK = '中断';
-    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = '执行下一个周期';
-    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = '跳出内部循环';
+    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK = '跳出循环';
+    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = '继续下一次循环';
+    Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = '跳出循环';
     Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = '跳过本循环的其余部分，并且\n' +
-    '进入下一循环周期。';
+    '进入下一次循环。';
     Blockly.Msg.LANG_CONTROLS_FLOW_STATEMENTS_WARNING = '警告：\n' +
-    '本代码块只能于\n' +
+    '本代码块只能在\n' +
     '循环语句块中使用。';
 
     Blockly.Msg.LANG_CONTROLS_WHILE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#while';
     Blockly.Msg.LANG_CONTROLS_WHILE_TITLE = '当';
     Blockly.Msg.LANG_CONTROLS_WHILE_INPUT_TEST = '满足条件';
-    Blockly.Msg.LANG_CONTROLS_WHILE_INPUT_DO = '执行';
+    Blockly.Msg.LANG_CONTROLS_WHILE_INPUT_DO = '循环执行';
     Blockly.Msg.LANG_CONTROLS_WHILE_COLLAPSED_TEXT = '满足条件';
-    Blockly.Msg.LANG_CONTROLS_WHILE_TOOLTIP = '当条件的表达式值为真时，执行“执行”区域中的代码块。';
-    Blockly.Msg.LANG_CONTROLS_CHOOSE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#choose';
+    Blockly.Msg.LANG_CONTROLS_WHILE_TOOLTIP = '当条件的表达式值为真时，循环执行“执行”区域中的代码块。';
 
+    Blockly.Msg.LANG_CONTROLS_CHOOSE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#choose';
     Blockly.Msg.LANG_CONTROLS_CHOOSE_TITLE = '如果'
     Blockly.Msg.LANG_CONTROLS_CHOOSE_INPUT_TEST = '';
     Blockly.Msg.LANG_CONTROLS_CHOOSE_INPUT_THEN_RETURN = '则';
     Blockly.Msg.LANG_CONTROLS_CHOOSE_INPUT_ELSE_RETURN = '否则';
     Blockly.Msg.LANG_CONTROLS_CHOOSE_COLLAPSED_TEXT = '如果';
-    Blockly.Msg.LANG_CONTROLS_CHOOSE_TOOLTIP = '如果条件表达式的检测值为真，' +
+    Blockly.Msg.LANG_CONTROLS_CHOOSE_TOOLTIP = '如果条件表达式的值为真，' +
       '则将关联的求值表达式运算结果传递给“则-返回”语句槽；' +
       '否则将关联的求值表达式运算结果传递给“否则-返回”语句槽；' +
       '一般只有一个返回槽表达式能被求值。';
@@ -238,8 +242,8 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
 
     Blockly.Msg.LANG_CONTROLS_EVAL_BUT_IGNORE_TITLE = '求值但忽略结果'
     Blockly.Msg.LANG_CONTROLS_EVAL_BUT_IGNORE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#evaluate';
-    Blockly.Msg.LANG_CONTROLS_EVAL_BUT_COLLAPSED_TEXT = '求值但不返回';
-    Blockly.Msg.LANG_CONTROLS_EVAL_BUT_IGNORE_TOOLTIP = '运行所连接的代码块但不返回运算值，用于调用求值过程但不需要其运算值。';
+    Blockly.Msg.LANG_CONTROLS_EVAL_BUT_COLLAPSED_TEXT = '求值但忽略结果';
+    Blockly.Msg.LANG_CONTROLS_EVAL_BUT_IGNORE_TOOLTIP = '运行所连接的代码块但忽略其结果(如果有)，用于调用求值过程但不需要其运算值。';
 
     /* [lyn 13/10/14] Removed for now. May come back some day.
     Blockly.Msg.LANG_CONTROLS_NOTHING_TITLE = '空值';
@@ -258,21 +262,20 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_OPEN_ANOTHER_SCREEN_WITH_START_VALUE_INPUT_SCREENNAME = '屏幕名称';
     Blockly.Msg.LANG_CONTROLS_OPEN_ANOTHER_SCREEN_WITH_START_VALUE_INPUT_STARTVALUE = '初始值';
     Blockly.Msg.LANG_CONTROLS_OPEN_ANOTHER_SCREEN_WITH_START_VALUE_COLLAPSED_TEXT = '打开屏幕并传值'
-    Blockly.Msg.LANG_CONTROLS_OPEN_ANOTHER_SCREEN_WITH_START_VALUE_TOOLTIP = '在多屏应用中开启一个新屏幕，并'
-    + '传入初始值。';
+    Blockly.Msg.LANG_CONTROLS_OPEN_ANOTHER_SCREEN_WITH_START_VALUE_TOOLTIP = '在多屏应用中打开一个新屏幕，并传入初始值。';
 
     Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#getstartvalue';
     Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_TITLE = '获取初始值';
     Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_INPUT_SCREENNAME = '屏幕名称';
     Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_INPUT_STARTVALUE = '初始值';
     Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_COLLAPSED_TEXT = '获取初始值';
-    Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_TOOLTIP = '在屏幕打开时返回传入的值。'
-    + '此屏幕通常由多屏应用程序中的另一个屏幕打开。如没有内容传入，'
-    + '则返回空文本。';
+    Blockly.Msg.LANG_CONTROLS_GET_START_VALUE_TOOLTIP = '在屏幕打开时获取传入的初始值。'
+    + '此屏幕通常由AppInventor多屏应用中的另一个屏幕打开。'
+    + '如没有内容传入，则返回空文本。';
 
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#closescreen';
-    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_TITLE = '关闭屏幕 ';
-    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_COLLAPSED_TEXT = '关闭屏幕 ';
+    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_TITLE = '关闭屏幕';
+    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_COLLAPSED_TEXT = '关闭屏幕';
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_TOOLTIP = '关闭当前屏幕';
 
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_VALUE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#closescreenwithvalue';
@@ -284,35 +287,36 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_CONTROLS_CLOSE_APPLICATION_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#closeapp';
     Blockly.Msg.LANG_CONTROLS_CLOSE_APPLICATION_TITLE = '退出程序';
     Blockly.Msg.LANG_CONTROLS_CLOSE_APPLICATION_COLLAPSED_TEXT = '退出程序';
-    Blockly.Msg.LANG_CONTROLS_CLOSE_APPLICATION_TOOLTIP = '关闭所有屏幕并终止程序。';
+    Blockly.Msg.LANG_CONTROLS_CLOSE_APPLICATION_TOOLTIP = '关闭所有屏幕并退出程序。';
 
     Blockly.Msg.LANG_CONTROLS_GET_PLAIN_START_TEXT_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#getplainstarttext';
     Blockly.Msg.LANG_CONTROLS_GET_PLAIN_START_TEXT_TITLE = '获取初始文本值';
     Blockly.Msg.LANG_CONTROLS_GET_PLAIN_START_TEXT_COLLAPSED_TEXT = '获取初始文本值';
-    Blockly.Msg.LANG_CONTROLS_GET_PLAIN_START_TEXT_TOOLTIP = ' 当屏幕被其他应用启动时返回所传入的文本值，'
+    Blockly.Msg.LANG_CONTROLS_GET_PLAIN_START_TEXT_TOOLTIP = '当屏幕被其他应用启动时获取传入的初始文本值，'
     + '如没有内容传入，则返回空文本值。'
-    + '对于多屏应用，更多地是采用获取初始值的方式，而非获取文本值。';
+    + '本代码块用于AppInventor屏幕和其他应用交换信息，'
+    + '若要获取其他AppInventor屏幕传递的初始值，请使用“获取初始值”';
 
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#closescreenwithplaintext';
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_TITLE = '关闭屏幕并返回文本';
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_INPUT_TEXT = '文本值';
     Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_COLLAPSED_TEXT = '关闭屏幕并返回文本';
-    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_TOOLTIP = '关闭当前屏幕，并向打开此屏幕的应用返回文本。'
-    + '对于多屏应用，则多采用关闭屏幕返回值，'
-    + '而非返回文本值。';
+    Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_TOOLTIP = '关闭当前屏幕，并向打开此屏幕的Activity返回文本。'
+    + '本代码块用于AppInventor屏幕和其他应用交换信息，'
+    + '若要将文本返回到其他AppInventor屏幕，请使用“关闭屏幕并返回值”。';
 
 // Logic Blocks.
     Blockly.Msg.LANG_CATEGORY_LOGIC = '逻辑';
     Blockly.Msg.LANG_LOGIC_COMPARE_HELPURL = 'http://en.wikipedia.org/wiki/Inequality _(mathematics)';
     Blockly.Msg.LANG_LOGIC_COMPARE_HELPURL_EQ = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#=';
     Blockly.Msg.LANG_LOGIC_COMPARE_HELPURL_NEQ = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#not=';
-    Blockly.Msg.LANG_LOGIC_COMPARE_TOOLTIP_EQ = '判断二对象是否相等，\n' +
-    '对象可为任意类型，不限于数字。\n' +
-	'判断数字是否相等的依据是它们的字符串形式是否相等。' +
-	'例如：数字0等同于字符串“0”；' +
-	'代表数字的字符串当它们代表的数字相等时也相等，\n' +
-	'例如“1”等于“01”';
-    Blockly.Msg.LANG_LOGIC_COMPARE_TOOLTIP_NEQ = '判断二对象是否互不相等，对象可为任意类型，不限于数字。';
+    Blockly.Msg.LANG_LOGIC_COMPARE_TOOLTIP_EQ = '判断两个对象是否相等，\n' +
+    '对象可为任意类型，不限于数值。\n' +
+	'判断数值是否相等的依据是它们的字符串形式是否相等。' +
+	'例如：数值0等同于字符串“0”；' +
+	'代表数值的字符串当它们代表的数值相等时也相等，\n' +
+	'例如 "1" 等于 "01"';
+    Blockly.Msg.LANG_LOGIC_COMPARE_TOOLTIP_NEQ = '判断两个对象是否互不相等，对象可为任意类型，不限于数值。';
     Blockly.Msg.LANG_LOGIC_COMPARE_TRANSLATED_NAME = '逻辑相等';
     Blockly.Msg.LANG_LOGIC_COMPARE_EQ = '=';
     Blockly.Msg.LANG_LOGIC_COMPARE_NEQ = '\u2260';
@@ -321,26 +325,26 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_LOGIC_OPERATION_HELPURL_OR = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#or';
     Blockly.Msg.LANG_LOGIC_OPERATION_AND = '与';
     Blockly.Msg.LANG_LOGIC_OPERATION_OR = '或';
-    Blockly.Msg.LANG_LOGIC_OPERATION_TOOLTIP_AND = '如所有输入项皆为真则返回真值。';
-    Blockly.Msg.LANG_LOGIC_OPERATION_TOOLTIP_OR = '只要任意输入项为真则返回真值。';
+    Blockly.Msg.LANG_LOGIC_OPERATION_TOOLTIP_AND = '如所有输入项皆为真则返回真。';
+    Blockly.Msg.LANG_LOGIC_OPERATION_TOOLTIP_OR = '只要任意输入项为真则返回真。';
 
     Blockly.Msg.LANG_LOGIC_NEGATE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#not';
     Blockly.Msg.LANG_LOGIC_NEGATE_INPUT_NOT = '非';
-    Blockly.Msg.LANG_LOGIC_NEGATE_TOOLTIP = '如输入项为假则返回真值，\n' +
-    '如输入项为真则返回假值。';
+    Blockly.Msg.LANG_LOGIC_NEGATE_TOOLTIP = '如输入项为假则返回真，\n' +
+    '如输入项为真则返回假。';
 
     Blockly.Msg.LANG_LOGIC_BOOLEAN_TRUE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#true';
     Blockly.Msg.LANG_LOGIC_BOOLEAN_FALSE_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/logic#false';
     Blockly.Msg.LANG_LOGIC_BOOLEAN_TRUE = '真';
     Blockly.Msg.LANG_LOGIC_BOOLEAN_FALSE = '假';
-    Blockly.Msg.LANG_LOGIC_BOOLEAN_TOOLTIP_TRUE = '返回真值';
-    Blockly.Msg.LANG_LOGIC_BOOLEAN_TOOLTIP_FALSE = '返回假值';
+    Blockly.Msg.LANG_LOGIC_BOOLEAN_TOOLTIP_TRUE = '返回真';
+    Blockly.Msg.LANG_LOGIC_BOOLEAN_TOOLTIP_FALSE = '返回假';
 
 // Math Blocks.
     Blockly.Msg.LANG_CATEGORY_MATH = '数学';
     Blockly.Msg.LANG_MATH_NUMBER_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#number';
-    Blockly.Msg.LANG_MATH_NUMBER_TOOLTIP = '报告所显示的数字 ';
-    Blockly.Msg.LANG_MATH_MUTATOR_ITEM_INPUT_NUMBER = '数字';
+    Blockly.Msg.LANG_MATH_NUMBER_TOOLTIP = '报告所显示的数值 ';
+    Blockly.Msg.LANG_MATH_MUTATOR_ITEM_INPUT_NUMBER = '数值';
 
     Blockly.Msg.LANG_MATH_COMPARE_HELPURL = '';
     Blockly.Msg.LANG_MATH_COMPARE_HELPURL_EQ = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#=';
@@ -349,13 +353,13 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_MATH_COMPARE_HELPURL_LTE = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#lte';
     Blockly.Msg.LANG_MATH_COMPARE_HELPURL_GT = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#gt';
     Blockly.Msg.LANG_MATH_COMPARE_HELPURL_GTE = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#gte';
-    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_EQ = '如两个数字相等则返回真值';
-    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_NEQ = '如两个数字不等则返回真值';
-    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_LT = '如第一个数字小于第二个数字，\n' +
+    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_EQ = '如两个数相等则返回真';
+    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_NEQ = '如两个数不等则返回真';
+    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_LT = '如第一个数小于第二个数，\n' +
     '则返回真。';
-    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_LTE = '如第一个数字小于或等于第二个数字，\n' +
+    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_LTE = '如第一个数小于或等于第二个数，\n' +
     '则返回真。';
-    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_GT = '如第一个数字大于第二个数字，\n' +
+    Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_GT = '如第一个数大于第二个数，\n' +
     '则返回真。';
     Blockly.Msg.LANG_MATH_COMPARE_TOOLTIP_GTE = '如果第一个数大于或等于第二个数，\n' +
     '则返回真。';
@@ -375,7 +379,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_MATH_ARITHMETIC_TOOLTIP_MINUS = '返回a-b';
     Blockly.Msg.LANG_MATH_ARITHMETIC_TOOLTIP_MULTIPLY = '返回a*b';
     Blockly.Msg.LANG_MATH_ARITHMETIC_TOOLTIP_DIVIDE = '返回a/b';
-    Blockly.Msg.LANG_MATH_ARITHMETIC_TOOLTIP_POWER = '返回a^b';
+    Blockly.Msg.LANG_MATH_ARITHMETIC_TOOLTIP_POWER = '返回a^b （a的b次幂）';
 
     Blockly.Msg.LANG_MATH_ARITHMETIC_ADD = '+';
     Blockly.Msg.LANG_MATH_ARITHMETIC_MINUS = '-';
@@ -386,7 +390,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     /*Blockly.Msg.LANG_MATH_CHANGE_TITLE_CHANGE = '改变';
     Blockly.Msg.LANG_MATH_CHANGE_TITLE_ITEM = '项目';
     Blockly.Msg.LANG_MATH_CHANGE_INPUT_BY = '由';
-    Blockly.Msg.LANG_MATH_CHANGE_TOOLTIP = '变量%1增加一个值"。';*/
+    Blockly.Msg.LANG_MATH_CHANGE_TOOLTIP = '变量%1增加一个值。';*/
 
     Blockly.Msg.LANG_MATH_SINGLE_OP_ROOT = '平方根';
     Blockly.Msg.LANG_MATH_SINGLE_OP_ABSOLUTE = '绝对值';
@@ -460,9 +464,9 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_MATH_RANDOM_INT_TITLE_RANDOM = '随机整数';
     Blockly.Msg.LANG_MATH_RANDOM_INT_INPUT_FROM = '范围从';
     Blockly.Msg.LANG_MATH_RANDOM_INT_INPUT_TO = '到';
-    Blockly.Msg.LANG_MATH_RANDOM_INT_INPUT = '随机整数从 %1 到 %2 ';
+    Blockly.Msg.LANG_MATH_RANDOM_INT_INPUT = '随机整数 范围从 %1 到 %2 ';
     Blockly.Msg.LANG_MATH_RANDOM_INT_TOOLTIP = '返回指定范围内的随机整数，\n' +
-    '接受的范围限于2^30之内。';
+    '范围限制于2^30之内。';
 
     Blockly.Msg.LANG_MATH_RANDOM_FLOAT_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#randomfrac';
     Blockly.Msg.LANG_MATH_RANDOM_FLOAT_TITLE_RANDOM = '随机小数';
@@ -473,53 +477,53 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_MATH_RANDOM_SEED_INPUT_TO = '为';
     Blockly.Msg.LANG_MATH_RANDOM_SEED_TOOLTIP = '为随机数生成器指定种子。';
 
-    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TITLE_CONVERT = '角度<——>弧度';
-    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_OP_RAD_TO_DEG = '弧度——>角度';
-    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_OP_DEG_TO_RAD = '角度——>弧度';
-    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TOOLTIP_RAD_TO_DEG = '返回输入弧度对应的角度,返回的度数范围[0, 360)。';
+    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TITLE_CONVERT = '角度/弧度换算';
+    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_OP_RAD_TO_DEG = '弧度转换为角度';
+    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_OP_DEG_TO_RAD = '角度转换为弧度';
+    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TOOLTIP_RAD_TO_DEG = '返回输入弧度对应的角度,返回的角度范围[0, 360)。';
     Blockly.Msg.LANG_MATH_CONVERT_ANGLES_HELPURL_RAD_TO_DEG = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#convertrad';
-    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TOOLTIP_DEG_TO_RAD = '返回角度对应的弧度值，返回的弧度范围[-\u03C0, +\u03C0)。';
+    Blockly.Msg.LANG_MATH_CONVERT_ANGLES_TOOLTIP_DEG_TO_RAD = '返回输入角度对应的弧度值，返回的弧度范围[-\u03C0, +\u03C0)。';
     Blockly.Msg.LANG_MATH_CONVERT_ANGLES_HELPURL_DEG_TO_RAD = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#convertdeg';
 
     Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#format';
     Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_TITLE = '求小数值';
-    Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_INPUT_NUM = '数字';
+    Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_INPUT_NUM = '数值';
     Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_INPUT_PLACES = '位数';
-    Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_INPUT = '将数字 %1转变为小数形式 位数 %2';
+    Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_INPUT = '将数值 %1 转变为小数形式 位数 %2';
     Blockly.Msg.LANG_MATH_FORMAT_AS_DECIMAL_TOOLTIP = '以指定位数返回该数值的小数形式。';
 
     Blockly.Msg.LANG_MATH_IS_A_NUMBER_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
-    Blockly.Msg.LANG_MATH_IS_A_NUMBER_INPUT_NUM = '是否为数字?';
-    Blockly.Msg.LANG_MATH_IS_A_NUMBER_TOOLTIP = '判断该对象是否为数字。';
+    Blockly.Msg.LANG_MATH_IS_A_NUMBER_INPUT_NUM = '是否为数值?';
+    Blockly.Msg.LANG_MATH_IS_A_NUMBER_TOOLTIP = '判断该对象是否为数值。';
 
-    // Blockly.Msg.LANG_MATH_IS_A_DECIMAL_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
-    // Blockly.Msg.LANG_MATH_IS_A_DECIMAL_INPUT_NUM = '是否为十进制数?';
-    // Blockly.Msg.LANG_MATH_IS_A_DECIMAL_TOOLTIP = '判断该对象是否为十进制数。';
+    Blockly.Msg.LANG_MATH_IS_A_DECIMAL_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
+    Blockly.Msg.LANG_MATH_IS_A_DECIMAL_INPUT_NUM = '是否为十进制数?';
+    Blockly.Msg.LANG_MATH_IS_A_DECIMAL_TOOLTIP = '判断该对象是否为十进制数。';
 
-    // Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
-    // Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_INPUT_NUM = '是否为十六进制?';
-    // Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_TOOLTIP = '判断该对象是否为十六进制数。';
+    Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
+    Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_INPUT_NUM = '是否为十六进制?';
+    Blockly.Msg.LANG_MATH_IS_A_HEXADECIMAL_TOOLTIP = '判断该对象是否为十六进制数。';
 
-    // Blockly.Msg.LANG_MATH_IS_A_BINARY_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
-    // Blockly.Msg.LANG_MATH_IS_A_BINARY_INPUT_NUM = '是否为二进制?';
-    // Blockly.Msg.LANG_MATH_IS_A_BINARY_TOOLTIP = '判断该对象是否为二进制数。';
+    Blockly.Msg.LANG_MATH_IS_A_BINARY_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#isnumber';
+    Blockly.Msg.LANG_MATH_IS_A_BINARY_INPUT_NUM = '是否为二进制?';
+    Blockly.Msg.LANG_MATH_IS_A_BINARY_TOOLTIP = '判断该对象是否为二进制数。';
 
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TITLE_CONVERT = '进制转换';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_DEC_TO_HEX = '10进制转16进制';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_DEC_TO_HEX = '';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_DEC_TO_HEX = '返回一个十进制数的十六进制形式。';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TITLE_CONVERT = '进制转换';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_DEC_TO_HEX = '10进制转16进制';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_DEC_TO_HEX = '';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_DEC_TO_HEX = '将输入的数值转换为其十六进制表示的字符串。';
 
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_HEX_TO_DEC = '16进制转10进制';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_HEX_TO_DEC = '';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_HEX_TO_DEC = '返回一个十六进制数的十进制形式。';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_HEX_TO_DEC = '16进制转10进制';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_HEX_TO_DEC = '';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_HEX_TO_DEC = '将输入的十六进制表示的字符串转换为数值。';
 
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_DEC_TO_BIN = '10进制转2进制';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_DEC_TO_BIN = '';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_DEC_TO_BIN = '返回一个十进制数的二进制形式。';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_DEC_TO_BIN = '10进制转2进制';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_DEC_TO_BIN = '';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_DEC_TO_BIN = '将输入的数值转换为其二进制表示的字符串。';
 
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_BIN_TO_DEC = '2进制转10进制';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_BIN_TO_DEC = '';
-    // Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_BIN_TO_DEC = '返回一个二进制数的十进制形式。';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_OP_BIN_TO_DEC = '2进制转10进制';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_HELPURL_BIN_TO_DEC = '';
+    Blockly.Msg.LANG_MATH_CONVERT_NUMBER_TOOLTIP_BIN_TO_DEC = '将输入的二进制表示的字符串转换为数值。';
 
 // Text Blocks.
     Blockly.Msg.LANG_CATEGORY_TEXT = '文本';
@@ -561,7 +565,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     + '大写字符顺序优于小写字符，例如 A<a。';
     Blockly.Msg.LANG_TEXT_COMPARE_TOOLTIP_EQUAL = '检测字符串内容是否相同，即：\n'
     + '是否由同一组顺序相同的字符组成，与通常的相等概念不同的是，\n'
-    + '当文本字串为数字，如123和0123，尽管数字相等，\n'
+    + '当文本字串为数值时，如 "123" 和 "0123" ，尽管数值相等，\n'
     + '但其字符串不相等。';
     Blockly.Msg.LANG_TEXT_COMPARE_TOOLTIP_GT = '按字典顺序比较text1是否大于text2，\n'
     + '如果text1与text2开头部分相同，则长度较短的字符串为较小值，\n'
@@ -593,8 +597,8 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
      Blockly.Msg.LANG_TEXT_CHARAT_INPUT_INTEXT = '字符串';
      Blockly.Msg.LANG_TEXT_CHARAT_TOOLTIP = '返回指定下标的字符。';*/
 
-    Blockly.Msg.LANG_TEXT_CHANGECASE_OPERATOR_UPPERCASE = '大写';
-    Blockly.Msg.LANG_TEXT_CHANGECASE_OPERATOR_DOWNCASE = '小写';
+    Blockly.Msg.LANG_TEXT_CHANGECASE_OPERATOR_UPPERCASE = '转为大写';
+    Blockly.Msg.LANG_TEXT_CHANGECASE_OPERATOR_DOWNCASE = '转为小写';
     Blockly.Msg.LANG_TEXT_CHANGECASE_TOOLTIP_UPPERCASE = '返回转为大写后的字符串副本。';
     Blockly.Msg.LANG_TEXT_CHANGECASE_HELPURL_UPPERCASE = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#upcase';
     Blockly.Msg.LANG_TEXT_CHANGECASE_TOOLTIP_DOWNCASE = '返回转为小写后的字符串副本。';
@@ -628,41 +632,40 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_TEXT_SPLIT_OPERATOR_SPLIT_AT_FIRST_OF_ANY = '分解任意首项';
     Blockly.Msg.LANG_TEXT_SPLIT_OPERATOR_SPLIT = '分解';
     Blockly.Msg.LANG_TEXT_SPLIT_OPERATOR_SPLIT_AT_ANY = '任意分解';
-    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT_AT_FIRST = '在首次出现分隔符的位置将给定文本分解为两部分，\n'
+    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT_AT_FIRST = '在首次出现分隔符的位置将指定文本分解为两部分，\n'
     + '并返回包含分隔点前和分隔点后两部分内容的列表，\n'
-    + '如分解字符串"苹果,香蕉,樱桃,西瓜"，以逗号作为分隔符，\n'
-    + '将返回一个包含两项的列表，其中第一项内容为"苹果"，第二项内容则为\n'
-    + '"香蕉,樱桃,西瓜"。\n'
-    + '注意，"苹果"后面的逗号不在结果中出现，\n'
+    + '如以 "," （逗号）作为分隔符，分解字符串 "apple,banana,cherry,dogfood"\n'
+    + '将返回一个二项列表，其中第一项为 "apple" ，第二项为\n'
+    + '"banana,cherry,dogfood" 。\n'
+    + '注意， "apple" 后面的逗号不在结果中出现，\n'
     + '因为它起到分隔符的作用。';
     Blockly.Msg.LANG_TEXT_SPLIT_HELPURL_SPLIT_AT_FIRST = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#splitat';
     Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT_AT_FIRST_OF_ANY = '以列表中的任意项作为分隔符，\n'
-    + '在首次出现分隔符的位置将给定文本分解为一个两项列表。\n\n'
-    + '如以"(稥,苹)"作为分隔符分解"我喜欢苹果香蕉苹果葡萄"，\n'
-    + '将返回一个两项列表，其第一项为"我喜欢"，第二项为\n'
-    + '"苹果香蕉苹果葡萄"';
+    + '在首次出现分隔符的位置将指定文本分解为一个二项列表。\n\n'
+    + '如以列表 ("ba", "ap") 分解字符串 "I love apples bananas apples grapes"\n'
+    + '将返回一个二项列表，其第一项为 "I love" ，第二项为\n'
+    + '"ples bananas apples grapes."';
     Blockly.Msg.LANG_TEXT_SPLIT_HELPURL_SPLIT_AT_FIRST_OF_ANY = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#splitatfirstofany';
-    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT = '以指定文本作为分隔符，将字符串分解为不同片段，并生成一个列表作为返回结果。\n'
-    + ' 如以","(逗号)分解"一,二,三,四"，将返回列表"(一 二 三 四)"，\n'
-    + ' 而以"-土豆"作为分隔符分解字符串"一-土豆,二-土豆,三-土豆,四"，则返回列表"(一 二 三 四)"。'
+    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT = '以指定文本作为分隔符，将指定文本分解为多个片段，并返回结果列表。\n'
+    + ' 如以 "," （逗号）分解 "one,two,three,four"，将返回列表 "(one two three four)"\n'
+    + ' 而以 "-potato" 分解字符串 "one-potato,two-potato,three-potato,four" ，则返回列表\n'
+    + '(one two three four)'
     Blockly.Msg.LANG_TEXT_SPLIT_HELPURL_SPLIT = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#split';
-    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT_AT_ANY  = '以分隔符列表中的任意一项作为分隔符，将给定文本分解为列表，\n'
-    + '并将列表作为处理结果返回。\n'
-    + '如分解字符串"蓝莓,香蕉,草莓,西瓜"，以一个含两元素的列表作为分隔符，\n'
-    + '其中第一项为逗号，第二项为"莓"，则返回列表：\n'
-    + '"(蓝 香蕉 草 西瓜)"'
+    Blockly.Msg.LANG_TEXT_SPLIT_TOOLTIP_SPLIT_AT_ANY  = '以列表中的任意项作为分隔符，将指定文本分解为多个片段，并返回结果列表。\n'
+    + '如以列表 (","（逗号）,"rry") 分解字符串 "appleberry,banana,cherry,dogfood" ，则返回列表\n'
+    + '(applebe banana che dogfood)';
     Blockly.Msg.LANG_TEXT_SPLIT_HELPURL_SPLIT_AT_ANY = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#splitatany';
 
     /*.LANG_TEXT_PRINT_HELPURL = 'http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode91.html';
      Blockly.Msg.LANG_TEXT_PRINT_TITLE_PRINT = '输出';
-     Blockly.Msg.LANG_TEXT_PRINT_TOOLTIP = '输出文本，数字或指定值。';
+     Blockly.Msg.LANG_TEXT_PRINT_TOOLTIP = '输出文本，数值或指定值。';
 
     /*Blockly.Msg.LANG_TEXT_PROMPT_HELPURL = 'http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode92.html';
      Blockly.Msg.LANG_TEXT_PROMPT_TITLE_PROMPT_FOR = '提示';
      Blockly.Msg.LANG_TEXT_PROMPT_TITILE_WITH_MESSAGE = '信息';
      Blockly.Msg.LANG_TEXT_PROMPT_TOOLTIP = '提示用户输入特定的文本。';
      Blockly.Msg.LANG_TEXT_PROMPT_TYPE_TEXT = '文本';
-     Blockly.Msg.LANG_TEXT_PROMPT_TYPE_NUMBER = '指定数字';*/
+     Blockly.Msg.LANG_TEXT_PROMPT_TYPE_NUMBER = '指定数值';*/
 
     Blockly.Msg.LANG_TEXT_SPLIT_AT_SPACES_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/text#splitspaces';
     Blockly.Msg.LANG_TEXT_SPLIT_AT_SPACES_TITLE = '用空格分解';
@@ -688,9 +691,9 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
 
 // Lists Blocks.
     Blockly.Msg.LANG_CATEGORY_LISTS = '列表 ';
-    Blockly.Msg.LANG_LISTS_CREATE_EMPTY_HELPURL = 'http://en.wikipedia.org/wiki/Linked_list#Empty _lists';
+//Blockly.Msg.LANG_LISTS_CREATE_EMPTY_HELPURL = 'http://en.wikipedia.org/wiki/Linked_list#Empty_lists';
     Blockly.Msg.LANG_LISTS_CREATE_EMPTY_TITLE = '创建空列表 ';
-    Blockly.Msg.LANG_LISTS_CREATE_EMPTY_TOOLTIP = '返回一个项数为零的列表对象';
+//Blockly.Msg.LANG_LISTS_CREATE_EMPTY_TOOLTIP = '返回一个项数为零的列表对象';
 
     Blockly.Msg.LANG_LISTS_CREATE_WITH_EMPTY_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#makealist';
     Blockly.Msg.LANG_LISTS_CREATE_WITH_TITLE_MAKE_LIST = '创建列表';
@@ -718,8 +721,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_LISTS_IS_IN_INPUT_THING = '对象';
     Blockly.Msg.LANG_LISTS_IS_IN_INPUT_LIST = '列表';
     Blockly.Msg.LANG_LISTS_IS_IN_INPUT = '检查列表%2中是否含对象%1'
-    Blockly.Msg.LANG_LISTS_IS_IN_TOOLTIP = '如该对象为列表中某一项则返回真值，'
-    + '否则为假。';
+    Blockly.Msg.LANG_LISTS_IS_IN_TOOLTIP = '如该对象为列表中某一项则返回真，否则返回假。'
 
     Blockly.Msg.LANG_LISTS_POSITION_IN_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#indexinlist';
     Blockly.Msg.LANG_LISTS_POSITION_IN_TITLE_POSITION = '列表项索引值';
@@ -750,11 +752,11 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_LISTS_REMOVE_ITEM_TOOLTIP = '删除指定索引值的列表项';
 
     /*Blockly.Msg.LANG_LISTS_REPEAT_HELPURL = 'http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Farsubex.htm';
-    Blockly.Msg.LANG_LISTS_REPEAT_TITLE_CREATE = '创建拥有项目列表';
+    Blockly.Msg.LANG_LISTS_REPEAT_TITLE_CREATE = '创建拥有指定项目的列表';
     Blockly.Msg.LANG_LISTS_REPEAT_INPUT_REPEATED = '重复';
     Blockly.Msg.LANG_LISTS_REPEAT_INPUT_TIMES = '次数';
-    Blockly.Msg.LANG_LISTS_REPEAT_TOOLTIP = '创建一个拥有给定项目的列表\n' +
-    '并且重复给定的次数';*/
+    Blockly.Msg.LANG_LISTS_REPEAT_TOOLTIP = '创建一个拥有指定项目的列表\n' +
+    '并且重复指定的次数';*/
 
     Blockly.Msg.LANG_LISTS_LENGTH_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#lengthoflist';
     Blockly.Msg.LANG_LISTS_LENGTH_INPUT_LENGTH = '求列表长度';
@@ -829,7 +831,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_LISTS_INSERT_INPUT_INDEX = '索引值';
     Blockly.Msg.LANG_LISTS_INSERT_INPUT_ITEM = '插入项';
     Blockly.Msg.LANG_LISTS_INSERT_INPUT = '在列表%1的第%2项处插入列表项%3';
-    Blockly.Msg.LANG_LISTS_INSERT_TOOLTIP = '在指定索引值(位置)处插入列表项。';
+    Blockly.Msg.LANG_LISTS_INSERT_TOOLTIP = '在指定索引值处插入列表项。';
 
     Blockly.Msg.LANG_LISTS_IS_EMPTY_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#islistempty';
     Blockly.Msg.LANG_LISTS_TITLE_IS_EMPTY = '列表是否为空?';
@@ -837,7 +839,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_LISTS_IS_EMPTY_TOOLTIP = '如果列表为空则返回真。';
 
     Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#lookuppairs';
-    Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_TITLE_LOOKUP_IN_PAIRS = '键值对查询';
+    Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_TITLE_LOOKUP_IN_PAIRS = '查询键值对';
     Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_INPUT_KEY = '关键字';
     Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_INPUT_PAIRS = '键值对';
     Blockly.Msg.LANG_LISTS_LOOKUP_IN_PAIRS_INPUT_NOT_FOUND = '查询无果';
@@ -883,7 +885,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     // Blockly.Msg.LANG_VARIABLES_SET_INPUT_ITEM = '项目';
     Blockly.Msg.LANG_VARIABLES_SET_TITLE_TO = '为';
     Blockly.Msg.LANG_VARIABLES_SET_COLLAPSED_TEXT = '设置变量值';
-    Blockly.Msg.LANG_VARIABLES_SET_TOOLTIP = '设置变量值等于输入的值。';
+    Blockly.Msg.LANG_VARIABLES_SET_TOOLTIP = '设置变量值为输入的值。';
     Blockly.Msg.LANG_VARIABLES_VARIABLE = '变量';
 
     Blockly.Msg.LANG_VARIABLES_LOCAL_DECLARATION_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/variables#do';
@@ -924,7 +926,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_THEN_RETURN = '然后返回';
     Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_DO = '执行语句';
     Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_RETURN = '返回';
-    Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_TOOLTIP = '执行其包含的语句块并返回一条语句，可以实现在过程执行后将返回数据赋值给相关变量。';
+    Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_TOOLTIP = '执行其包含的语句块并返回一条语句，可以用于在过程执行后将返回数据赋值给相关变量。';
     Blockly.Msg.LANG_PROCEDURES_DOTHENRETURN_COLLAPSED_TEXT = '执行/返回';
 
     Blockly.Msg.LANG_PROCEDURES_DEFRETURN_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/procedures#return';
@@ -1283,19 +1285,20 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.REPL_NETWORK_ERROR_RESTART = "与AI伴侣通信故障，<br />请尝试重新启动AI伴侣并重新连接";
     Blockly.Msg.REPL_OK = "确定";
     Blockly.Msg.REPL_COMPANION_VERSION_CHECK = "检查AI伴侣版本";
-    Blockly.Msg.REPL_COMPANION_OUT_OF_DATE = 'AI伴侣已版本过期，点击“确定”升级。';
+    Blockly.Msg.REPL_COMPANION_OUT_OF_DATE = 'AI伴侣版本已过期，点击“确定”升级。';
     Blockly.Msg.REPL_EMULATORS = "查看模拟器";
     Blockly.Msg.REPL_DEVICES = "设备";
     Blockly.Msg.REPL_APPROVE_UPDATE = "您将被请求允许更新。";
     Blockly.Msg.REPL_NOT_NOW = "现在不";
     Blockly.Msg.REPL_COMPANION_OUT_OF_DATE1 = "你正使用的AI伴侣已经过期，<br/><br/>本版本App Inventor适用的AI伴侣版本为";
     Blockly.Msg.REPL_COMPANION_OUT_OF_DATE_IMMEDIATE = "你正在使用的AI伴侣版本已过期，请尽快升级";
-    Blockly.Msg.REPL_COMPANION_WRONG_PACKAGE = "你正在使用的AI伴侣是针对不同版本的APP Inventor创建的。请前往菜单栏的“帮助——>AI伴侣信息”获取正确的AI伴侣版本。";
+    Blockly.Msg.REPL_COMPANION_WRONG_PACKAGE = "你正在使用的AI伴侣是针对不同版本的APP Inventor创建的。请前往菜单栏的“帮助—>AI伴侣信息”获取正确的AI伴侣版本。";
     Blockly.Msg.REPL_DISMISS = "放弃";
     Blockly.Msg.REPL_SOFTWARE_UPDATE = "软件升级";
     Blockly.Msg.REPL_OK_LOWER = "确定";
     Blockly.Msg.REPL_GOT_IT = "升级完成";
-    Blockly.Msg.REPL_UPDATE_INFO = '正在你的设备上安装更新。请查看移动设备(或模拟器)屏幕上的提示，同意安装软件。<br /><br />注意:更新完成后,请点击“完成”(不要点击“打开”)。然后再次进入App Inventor网页,点击“连接”菜单,选择“重置连接”。然后重新连接设备。';
+    Blockly.Msg.REPL_UPDATE_INFO = '正在你的设备上安装更新。请查看移动设备(或模拟器)屏幕上的提示，同意安装软件。<br /><br />'
+    + '注意:更新完成后，请点击“完成”(不要点击“打开”)。然后再次进入App Inventor网页，点击“连接”菜单，选择“重置连接”。然后重新连接设备。';
 
     Blockly.Msg.REPL_UPDATE_NO_UPDATE = "无可用更新";
     Blockly.Msg.REPL_UPDATE_NO_CONNECTION = "你必须与AI伴侣连接才能开始更新";
@@ -1304,7 +1307,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.REPL_UNABLE_TO_LOAD_NO_RESPOND = "无法从App Inventor服务器获取更新信息(服务器无响应)";
     Blockly.Msg.REPL_NOW_DOWNLOADING = "正在从App Inventor服务器下载升级包，请耐心等待。";
     Blockly.Msg.REPL_RUNTIME_ERROR = "运行故障";
-    Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS = "<br/><i>注意：</i>&nbsp;5秒钟后将报告另一条错误信息。";
+    Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS = "<br/><i>注意:</i>&nbsp;5秒钟后将报告另一条错误信息。";
     Blockly.Msg.REPL_CONNECTING_USB_CABLE = "正在通过USB线连接";
     Blockly.Msg.REPL_STARTING_EMULATOR = "正在启动Android模拟器<br/>请等待：可能需要一至两分钟";
     Blockly.Msg.REPL_CONNECTING = "连接中...";
@@ -1314,7 +1317,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.REPL_CONNECTION_FAILURE1 = "连接失败";
     Blockly.Msg.REPL_NO_START_EMULATOR = "无法在模拟器中启动AI伴侣";
     Blockly.Msg.REPL_PLUGGED_IN_Q = "是否已插入USB线？";
-    Blockly.Msg.REPL_AI_NO_SEE_DEVICE = "AI2没有查找到设备，请确认USB是否连接以及驱动程序是否正常安装。";
+    Blockly.Msg.REPL_AI_NO_SEE_DEVICE = "AI2没有找到设备，请确认USB是否连接以及驱动程序是否正常。";
     Blockly.Msg.REPL_HELPER_Q = "是否已运行aiStarter助手程序？";
     Blockly.Msg.REPL_HELPER_NOT_RUNNING = 'aiStarter助手程序未运行，<br />是否需要<a href="http://appinventor.mit.edu" target="_blank">帮助</a>?';
     Blockly.Msg.REPL_USB_CONNECTED_WAIT = "USB已连接，请等待";
@@ -1326,7 +1329,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.REPL_VERIFYING_COMPANION = "检查AI伴侣启动状态....";
     Blockly.Msg.REPL_CONNECT_TO_COMPANION = "连接到AI伴侣";
     Blockly.Msg.REPL_TRY_AGAIN1 = "无法连接AI伴侣，请重试。";
-    Blockly.Msg.REPL_YOUR_CODE_IS = "编码为";
+    Blockly.Msg.REPL_YOUR_CODE_IS = "AI伴侣编码为";
     Blockly.Msg.REPL_DO_YOU_REALLY_Q = "你真的要这么做吗？";
     Blockly.Msg.REPL_FACTORY_RESET = "这将使模拟器恢复出厂模式，如果此前升级过AI伴侣，则需要重新升级。";
 
@@ -1334,11 +1337,11 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.WARNING_DELETE_X_BLOCKS = "你确定要删除 %1 个模块吗?";
 
 // Blocklyeditor.js
-    Blockly.Msg.GENERATE_YAIL = "生成 Yail";
-    Blockly.Msg.DO_IT = "预览代码块";
-    Blockly.Msg.CLEAR_DO_IT_ERROR = "清除出现錯误";
-    Blockly.Msg.CAN_NOT_DO_IT = "无法预览代码块";
-    Blockly.Msg.CONNECT_TO_DO_IT = '你必须要连接AI伴侣或者模拟器才能使用"预览代码块"功能';
+    Blockly.Msg.GENERATE_YAIL = "生成Yail";
+    Blockly.Msg.DO_IT = "执行代码块";
+    Blockly.Msg.CLEAR_DO_IT_ERROR = "清除错误信息";
+    Blockly.Msg.CAN_NOT_DO_IT = "无法执行代码块";
+    Blockly.Msg.CONNECT_TO_DO_IT = '你必须连接AI伴侣或者模拟器才能使用“执行代码块”功能';
 
 // Clock Component Menu Items
     Blockly.Msg.TIME_YEARS = "年";
@@ -1348,7 +1351,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.TIME_HOURS = "时";
     Blockly.Msg.TIME_MINUTES = "分";
     Blockly.Msg.TIME_SECONDS = "秒";
-    Blockly.Msg.TIME_DURATION = "时段";
+    Blockly.Msg.TIME_DURATION = "时间段";
   }
 };
 
