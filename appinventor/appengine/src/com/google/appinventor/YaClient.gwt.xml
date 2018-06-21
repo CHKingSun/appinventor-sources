@@ -113,5 +113,6 @@
   <extend-property name="locale" values="zh_CN"/>
 
   <set-property-fallback name="locale" value="zh_CN"/>
+  <collapse-all-properties/>
 
 </module>
