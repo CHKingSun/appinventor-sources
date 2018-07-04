@@ -6,6 +6,9 @@
 
 package com.google.appinventor.server.flags;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * A flag associated with a system property.
  *
@@ -20,6 +23,16 @@ public abstract class Flag<T> {
   private final T defaultValue;
   private T cachedValue = null;
 
+  private static final Properties prop = new Properties();
+
+  static{
+    try(InputStream in = Flag.class.getResourceAsStream("/flags.properties")){
+      prop.load(in);
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+
   protected Flag(String name, T defaultValue) {
     this.name = name;
     this.defaultValue = defaultValue;
@@ -32,7 +45,9 @@ public abstract class Flag<T> {
    */
   public final T get() throws IllegalFlagValueException {
     if (cachedValue == null) {
-      String value = System.getProperty(name);
+      String value = prop.getProperty(name);
+      if(value == null)
+        value = System.getProperty(name);
       cachedValue = (value == null) ? defaultValue : convert(value);
     }
     return cachedValue;
