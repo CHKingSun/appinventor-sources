@@ -32,7 +32,7 @@ public class SQLStorageIo implements StorageIo {
     private static final Flag<String> dbAddress = Flag.createFlag("db.address", "");
     private static final Flag<String> dbUsername = Flag.createFlag("db.username", "");
     private static final Flag<String> dbPassword = Flag.createFlag("db.password", "");
-    static DataSource ds = null;
+    private static DataSource ds = null;
 
     public SQLStorageIo() {
         HikariConfig config = new HikariConfig();
@@ -101,21 +101,21 @@ public class SQLStorageIo implements StorageIo {
         return ds.getConnection();
     }
 
-    public void beginTransaction(Connection conn) {
+    private void beginTransaction(Connection conn) {
         try {
             conn.setAutoCommit(false);
         } catch (Exception e) {
         }
     }
 
-    public void endTransaction(Connection conn) {
+    private void endTransaction(Connection conn) {
         try {
             conn.setAutoCommit(true);
         } catch (Exception e) {
         }
     }
 
-    public void closeConnection(Connection conn) {
+    private void closeConnection(Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
@@ -886,9 +886,10 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public String uploadTempFile(byte[] content) throws IOException {
-        String fileName = UUID.randomUUID().toString();
+        String fileName = "__TEMP__" + UUID.randomUUID().toString();
         Path tempFile = Paths.get(storageRoot.get(), "temp", fileName);
-        Files.createDirectory(tempFile.getParent());
+        if(Files.notExists(tempFile.getParent()))
+            Files.createDirectories(tempFile.getParent());
         Files.write(tempFile, content);
         return fileName;
     }
@@ -907,7 +908,7 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public Motd getCurrentMotd() {
-        return new Motd(1, "None", "No MOTD");
+        return new Motd(1, "", "");
     }
 
     @Override
