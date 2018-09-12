@@ -38,7 +38,7 @@
     </head>
     <body>
         <script>
-            const root = "http://127.0.0.1:8888";
+            const root = "";
             var groups = {};
             // checkbox集合
             var cb = [];

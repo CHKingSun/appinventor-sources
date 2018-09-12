@@ -39,7 +39,7 @@
     </head>
     <body>
         <script>
-            const root = "http://127.0.0.1:8888";
+            const root = "";
             var userData;
             var cb = [];
             var selection = new Set();
