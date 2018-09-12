@@ -440,7 +440,7 @@ Blockly.Msg.zh.switch_language_to_chinese_cn = {
     Blockly.Msg.LANG_MATH_TRIG_HELPURL_ACOS = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#acos';
     Blockly.Msg.LANG_MATH_TRIG_TOOLTIP_ATAN = '返回atan(x)。（x单位为度,范围(-90, +90)）';
     Blockly.Msg.LANG_MATH_TRIG_HELPURL_ATAN = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#atan';
-    Blockly.Msg.LANG_MATH_TRIG_TOOLTIP_ATAN2 = '返回atan2(x)。（x单位为度,范围(-180, +180]）';
+    Blockly.Msg.LANG_MATH_TRIG_TOOLTIP_ATAN2 = '返回atan2(y, x)。（x, y单位为度,范围(-180, +180]）';
     Blockly.Msg.LANG_MATH_TRIG_HELPURL_ATAN2 = 'http://appinventor.mit.edu/explore/ai2/support/blocks/math#atan2';
 
     Blockly.Msg.LANG_MATH_ONLIST_OPERATOR_MIN = '最小值';
