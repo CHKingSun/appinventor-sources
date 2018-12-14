@@ -235,13 +235,13 @@ public class TopToolbar extends Composite {
     // SDK of 26 for those MIT App Inventor users who wish to put their applications in
     // the Play Store after 8/1/2018.
 
-    if (Ode.getInstance().hasSecondBuildserver()) {
+    /* if (Ode.getInstance().hasSecondBuildserver()) {
       buildItems.add(null);
       buildItems.add(new DropDownItem(WIDGET_NAME_BUILD_BARCODE2, MESSAGES.showBarcodeMenuItem2(),
           new BarcodeAction(true)));
       buildItems.add(new DropDownItem(WIDGET_NAME_BUILD_DOWNLOAD2, MESSAGES.downloadToComputerMenuItem2(),
           new DownloadAction(true)));
-    }
+    } */
 
     if (AppInventorFeatures.hasYailGenerationOption() && Ode.getInstance().getUser().getIsAdmin()) {
       buildItems.add(null);
@@ -255,7 +255,7 @@ public class TopToolbar extends Composite {
         new AboutAction()));
     helpItems.add(null);
     Config config = Ode.getInstance().getSystemConfig();
-    /*String libraryUrl = config.getLibraryUrl();
+    /* String libraryUrl = config.getLibraryUrl();
     if (!Strings.isNullOrEmpty(libraryUrl)) {
       helpItems.add(new DropDownItem(WIDGET_NAME_LIBRARY, MESSAGES.libraryMenuItem(),
           new WindowOpenAction(libraryUrl)));
@@ -291,13 +291,13 @@ public class TopToolbar extends Composite {
       helpItems.add(new DropDownItem(WIDGET_NAME_FEEDBACK, MESSAGES.feedbackMenuItem(),
           new WindowOpenAction(feedbackUrl)));
       helpItems.add(null);
-    }*/
+    } */
     helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONINFO, MESSAGES.companionInformation(),
         new AboutCompanionAction()));
-    /*helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONUPDATE, MESSAGES.companionUpdate(),
+    /* helpItems.add(new DropDownItem(WIDGET_NAME_COMPANIONUPDATE, MESSAGES.companionUpdate(),
         new CompanionUpdateAction()));
     helpItems.add(new DropDownItem(WIDGET_NAME_SHOWSPLASH, MESSAGES.showSplashMenuItem(),
-        new ShowSplashAction()));*/
+        new ShowSplashAction())); */
 
     // Create the TopToolbar drop down menus.
     fileDropDown = new DropDownButton(WIDGET_NAME_PROJECT, MESSAGES.projectsTabName(),
@@ -323,7 +323,7 @@ public class TopToolbar extends Composite {
     // Commented out language switching until we have a clean Chinese translation. (AFM)
     toolbar.add(helpDropDown);
 
-    //Only if logged in as an admin, add the Admin Button
+    // Only if logged in as an admin, add the Admin Button
     if (Ode.getInstance().getUser().getIsAdmin()) {
       List<DropDownItem> adminItems = Lists.newArrayList();
       adminItems.add(new DropDownItem(WIDGET_NAME_DOWNLOAD_USER_SOURCE,
