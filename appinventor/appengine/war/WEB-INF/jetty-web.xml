@@ -1,0 +1,24 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <Set name="contextPath">/</Set>
+    <Set name="war">war/</Set>
+    <Call name="setInitParameter">
+        <Arg>org.eclipse.jetty.servlet.MaxAge</Arg>
+        <Arg>-1</Arg>
+    </Call>
+
+    <Get id="sh" name="sessionHandler">
+        <Set name="sessionCache">
+            <New class="org.eclipse.jetty.server.session.DefaultSessionCache">
+                <Arg><Ref id="sh"/></Arg>
+                <Set name="sessionDataStore">
+                    <New class="org.eclipse.jetty.server.session.FileSessionDataStore">
+                        <Set name="storeDir">storage/sessions</Set>
+                    </New>
+                </Set>
+            </New>
+        </Set>
+    </Get>
+</Configure>

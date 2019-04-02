@@ -6,7 +6,10 @@
 
 package com.google.appinventor.server.flags;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -26,8 +29,22 @@ public abstract class Flag<T> {
   private static final Properties prop = new Properties();
 
   static{
-    try(InputStream in = Flag.class.getResourceAsStream("/flags.properties")){
+    String classPath = Flag.class.getResource("/").getPath().substring(1);
+//    System.out.println(classPath);
+    try(InputStream in = new FileInputStream(classPath + "../flags.properties")){
       prop.load(in);
+      String path = prop.getProperty("storage.root");
+      if (path.charAt(0) == '.') prop.setProperty("storage.root", Paths.get(classPath, path).normalize().toString());
+      File storageFile = new File(prop.getProperty("storage.root"));
+      if (!storageFile.isDirectory()) storageFile.mkdirs();
+      path = prop.getProperty("root.path");
+      if (path.charAt(0) == '.') prop.setProperty("root.path", Paths.get(classPath, path).normalize().toString());
+      path = prop.getProperty("session.keyfile");
+      if (path.charAt(0) == '.') prop.setProperty("session.keyfile", Paths.get(classPath, path).normalize().toString());
+
+//      for(Object key : prop.keySet()) {
+//        System.out.println(key + " " + prop.get(key));
+//      }
     }catch(Exception e){
       e.printStackTrace();
     }
