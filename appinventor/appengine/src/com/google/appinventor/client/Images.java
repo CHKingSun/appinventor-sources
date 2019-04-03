@@ -586,4 +586,9 @@ public interface Images extends Resources {
   @Source("com/google/appinventor/images/rectangle.png")
   ImageResource rectangle();
 
+  /**
+   * Designer palette item: AI items
+   */
+  @Source("com/google/appinventor/images/ai.png")
+  ImageResource ai();
 }

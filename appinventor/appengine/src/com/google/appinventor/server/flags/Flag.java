@@ -30,11 +30,12 @@ public abstract class Flag<T> {
 
   static{
     String classPath = Flag.class.getResource("/").getPath().substring(1);
-//    System.out.println(classPath);
+    String rootPath = System.getProperty("user.dir");
+//    System.out.println(rootPath);
     try(InputStream in = new FileInputStream(classPath + "../flags.properties")){
       prop.load(in);
       String path = prop.getProperty("storage.root");
-      if (path.charAt(0) == '.') prop.setProperty("storage.root", Paths.get(classPath, path).normalize().toString());
+      if (path.charAt(0) == '.') prop.setProperty("storage.root", Paths.get(rootPath, path).normalize().toString());
       File storageFile = new File(prop.getProperty("storage.root"));
       if (!storageFile.isDirectory()) storageFile.mkdirs();
       path = prop.getProperty("root.path");

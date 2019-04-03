@@ -2351,6 +2351,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String legoMindstormsComponentPallette();
 
+  @DefaultMessage("AI")
+  @Description("")
+  String aiComponentPallette();
+
   @DefaultMessage("Extension")
   @Description("")
   String extensionComponentPallette();
@@ -7108,4 +7112,163 @@ public interface OdeMessages extends Messages {
       "<br/>These applications will not run on Android versions older than 4.0.")
   @Description("Text for the Package SDK 26 Warning Dialog Box (HTML)")
   String Package26Notice();
+
+  // For AI(MLX)
+  @DefaultMessage("CommonObjectSensor")
+  @Description("物体识别 上传jpg格式图像文件到服务器，由服务器计算并返回物体的位置、类别、置信度等信息。")
+  String commonObjectSensorComponentPallette();
+
+  @DefaultMessage("EmotionAndGender")
+  @Description("人脸表情与性别识别 上传jpg格式图像文件到服务器，由服务器计算并返回人脸的包围盒、表情、性别等信息。")
+  String emotionAndGenderComponentPallette();
+
+  @DefaultMessage("FaceDetector")
+  @Description("人脸识别 上传jpg格式图像文件到服务器，由服务器计算并返回人脸的包围盒、器官坐标等信息。")
+  String faceDetectorComponentPallette();
+
+  @DefaultMessage("HCCR")
+  @Description("汉字手写体识别 上传jpg格式图像文件到服务器，由服务器识别并返回图像中的汉字。")
+  String hCCRComponentPallette();
+
+  @DefaultMessage("ImageSummarizer")
+  @Description("图像概述 上传jpg格式图像文件到服务器，由服务器生成描述该图像的英文语句。")
+  String imageSummarizerComponentPallette();
+
+  @DefaultMessage("StyleMixer")
+  @Description("图像风格转换 上传jpg格式图像文件到服务器，指定风格样式，由服务器生成混合风格的图像。")
+  String styleMixerComponentPallette();
+
+  @DefaultMessage("物体识别 上传jpg格式图像文件到服务器，由服务器计算并返回物体的位置、类别、置信度等信息。")
+  @Description("")
+  String CommonObjectSensorHelpStringComponentPallette();
+
+  @DefaultMessage("人脸表情与性别识别 上传jpg格式图像文件到服务器，由服务器计算并返回人脸的包围盒、表情、性别等信息。")
+  @Description("")
+  String EmotionAndGenderHelpStringComponentPallette();
+
+  @DefaultMessage("人脸识别 上传jpg格式图像文件到服务器，由服务器计算并返回人脸的包围盒、器官坐标等信息。")
+  @Description("")
+  String FaceDetectorHelpStringComponentPallette();
+
+  @DefaultMessage("汉字手写体识别 上传jpg格式图像文件到服务器，由服务器识别并返回图像中的汉字。")
+  @Description("")
+  String HCCRHelpStringComponentPallette();
+
+  @DefaultMessage("图像概述 上传jpg格式图像文件到服务器，由服务器生成描述该图像的英文语句。")
+  @Description("")
+  String ImageSummarizerHelpStringComponentPallette();
+
+  @DefaultMessage("图像风格转换 上传jpg格式图像文件到服务器，指定风格样式，由服务器生成混合风格的图像。")
+  @Description("")
+  String StyleMixerHelpStringComponentPallette();
+
+  @DefaultMessage("Server")
+  @Description("服务器地址")
+  String ServerProperties();
+
+  @DefaultMessage("")
+  @Description("")
+  String indexParams();
+
+  // CommonObjectSensor
+  @DefaultMessage("")
+  @Description("图像上传完成后执行的事件。")
+  String ImageUploadFinishedEvents();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的物体包围盒坐标列表(xmin, ymin, xmax, ymax)，对应其左上角和右下角坐标。")
+  String GetDetectionBoxMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的物体的类别名")
+  String GetDetectionClassNameMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的物体的置信度/分数/可能性，为浮点数，范围在(0, 1)")
+  String GetDetectionScoreMethods();
+
+  @DefaultMessage("")
+  @Description("获取检测到的物体数量")
+  String GetNumDetectionsMethods();
+
+  @DefaultMessage("")
+  @Description("获取检测结果图像的URL。")
+  String GetResultImageURLMethods();
+
+  @DefaultMessage("")
+  @Description("获取已上传图像的URL。")
+  String GetUploadedImageURLMethods();
+
+  @DefaultMessage("")
+  @Description("异步请求服务器开始物体识别。")
+  String StartDetectionMethods();
+
+  @DefaultMessage("")
+  @Description("上传jpg格式的图像到服务器，并令其作为检测的输入。")
+  String UploadAndUseImageMethods();
+
+  // EmotionAndGender
+  @DefaultMessage("")
+  @Description("获取指定索引的人脸的表情。")
+  String GetDetectionEmotionMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的人脸的性别。")
+  String GetDetectionGenderMethods();
+
+  // FaceDetector
+  @DefaultMessage("")
+  @Description("获取指定索引的人脸的128维向量编码。")
+  String GetDetectionEncodingMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的人脸的器官名称列表。")
+  String GetDetectionLandmarkNamesMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引的人脸中，指定名称的器官的坐标列表。")
+  String GetDetectionLandmarkPositionsMethods();
+
+  @DefaultMessage("")
+  @Description("获取服务器返回的未经处理的JSON信息。")
+  String RawJSONDataMethods();
+
+  // HCCR
+  @DefaultMessage("")
+  @Description("获取识别结果(汉字)的列表。")
+  String GetResultCharactersMethods();
+
+  @DefaultMessage("")
+  @Description("异步请求服务器开始物体识别。")
+  String StartRecognitionMethods();
+
+  // ImageSummarizer
+  @DefaultMessage("")
+  @Description("获取生成的描述语句的数量。")
+  String GetNumSentencesMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引值的描述语句。")
+  String GetSentenceMethods();
+
+  @DefaultMessage("")
+  @Description("获取指定索引值的描述语句的分数。")
+  String GetSentenceScoreMethods();
+
+  @DefaultMessage("")
+  @Description("异步请求服务器开始生成描述。")
+  String StartGenerationMethods();
+
+  // StyleMixer
+  @DefaultMessage("Style")
+  @Description("风格样式")
+  String StyleProperties();
+
+  @DefaultMessage("")
+  @Description("获取可用风格样式的列表。")
+  String GetSupportedStylesMethods();
+
+  @DefaultMessage("")
+  @Description("异步请求服务器开始风格转换。")
+  String StartTransferMethods();
 }

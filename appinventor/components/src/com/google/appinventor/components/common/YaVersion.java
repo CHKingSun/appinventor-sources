@@ -434,7 +434,7 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 173:
   // - FORM_COMPONENT_VERSION was incremented to 24
 
-  public static final int YOUNG_ANDROID_VERSION = 173;
+  public static final int YOUNG_ANDROID_VERSION = 174;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -1161,6 +1161,24 @@ public class YaVersion {
 
   //For PROXIMITYSENSOR_COMPONENT_VERSION: Initial Version
   public static final int PROXIMITYSENSOR_COMPONENT_VERSION = 1;
+
+  // For MLX CommonObjectSensor
+  public static final int COMMON_OBJECT_SENSOR_COMPONENT_VERSION = 1;
+
+  // For MLX EmotionAndGender
+  public static final int EMOTION_AND_GENDER_COMPONENT_VERSION = 1;
+
+  // For MLX FaceDetector
+  public static final int FACE_DETECTOR_COMPONENT_VERSION = 1;
+
+  // For MLX HCCR
+  public static final int HCCR_COMPONENT_VERSION = 1;
+
+  // For MLX ImageSummarizer
+  public static final int IMAGE_SUMMARIZER_COMPONENT_VERSION = 1;
+
+  // For MLX StyleMixer
+  public static final int STYLE_MIXER_COMPONENT_VERSION = 1;
 
   // Rendezvous Server Location
 
