@@ -2037,6 +2037,7 @@ public class Ode implements EntryPoint {
           dialogBox.hide();
           // call save2 again, this time with force = true so the empty workspace will be written
           getProjectService().save2(getSessionId(), projectId, fileId, true, content, callback);
+          screenShot(currentFileEditor);
         }
       });
     holder.add(continueSession);
@@ -2301,6 +2302,50 @@ public class Ode implements EntryPoint {
           next.run();
         }
       });
+  }
+
+  /**
+   * Take a screenshot when the user leaves a blocks editor
+   *
+   * Take note of the "deferred" flag. If set, we run the runnable
+   * after i/o is finished. Otherwise we run it immediately while i/o
+   * may still be happening. We wait in the case of logout or window
+   * closing, where we want to hold things up until i/o is done.
+   **/
+
+  public void screenShot(FileEditor editor) {
+    CLog("Screen shot.");
+
+    final long projectId = editor.getProjectId();
+    final FileNode fileNode = editor.getFileNode();
+    editor.getBlocksImage(new Callback<String,String>() {
+      @Override
+      public void onSuccess(String result) {
+        int comma = result.indexOf(",");
+        if (comma < 0) {
+          OdeLog.log("screenshot invalid");
+          return;
+        }
+        result = result.substring(comma+1); // Strip off url header
+        String screenShotName = fileNode.getName();
+        int period = screenShotName.lastIndexOf(".");
+        screenShotName = "screenshots/" + screenShotName.substring(0, period) + ".png";
+        OdeLog.log("ScreenShotName = " + screenShotName);
+        projectService.screenshot(sessionId, projectId, screenShotName, result,
+                new OdeAsyncCallback<RpcResult>() {
+                  @Override
+                  public void onSuccess(RpcResult result) {
+                  }
+                  public void OnFailure(Throwable caught) {
+                    CLog(caught.toString());
+                  }
+                });
+      }
+      @Override
+      public void onFailure(String error) {
+        OdeLog.log("Screenshot failed: " + error);
+      }
+    });
   }
 
   private void initializeGallery() {

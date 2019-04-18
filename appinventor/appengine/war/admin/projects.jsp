@@ -121,9 +121,20 @@
                 cb.push(checkbox);
                 
                 $("<td>").append(checkbox).appendTo(tr);
+                // .click(()=>{
+                //     // $(this).find(":checkbox").trigger("click");
+                //     console.log(project["uid"] + " check box clicked!");
+                //     checkbox.trigger("click");
+                // });
                 $("<td>").text(getUserEmail(project["uid"])).appendTo(tr);
-                $("<td>").text(project["name"]).appendTo(tr);
-                
+                $("<td>").text(project["name"]).appendTo(tr).click(()=>{
+                    console.log(project["uid"] + " clicked!");
+                    console.log(project);
+                    window.open(root + "/api/user?action=openProject"
+                        + "&uid=" + project["uid"]
+                        + "&pid=" + project["pid"]);
+                });
+
                 /*var viewFileLink = $("<a>");
                 viewFileLink.attr("href", "/admin/files.jsp?uid=<%=uid%>&pid=" + project["pid"]);
                 viewFileLink.text("查看文件...");
@@ -133,10 +144,6 @@
                 $("<td>").text(formatDate(project["dateModified"])).appendTo(tr);
                 
                 $("#content").append(tr);
-                
-                tr.click(function(){
-                    $(this).find(":checkbox").trigger("click");
-                });
                 
                 tr.hover(function(){
                         $(this).addClass("hover");

@@ -414,6 +414,7 @@ public final class EditorManager {
               }
             }
           });
+        Ode.getInstance().screenShot(getOpenProjectEditor(projectId).getFileEditor(fileId));
       }
     }
   }

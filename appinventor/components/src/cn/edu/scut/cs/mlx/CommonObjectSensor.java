@@ -136,8 +136,9 @@ public class CommonObjectSensor extends MLXBase{
     public String GetDetectionClassName(int index){
         try{
             if(resultData != null){
-                JSONObject detection = this.resultData.getJSONObject(index - 1);
-                return detection.getString("class_name");
+//                JSONObject detection = this.resultData.getJSONObject(index - 1);
+//                return detection.getString("class_name");
+                return this.resultData.toString();
             }
         }catch(Exception e){
             raiseError("GetDetectionClassName", -1, "Failed to parse JSON");

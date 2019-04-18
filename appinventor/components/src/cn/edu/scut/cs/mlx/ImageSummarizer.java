@@ -105,8 +105,9 @@ public class ImageSummarizer extends MLXBase{
     public String GetSentence(int index){
         try{
             if(resultData != null){
-                JSONObject sentence = this.resultData.getJSONObject(index - 1);
-                return sentence.getString("sentence");
+//                JSONObject sentence = this.resultData.getJSONObject(index - 1);
+//                return sentence.getString("sentence");
+                return resultData.toString();
             }
         }catch(Exception e){
             raiseError("GetSentence", -1, "Failed to parse JSON");
