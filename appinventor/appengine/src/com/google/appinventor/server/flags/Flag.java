@@ -41,6 +41,7 @@ public abstract class Flag<T> {
       if (path.charAt(0) == '.') prop.setProperty("root.path", Paths.get(classPath, path).normalize().toString() + '/');
       path = prop.getProperty("session.keyfile");
       if (path.charAt(0) == '.') prop.setProperty("session.keyfile", Paths.get(classPath, path).normalize().toString() + '/');
+      prop.setProperty("images.path", Paths.get(prop.getProperty("root.path"), "images").normalize().toString() + '/');
 
 //      for(Object key : prop.keySet()) {
 //        System.out.println(key + " " + prop.get(key));

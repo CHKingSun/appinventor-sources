@@ -314,6 +314,22 @@ public abstract class CommonProjectService {
     return RpcResult.createSuccessfulRpcResult("", "");
   }
 
+    /**
+     * Saves a screenshot of a current blocks editor. This is called from the client side
+     * whenever the user leaves a blocks editor. The data is shipped to us in base64 encoding
+     * which we decode and then store in the project.
+     *
+     * @param userId user who owns the projectId
+     * @param projectId project id for the project
+     * @param fileId the filename to store the screenshot in
+     * @param content the base64 encoded content
+     */
+
+    public RpcResult saveScreenshot(String userId, long projectId, String fileId, String content) {
+        storageIo.uploadScreenShot(projectId, fileId, userId, Base64Util.decodeLines(content));
+        return RpcResult.createSuccessfulRpcResult("", "");
+    }
+
 
   /**
    * Invokes a build command for the project.

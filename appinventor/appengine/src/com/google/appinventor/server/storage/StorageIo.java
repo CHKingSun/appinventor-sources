@@ -490,6 +490,16 @@ public interface StorageIo {
   long uploadRawFileForce(long projectId, String fileId, String userId, byte[] content);
 
   /**
+   * Uploads a file. -- forces the save even with trivial workspace
+   * @param projectId  project ID
+   * @param fileId  file ID
+   * @param userId the user who owns the file
+   * @param content  file content
+   * @return modification date for project
+   */
+  long uploadScreenShot(long projectId, String fileId, String userId, byte[] content);
+
+  /**
    * Deletes a file.
    * @param userId a user Id (the request is made on behalf of this user)
    * @param projectId  project ID

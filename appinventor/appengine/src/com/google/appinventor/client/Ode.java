@@ -30,6 +30,7 @@ import com.google.appinventor.client.editor.EditorManager;
 import com.google.appinventor.client.editor.FileEditor;
 import com.google.appinventor.client.editor.youngandroid.BlocklyPanel;
 import com.google.appinventor.client.editor.youngandroid.TutorialPanel;
+import com.google.appinventor.client.editor.youngandroid.YaFormEditor;
 import com.google.appinventor.client.explorer.commands.ChainableCommand;
 import com.google.appinventor.client.explorer.commands.CommandRegistry;
 import com.google.appinventor.client.explorer.commands.SaveAllEditorsCommand;
@@ -2314,38 +2315,48 @@ public class Ode implements EntryPoint {
    **/
 
   public void screenShot(FileEditor editor) {
-    CLog("Screen shot.");
+    if (editor == null || editor instanceof YaFormEditor) {
+      CLog("No editor!");
+      return;
+    } else {
+      CLog("Screen shot.");
+    }
+//    CLog(editor);
 
     final long projectId = editor.getProjectId();
     final FileNode fileNode = editor.getFileNode();
-    editor.getBlocksImage(new Callback<String,String>() {
-      @Override
-      public void onSuccess(String result) {
-        int comma = result.indexOf(",");
-        if (comma < 0) {
-          OdeLog.log("screenshot invalid");
-          return;
+    try {
+      editor.getBlocksImage(new Callback<String,String>() {
+        @Override
+        public void onSuccess(String result) {
+          int comma = result.indexOf(",");
+          if (comma < 0) {
+            OdeLog.log("screenshot invalid");
+            return;
+          }
+          result = result.substring(comma+1); // Strip off url header
+          String screenShotName = fileNode.getName();
+          int period = screenShotName.lastIndexOf(".");
+          screenShotName = screenShotName.substring(0, period) + ".png";
+          OdeLog.log("ScreenShotName = " + screenShotName);
+          projectService.saveScreenShot(sessionId, projectId, screenShotName, result,
+                  new OdeAsyncCallback<RpcResult>() {
+                    @Override
+                    public void onSuccess(RpcResult result) {
+                    }
+                    public void OnFailure(Throwable caught) {
+                      CLog(caught.toString());
+                    }
+                  });
         }
-        result = result.substring(comma+1); // Strip off url header
-        String screenShotName = fileNode.getName();
-        int period = screenShotName.lastIndexOf(".");
-        screenShotName = "screenshots/" + screenShotName.substring(0, period) + ".png";
-        OdeLog.log("ScreenShotName = " + screenShotName);
-        projectService.screenshot(sessionId, projectId, screenShotName, result,
-                new OdeAsyncCallback<RpcResult>() {
-                  @Override
-                  public void onSuccess(RpcResult result) {
-                  }
-                  public void OnFailure(Throwable caught) {
-                    CLog(caught.toString());
-                  }
-                });
-      }
-      @Override
-      public void onFailure(String error) {
-        OdeLog.log("Screenshot failed: " + error);
-      }
-    });
+        @Override
+        public void onFailure(String error) {
+          OdeLog.log("Screenshot failed: " + error);
+        }
+      });
+    } catch (Exception e) {
+      CLog("Screen shot failed with error: " + e.toString());
+    }
   }
 
   private void initializeGallery() {
@@ -2566,6 +2577,10 @@ public class Ode implements EntryPoint {
 
   public static native void CLog(String message) /*-{
     console.log(message);
+  }-*/;
+
+  public static native void CLog(Object obj) /*-{
+    console.log(obj);
   }-*/;
 
 }

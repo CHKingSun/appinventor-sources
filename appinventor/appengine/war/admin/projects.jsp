@@ -30,10 +30,20 @@
                 background-color: #286090;
                 border-color: #204d74;
             }
+            .left {
+                float: left;
+                width: 240px;
+            }
+            .right {
+                float: right;
+                width: 66%;
+                margin-left: -270px;
+                margin-right: 30px;
+            }
             ul#nav{ width:100%; height:60px; background:#00A2CA;margin:0 auto} 
             ul#nav li{display:inline; height:60px} 
             ul#nav li a{display:inline-block; padding:0 20px; height:60px; line-height:60px;
-             color:#FFF; font-size:16px;  text-decoration:none;} 
+             color:#FFF; font-size:16px;  text-decoration:none;}
             ul#nav li a:hover{background:#0095BB}
         </style>
     </head>
@@ -60,6 +70,7 @@
                 selection.clear();
                 $("#numberSelected").text(0);
                 $("#filterText").val("");
+                changeImage();
                 
                 // 如果指定了uid, 只显示该用户的项目
                 <% if(uid != null){ %>
@@ -127,12 +138,10 @@
                 //     checkbox.trigger("click");
                 // });
                 $("<td>").text(getUserEmail(project["uid"])).appendTo(tr);
-                $("<td>").text(project["name"]).appendTo(tr).click(()=>{
+                $("<td style='cursor: pointer'>").text(project["name"]).appendTo(tr).click(()=>{
                     console.log(project["uid"] + " clicked!");
-                    console.log(project);
-                    window.open(root + "/api/user?action=openProject"
-                        + "&uid=" + project["uid"]
-                        + "&pid=" + project["pid"]);
+                    // console.log(project);
+                    changeImage(project);
                 });
 
                 /*var viewFileLink = $("<a>");
@@ -140,8 +149,8 @@
                 viewFileLink.text("查看文件...");
                 viewFileLink.appendTo(tr);*/
                 
-                $("<td>").text(formatDate(project["dateCreated"])).appendTo(tr);
-                $("<td>").text(formatDate(project["dateModified"])).appendTo(tr);
+                // $("<td>").text(formatDate(project["dateCreated"])).appendTo(tr);
+                // $("<td>").text(formatDate(project["dateModified"])).appendTo(tr);
                 
                 $("#content").append(tr);
                 
@@ -253,6 +262,17 @@
                         row.hide();
                 }
             }
+
+            function changeImage(project) {
+                if (project !== undefined) {
+                    $("#screenShot").attr("src", "../images/" + project['uid'] + "/" + project['pid'] + "/Screen1.png")
+                        .attr("alt", "Screen1");
+                    return;
+                }
+
+                $("#screenShot").attr("src", "../images/squairy_light.png")
+                    .attr("alt", "No screen shot");
+            }
         </script>
         <ul id="nav">
             <li><a href="/admin/users.jsp">用户列表</a></li> 
@@ -283,18 +303,21 @@
                 <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>导出项目
             </button>
         </p>
-        <table class="ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 80%;">
-            <thead>
-                <tr class="ui-widget-header">
-                    <th style="width: 5%">选择</th>
-                    <th>账号</th>
-                    <th>项目名</th>
-                    <!-- <th>文件</th> -->
-                    <th>创建时间</th>
-                    <th>修改时间</th>
-                </tr>
-            </thead>
-            <tbody id="content"></tbody>
-        </table>
+        <div>
+            <table class="left ui-widget ui-widget-content ui-corner-all" style="text-align: center; width: 30%;">
+                <thead>
+                    <tr class="ui-widget-header">
+                        <th style="width: 5%">选择</th>
+                        <th>账号</th>
+                        <th>项目名</th>
+                        <!-- <th>文件</th> -->
+<%--                        <th>创建时间</th>--%>
+<%--                        <th>修改时间</th>--%>
+                    </tr>
+                </thead>
+                <tbody id="content"></tbody>
+            </table>
+            <img id="screenShot" class="right" src="../images/squairy_light.png" alt="No screen shot"/>
+        </div>
     </body>
 </html>

@@ -29,6 +29,7 @@ import java.util.zip.ZipOutputStream;
 public class SQLStorageIo implements StorageIo {
     private static final Flag<Boolean> requireTos = Flag.createFlag("require.tos", false);
     private static final Flag<String> storageRoot = Flag.createFlag("storage.root", "");
+    private static final Flag<String> imagesPath = Flag.createFlag("images.path", "");
     private static final Flag<String> dbAddress = Flag.createFlag("db.address", "");
     private static final Flag<String> dbUsername = Flag.createFlag("db.username", "");
     private static final Flag<String> dbPassword = Flag.createFlag("db.password", "");
@@ -421,21 +422,30 @@ public class SQLStorageIo implements StorageIo {
             throw new RuntimeException(e);
         }
 
+        SimpleFileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.deleteIfExists(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.deleteIfExists(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        };
+
         Path projectDir = Paths.get(storageRoot.get(), userId, String.valueOf(projectId));
         try {
-            Files.walkFileTree(projectDir, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.deleteIfExists(file);
-                    return FileVisitResult.CONTINUE;
-                }
+            Files.walkFileTree(projectDir, visitor);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.deleteIfExists(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+        Path imagesDir = Paths.get(imagesPath.get(), userId, String.valueOf(projectId));
+        try {
+            Files.walkFileTree(imagesDir, visitor);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -839,6 +849,20 @@ public class SQLStorageIo implements StorageIo {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public long uploadScreenShot(long projectId, String fileId, String userId, byte[] content) {
+        Path path = Paths.get(imagesPath.get(), userId, String.valueOf(projectId), fileId);
+//        System.out.println(path);
+        try {
+            Files.createDirectories(path.getParent());
+            Files.write(path, content);
+            setProjectDateModified(userId, projectId, System.currentTimeMillis());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return System.currentTimeMillis();
     }
 
     @Override
