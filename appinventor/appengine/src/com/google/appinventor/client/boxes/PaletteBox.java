@@ -18,6 +18,8 @@ public final class PaletteBox extends Box {
   // Singleton palette box instance
   private static final PaletteBox INSTANCE = new PaletteBox();
 
+  private boolean isHide = false;
+
   /**
    * Return the palette box.
    *
@@ -38,5 +40,19 @@ public final class PaletteBox extends Box {
         false,     // startMinimized
         false,     // usePadding
         false);    // highlightCaption
+  }
+
+  public void setHide(boolean isHide) {
+    this.isHide = isHide;
+    if (isHide) {
+      super.setVisible(false);
+    }
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    if (!isHide) {
+      super.setVisible(visible);
+    }
   }
 }

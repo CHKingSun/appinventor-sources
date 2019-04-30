@@ -99,4 +99,12 @@
         <when-type-assignable class="com.google.gwt.user.client.rpc.RemoteService" />
     </generate-with>
 
+    <!-- English language, independent of country -->
+    <extend-property name="locale" values="en"/>
+    <!-- Simplified Chinese -->
+    <extend-property name="locale" values="zh_CN"/>
+
+    <set-property-fallback name="locale" value="zh_CN"/>
+    <collapse-all-properties/>
+
 </module>
