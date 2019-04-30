@@ -42,6 +42,7 @@ public class ProjectToolbar extends Toolbar {
   public ProjectToolbar() {
     super();
     isReadOnly = Ode.getInstance().isReadOnly();
+    getWidget().setStylePrimaryName("ya-ProjectToolbar");
 
     addButton(new ToolbarItem(WIDGET_NAME_NEW, MESSAGES.newProjectMenuItem(),
         new NewAction(this)));

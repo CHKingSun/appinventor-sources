@@ -633,12 +633,14 @@ select {
 
 /* Young Android Toolbar */
 
-.ya-Toolbar {
+.ya-Toolbar,
+.ya-ProjectToolbar {
   background-color: #8fc202;
   margin-bottom: 4px;
 }
 
-.ya-Toolbar .ya-ProjectName {
+.ya-Toolbar .ya-ProjectName,
+.ya-ProjectToolbar .ya-ProjectName {
   color: white;
   font-weight: bold;
   font-size: 18px;
@@ -737,7 +739,8 @@ select {
   text-shadow: none;
 }
 
-.ya-Toolbar .ode-TextButton {
+.ya-Toolbar .ode-TextButton,
+.ya-ProjectToolbar .ode-TextButton {
   font-size: 11px;
 }
 

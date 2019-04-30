@@ -46,6 +46,18 @@ public interface OdeMessages extends Messages {
   @Description("Caption for None entry")
   String noneCaption();
 
+  @DefaultMessage("Select All")
+  @Description("Text on \"Select All\" button")
+  String selectAllButton();
+
+  @DefaultMessage("Deselect All")
+  @Description("Text on \"Deselect All\" button")
+  String deselectAllButton();
+
+  @DefaultMessage("Import To Me")
+  @Description("Text on \"Import To Me\" button")
+  String importToMeButton();
+
   @DefaultMessage("Delete")
   @Description("Text on \"Delete\" button")
   String deleteButton();

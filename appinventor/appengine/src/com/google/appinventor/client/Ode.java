@@ -56,36 +56,36 @@ import com.google.appinventor.client.wizards.NewProjectWizard.NewProjectCommand;
 import com.google.appinventor.client.wizards.TemplateUploadWizard;
 import com.google.appinventor.common.version.AppInventorFeatures;
 import com.google.appinventor.components.common.YaVersion;
-import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthService;
-import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthServiceAsync;
-import com.google.appinventor.shared.rpc.component.ComponentService;
-import com.google.appinventor.shared.rpc.component.ComponentServiceAsync;
-import com.google.appinventor.shared.rpc.GetMotdService;
-import com.google.appinventor.shared.rpc.GetMotdServiceAsync;
-import com.google.appinventor.shared.rpc.RpcResult;
-import com.google.appinventor.shared.rpc.ServerLayout;
-import com.google.appinventor.shared.rpc.admin.AdminInfoService;
-import com.google.appinventor.shared.rpc.admin.AdminInfoServiceAsync;
-import com.google.appinventor.shared.rpc.help.HelpService;
-import com.google.appinventor.shared.rpc.help.HelpServiceAsync;
-import com.google.appinventor.shared.rpc.project.FileNode;
-import com.google.appinventor.shared.rpc.project.GalleryAppListResult;
-import com.google.appinventor.shared.rpc.project.GalleryComment;
-import com.google.appinventor.shared.rpc.project.GallerySettings;
-import com.google.appinventor.shared.rpc.project.ProjectRootNode;
-import com.google.appinventor.shared.rpc.project.ProjectService;
-import com.google.appinventor.shared.rpc.project.ProjectServiceAsync;
-import com.google.appinventor.shared.rpc.project.UserProject;
-import com.google.appinventor.shared.rpc.project.GalleryService;
-import com.google.appinventor.shared.rpc.project.GalleryServiceAsync;
-import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSourceNode;
-import com.google.appinventor.shared.rpc.user.Config;
-import com.google.appinventor.shared.rpc.user.SplashConfig;
-import com.google.appinventor.shared.rpc.user.User;
-import com.google.appinventor.shared.rpc.user.UserInfoService;
-import com.google.appinventor.shared.rpc.user.UserInfoServiceAsync;
-import com.google.appinventor.shared.settings.SettingsConstants;
-import com.google.gwt.core.client.Callback;
+  import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthService;
+  import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthServiceAsync;
+  import com.google.appinventor.shared.rpc.component.ComponentService;
+  import com.google.appinventor.shared.rpc.component.ComponentServiceAsync;
+  import com.google.appinventor.shared.rpc.GetMotdService;
+  import com.google.appinventor.shared.rpc.GetMotdServiceAsync;
+  import com.google.appinventor.shared.rpc.RpcResult;
+  import com.google.appinventor.shared.rpc.ServerLayout;
+  import com.google.appinventor.shared.rpc.admin.AdminInfoService;
+  import com.google.appinventor.shared.rpc.admin.AdminInfoServiceAsync;
+  import com.google.appinventor.shared.rpc.help.HelpService;
+  import com.google.appinventor.shared.rpc.help.HelpServiceAsync;
+  import com.google.appinventor.shared.rpc.project.FileNode;
+  import com.google.appinventor.shared.rpc.project.GalleryAppListResult;
+  import com.google.appinventor.shared.rpc.project.GalleryComment;
+  import com.google.appinventor.shared.rpc.project.GallerySettings;
+  import com.google.appinventor.shared.rpc.project.ProjectRootNode;
+  import com.google.appinventor.shared.rpc.project.ProjectService;
+  import com.google.appinventor.shared.rpc.project.ProjectServiceAsync;
+  import com.google.appinventor.shared.rpc.project.UserProject;
+  import com.google.appinventor.shared.rpc.project.GalleryService;
+  import com.google.appinventor.shared.rpc.project.GalleryServiceAsync;
+  import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSourceNode;
+  import com.google.appinventor.shared.rpc.user.Config;
+  import com.google.appinventor.shared.rpc.user.SplashConfig;
+  import com.google.appinventor.shared.rpc.user.User;
+  import com.google.appinventor.shared.rpc.user.UserInfoService;
+  import com.google.appinventor.shared.rpc.user.UserInfoServiceAsync;
+  import com.google.appinventor.shared.settings.SettingsConstants;
+  import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -931,10 +931,271 @@ public class Ode implements EntryPoint {
     //History.fireCurrentHistoryState();
   }
 
+  protected void onAdminModuleLoad(Ode odeAdmin) {
+      Tracking.trackPageview();
+
+      // Handler for any otherwise unhandled exceptions
+      GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
+          @Override
+          public void onUncaughtException(Throwable e) {
+              OdeLog.xlog(e);
+
+              if (AppInventorFeatures.sendBugReports()) {
+                  if (Window.confirm(MESSAGES.internalErrorReportBug())) {
+                      Window.open(BugReport.getBugReportLink(e), "_blank", "");
+                  }
+              } else {
+                  // Display a confirm dialog with error msg and if 'ok' open the debugging view
+                  if (Window.confirm(MESSAGES.internalErrorClickOkDebuggingView())) {
+                      Ode.getInstance().switchToDebuggingView();
+                  }
+              }
+          }
+      });
+
+      // Initialize global Ode instance
+      instance = odeAdmin;
+
+      // Let's see if we were started with a repo= parameter which points to a template
+      templatePath = Window.Location.getParameter("repo");
+      if (templatePath != null) {
+          OdeLog.wlog("Got a template path of " + templatePath);
+          templateLoadingFlag = true;
+      }
+
+      // Let's see if we were started with a galleryId= parameter which points to a template
+      galleryId = Window.Location.getParameter("galleryId");
+      if(galleryId != null){
+          OdeLog.wlog("Got a galleryId of " + galleryId);
+          galleryIdLoadingFlag = true;
+      }
+
+      // Get user information.
+      OdeAsyncCallback<Config> callback = new OdeAsyncCallback<Config>(
+              // failure message
+              MESSAGES.serverUnavailable()) {
+
+          @Override
+          public void onSuccess(Config result) {
+              config = result;
+              user = result.getUser();
+              if (!user.getIsAdmin()) {
+                  String locale = Window.Location.getParameter("locale");
+                  String repo = Window.Location.getParameter("repo");
+                  galleryId = Window.Location.getParameter("galleryId");
+                  String separator = "?";
+                  String uri = "/";
+                  if (locale != null && !locale.equals("")) {
+                      uri += separator + "locale=" + locale;
+                      separator = "&";
+                  }
+                  if (repo != null && !repo.equals("")) {
+                      uri += separator + "repo=" + repo;
+                      separator = "&";
+                  }
+                  if (galleryId != null && !galleryId.equals("")) {
+                      uri += separator + "galleryId=" + galleryId;
+                  }
+                  Window.Location.replace(uri);
+                  Window.alert("You are not admin!");
+                  return;           // likely not reached
+              }
+              isReadOnly = true;
+
+              // load the user's backpack if we are not using a shared
+              // backpack
+
+              String backPackId = user.getBackpackId();
+              if (backPackId == null || backPackId.isEmpty()) {
+                  loadBackpack();
+                  OdeLog.log("backpack: No shared backpack");
+              } else {
+                  BlocklyPanel.setSharedBackpackId(backPackId);
+                  OdeLog.log("Have a shared backpack backPackId = " + backPackId);
+              }
+
+              // Setup noop timer (if enabled)
+              int noop = config.getNoop();
+              if (noop > 0) {
+                  // If we have a noop time, setup a timer to do the noop
+                  Timer t = new Timer() {
+                      @Override
+                      public void run() {
+                          userInfoService.noop(new AsyncCallback<Void>() {
+                              @Override
+                              public void onSuccess(Void e) {
+                              }
+                              @Override
+                              public void onFailure(Throwable e) {
+                              }
+                          });
+                      }
+                  };
+                  t.scheduleRepeating(1000*60*noop);
+              }
+
+              // If user hasn't accepted terms of service, ask them to.
+              if (!user.getUserTosAccepted() && !isReadOnly) {
+                  // We expect that the redirect to the TOS page should be handled
+                  // by the onFailure method below. The server should return a
+                  // "forbidden" error if the TOS wasn't accepted.
+                  ErrorReporter.reportError(MESSAGES.serverUnavailable());
+                  return;
+              }
+
+              splashConfig = result.getSplashConfig();
+              secondBuildserver = result.getSecondBuildserver();
+              // The code below is invoked if we do not have a second buildserver
+              // configured. It sets the warnedBuild1 flag to true which inhibits
+              // the display of the dialog box used when building. This means that
+              // if no second buildserver is configured, there is no dialog box
+              // displayed when the build menu items are invoked.
+              if (!secondBuildserver) {
+                  warnedBuild1 = true;
+              }
+
+              if (result.getRendezvousServer() != null) {
+                  setRendezvousServer(result.getRendezvousServer());
+              } else {
+                  setRendezvousServer(YaVersion.RENDEZVOUS_SERVER);
+              }
+
+              userSettings = new UserSettings(user);
+
+              // Gallery settings
+              gallerySettings = new GallerySettings();
+              //gallerySettings.loadGallerySettings();
+              loadGallerySettings();
+
+              // Initialize project and editor managers
+              // The project manager loads the user's projects asynchronously
+              projectManager = new ProjectManager();
+              projectManager.addProjectManagerEventListener(new ProjectManagerEventAdapter() {
+                  @Override
+                  public void onProjectsLoaded() {
+                      projectManager.removeProjectManagerEventListener(this);
+
+                      // This handles any built-in templates stored in /war
+                      // Retrieve template data stored in war/templates folder and
+                      // and save it for later use in TemplateUploadWizard
+                      OdeAsyncCallback<String> templateCallback =
+                              new OdeAsyncCallback<String>(
+                                      // failure message
+                                      MESSAGES.createProjectError()) {
+                                  @Override
+                                  public void onSuccess(String json) {
+                                      // Save the templateData
+                                      TemplateUploadWizard.initializeBuiltInTemplates(json);
+                                      // Here we call userSettings.loadSettings, but the settings are actually loaded
+                                      // asynchronously, so this loadSettings call will return before they are loaded.
+                                      // After the user settings have been loaded, openPreviousProject will be called.
+                                      // We have to call this after the builtin templates have been loaded otherwise
+                                      // we will get a NPF.
+                                      userSettings.loadSettings();
+                                  }
+                              };
+                      Ode.getInstance().getProjectService().retrieveTemplateData(TemplateUploadWizard.TEMPLATES_ROOT_DIRECTORY, templateCallback);
+                  }
+              });
+              editorManager = new EditorManager();
+
+              // Initialize UI
+              initializeUi();
+              Window.setTitle("App Inventor Admin");
+
+              if(user.getUserEmail().equals(user.getUserName()))
+                  topPanel.showUserEmail(user.getUserEmail());
+              else
+                  topPanel.showUserEmail(user.getUserName() + "<" + user.getUserEmail() + ">");
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+              if (caught instanceof StatusCodeException) {
+                  StatusCodeException e = (StatusCodeException) caught;
+                  int statusCode = e.getStatusCode();
+                  switch (statusCode) {
+                      case Response.SC_UNAUTHORIZED:
+                          // unauthorized => not on whitelist
+                          // getEncodedResponse() gives us the message that we wrote in
+                          // OdeAuthFilter.writeWhitelistErrorMessage().
+                          Window.alert(e.getEncodedResponse());
+                          return;
+                      case Response.SC_FORBIDDEN:
+                          // forbidden => need tos accept
+                          Window.open("/" + ServerLayout.YA_TOS_FORM, "_self", null);
+                          return;
+                      case Response.SC_PRECONDITION_FAILED:
+                          String locale = Window.Location.getParameter("locale");
+                          String repo = Window.Location.getParameter("repo");
+                          galleryId = Window.Location.getParameter("galleryId");
+                          String separator = "?";
+                          String uri = "/login/";
+                          if (locale != null && !locale.equals("")) {
+                              uri += separator + "locale=" + locale;
+                              separator = "&";
+                          }
+                          if (repo != null && !repo.equals("")) {
+                              uri += separator + "repo=" + repo;
+                              separator = "&";
+                          }
+                          if (galleryId != null && !galleryId.equals("")) {
+                              uri += separator + "galleryId=" + galleryId;
+                          }
+                          Window.Location.replace(uri);
+                          return;           // likely not reached
+                  }
+              }
+              super.onFailure(caught);
+          }
+      };
+
+      // The call below begins an asynchronous read of the user's settings
+      // When the settings are finished reading, various settings parsers
+      // will be called on the returned JSON object. They will call various
+      // other functions in this module, including openPreviousProject (the
+      // previous project ID is stored in the settings) as well as the splash
+      // screen displaying functions below.
+      //
+      // TODO(user): ODE makes too many RPC requests at startup time. Currently
+      // we do 3 RPCs + 1 per project + 1 per open file. We should bundle some of
+      // those with each other or with the initial HTML transfer.
+      //
+      // This call also stores our sessionId in the backend. This will be checked
+      // when we go to save a file and if different file saving will be disabled
+      // Newer sessions invalidate older sessions.
+
+      userInfoService.getSystemConfig(sessionId, callback);
+
+      // History.addValueChangeHandler(new ValueChangeHandler<String>() {
+      //     @Override
+      //     public void onValueChange(ValueChangeEvent<String> event) {
+      //         openProject(event.getValue());
+      //     }
+      // });
+
+      // load project based on current url
+      // TODO(sharon): Seems like a possible race condition here if the onValueChange
+      // handler defined above gets called before the getSystemConfig call sets
+      // userSettings.
+      // The following line causes problems with GWT debugging, and commenting
+      // it out doesn't seem to break things.
+      //History.fireCurrentHistoryState();
+  }
+
+  protected void setProjectView(VerticalPanel panel) {
+    projectsTabIndex = deckPanel.getWidgetCount();
+    deckPanel.add(panel);
+  }
+
+  public void updateProjectToolbarButtons() {
+    Ode.getInstance().getProjectToolbar().updateButtons();
+  }
+
   /*
    * Initializes all UI elements.
    */
-  private void initializeUi() {
+  protected void initializeUi() {
     rpcStatusPopup = new RpcStatusPopup();
 
     // Register services with RPC status popup

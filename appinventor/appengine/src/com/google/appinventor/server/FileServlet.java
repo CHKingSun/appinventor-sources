@@ -1,5 +1,6 @@
 package com.google.appinventor.server;
 
+import com.google.appinventor.server.flags.Flag;
 import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
@@ -17,6 +18,7 @@ import javax.servlet.ServletOutputStream;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.*;
 
@@ -26,6 +28,7 @@ public class FileServlet extends HttpServlet {
     private final StorageIo storageIo = StorageIoInstanceHolder.INSTANCE;
     private final FileImporter fileImporter = new FileImporterImpl();
     private final FileExporter fileExporter = new FileExporterImpl();
+    private static final Flag<String> imagesPath = Flag.createFlag("images.path", "");
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.addHeader("Access-Control-Allow-Origin", "*");
@@ -107,6 +110,46 @@ public class FileServlet extends HttpServlet {
                     attachDownloadData(resp, exportProject(nonce.getUserId(), nonce.getProjectId()));
                 else
                     resp.getWriter().print("分享链接已过期或项目不存在");
+                break;
+            }
+            case "getScreenShot": {
+                String uid = req.getParameter("uid");
+                String pid = req.getParameter("pid");
+                if (!isNullOrEmpty(uid)) {
+                    String[] pngFiles = Paths.get(imagesPath.get(), uid, pid).toFile()
+                            .list(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith("png");
+                        }
+                    });
+                    if (pngFiles != null && pngFiles.length > 0) {
+//                        System.out.println("../images/" + uid + "/" + pid + "/" + pngFiles[0]);
+                        resp.getWriter().println("../images/" + uid + "/" + pid + "/" + pngFiles[0]);
+                        break;
+                    }
+                }
+
+                resp.getWriter().println("../images/squairy_light.png");
+                break;
+            }
+            case "importProjects": {
+                String uid = req.getParameter("uid");
+                for (File dir : new File("C:\\Users\\KingSun\\Desktop\\G0").listFiles()) {
+                    File file = dir.listFiles( new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith(".aia");
+                        }
+                    })[0];
+                    try {
+                        fileImporter.importProject(uid, file.getName(), new FileInputStream(file));
+                    } catch (FileImporterException e) {
+                        resp.getWriter().println(e.getLocalizedMessage());
+                        break;
+                    }
+                }
+                resp.getWriter().println("OK");
                 break;
             }
             default: {

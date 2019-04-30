@@ -48,7 +48,7 @@ public final class ProjectManager {
         for (UserProject projectInfo : projectInfos) {
           addProject(projectInfo);
         }
-        fireProjectsLoaded();
+//        fireProjectsLoaded();
       }
     });
   }

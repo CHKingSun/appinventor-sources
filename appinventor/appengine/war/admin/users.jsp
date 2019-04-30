@@ -334,6 +334,21 @@
                         alert("未选择用户");
                         return;
                     }
+
+                    // $.ajax({
+                    //     url: root + "/api/file",
+                    //     type: "GET",
+                    //     data: {
+                    //         "action": "importProjects",
+                    //         "uid": selection.values().next().value,
+                    //     },
+                    //     success: (data)=>{
+                    //         if(data == "OK")
+                    //             alert("上传成功");
+                    //     }
+                    // });
+                    // return;
+
                     var files = $("#fileImportProject").prop("files");
                     if(files.length == 0){
                         alert("未选择文件");

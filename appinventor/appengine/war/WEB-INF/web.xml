@@ -137,6 +137,7 @@
   <servlet-mapping>
     <servlet-name>downloadServlet</servlet-name>
     <url-pattern>/ode/download/*</url-pattern>
+    <url-pattern>/ode_admin/download/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -151,6 +152,7 @@
   <servlet-mapping>
     <servlet-name>getMotdService</servlet-name>
     <url-pattern>/ode/getmotd</url-pattern>
+    <url-pattern>/ode_admin/getmotd</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -165,6 +167,7 @@
   <servlet-mapping>
     <servlet-name>helpService</servlet-name>
     <url-pattern>/ode/help</url-pattern>
+    <url-pattern>/ode_admin/help</url-pattern>
   </servlet-mapping>
 
   <!-- projects -->
@@ -175,6 +178,7 @@
   <servlet-mapping>
     <servlet-name>projectService</servlet-name>
     <url-pattern>/ode/projects</url-pattern>
+    <url-pattern>/ode_admin/projects</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -189,6 +193,7 @@
   <servlet-mapping>
     <servlet-name>galleryService</servlet-name>
     <url-pattern>/ode/gallery</url-pattern>
+    <url-pattern>/ode_admin/gallery</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -203,6 +208,7 @@
   <servlet-mapping>
     <servlet-name>galleryServlet</servlet-name>
     <url-pattern>/ode/gallery_servlet/*</url-pattern>
+    <url-pattern>/ode_admin/gallery_servlet/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -217,6 +223,7 @@
   <servlet-mapping>
     <servlet-name>uploadServlet</servlet-name>
     <url-pattern>/ode/upload/*</url-pattern>
+    <url-pattern>/ode_admin/upload/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -231,6 +238,7 @@
   <servlet-mapping>
     <servlet-name>adminInfoService</servlet-name>
     <url-pattern>/ode/admininfo</url-pattern>
+    <url-pattern>/ode_admin/admininfo</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -246,6 +254,7 @@
   <servlet-mapping>
     <servlet-name>userInfoService</servlet-name>
     <url-pattern>/ode/userinfo</url-pattern>
+    <url-pattern>/ode_admin/userinfo</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -260,6 +269,7 @@
   <servlet-mapping>
     <servlet-name>cloudDBAuthService</servlet-name>
     <url-pattern>/ode/cloudDBAuth</url-pattern>
+    <url-pattern>/ode_admin/cloudDBAuth</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -288,6 +298,7 @@
   <servlet-mapping>
     <servlet-name>tosServlet</servlet-name>
     <url-pattern>/ode/accept_tos</url-pattern>
+    <url-pattern>/ode_admin/accept_tos</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -302,6 +313,7 @@
   <servlet-mapping>
     <servlet-name>feedbackServlet</servlet-name>
     <url-pattern>/ode/feedback</url-pattern>
+    <url-pattern>/ode_admin/feedback</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -316,6 +328,7 @@
   <servlet-mapping>
     <servlet-name>logoutServlet</servlet-name>
     <url-pattern>/ode/_logout</url-pattern>
+    <url-pattern>/ode_admin/_logout</url-pattern>
   </servlet-mapping>
 
   <!-- receivebuild
@@ -337,6 +350,7 @@
   <servlet-mapping>
     <servlet-name>firebaseAuthService</servlet-name>
     <url-pattern>/ode/firebase_auth</url-pattern>
+    <url-pattern>/ode_admin/firebase_auth</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
@@ -351,6 +365,7 @@
   <servlet-mapping>
     <servlet-name>odeUiServlet</servlet-name>
     <url-pattern>/ode/*</url-pattern>
+    <url-pattern>/ode_admin/*</url-pattern>
   </servlet-mapping>
   -->
 
@@ -386,6 +401,7 @@
   <servlet-mapping>
     <servlet-name>componentService</servlet-name>
     <url-pattern>/ode/components</url-pattern>
+    <url-pattern>/ode_admin/components</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>

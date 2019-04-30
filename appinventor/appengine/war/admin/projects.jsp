@@ -139,7 +139,7 @@
                 // });
                 $("<td>").text(getUserEmail(project["uid"])).appendTo(tr);
                 $("<td style='cursor: pointer'>").text(project["name"]).appendTo(tr).click(()=>{
-                    console.log(project["uid"] + " clicked!");
+                    // console.log(project["uid"] + " clicked!");
                     // console.log(project);
                     changeImage(project);
                 });
@@ -264,14 +264,25 @@
             }
 
             function changeImage(project) {
-                if (project !== undefined) {
-                    $("#screenShot").attr("src", "../images/" + project['uid'] + "/" + project['pid'] + "/Screen1.png")
-                        .attr("alt", "Screen1");
-                    return;
-                }
-
                 $("#screenShot").attr("src", "../images/squairy_light.png")
                     .attr("alt", "No screen shot");
+
+                if (project !== undefined) {
+                    $.ajax({
+                        url: root + "/api/file",
+                        data: {
+                            "action": "getScreenShot",
+                            "uid": project['uid'],
+                            "pid": project['pid']
+                        },
+                        type: "GET",
+                        success: (data)=> {
+                            $("#screenShot").attr("src", data)
+                                .attr("alt", data.slice(data.lastIndexOf('/'), -4));
+                        }
+                    });
+                }
+
             }
         </script>
         <ul id="nav">

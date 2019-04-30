@@ -444,10 +444,12 @@ public class SQLStorageIo implements StorageIo {
         }
 
         Path imagesDir = Paths.get(imagesPath.get(), userId, String.valueOf(projectId));
-        try {
-            Files.walkFileTree(imagesDir, visitor);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (imagesDir.toFile().exists()) {
+            try {
+                Files.walkFileTree(imagesDir, visitor);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
