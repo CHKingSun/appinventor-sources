@@ -75,10 +75,6 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
   private final Label dateModifiedSortIndicator;
   private final Label publishedSortIndicator;
 
-  // Whether hide date messages
-  boolean dateCreatedVisible = true;
-  boolean dateModifiedVisible = true;
-
   GalleryClient gallery = null;
 
   /**
@@ -326,12 +322,8 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
       }
       table.setWidget(row, 0, pw.checkBox);
       table.setWidget(row, 1, pw.nameLabel);
-      if (dateCreatedVisible) {
-        table.setWidget(row, 2, pw.dateCreatedLabel);
-      }
-      if (dateModifiedVisible) {
-        table.setWidget(row, 3, pw.dateModifiedLabel);
-      }
+      table.setWidget(row, 2, pw.dateCreatedLabel);
+      table.setWidget(row, 3, pw.dateModifiedLabel);
       table.setWidget(row, 4, pw.publishedLabel);
       if(Ode.getGallerySettings().galleryEnabled()){
         if (project.isPublished()) {
@@ -375,18 +367,6 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
     return selectedProjects;
   }
 
-  public void setlectAllProjects() {
-    for (ProjectWidgets widget : projectWidgets.values()) {
-      widget.checkBox.setValue(true, true);
-    }
-  }
-
-  public void DesetlectAllProjects() {
-    for (ProjectWidgets widget : projectWidgets.values()) {
-      widget.checkBox.setValue(false, true);
-    }
-  }
-
   // ProjectManagerEventListener implementation
 
   @Override
@@ -416,17 +396,5 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
 
   public void setPublishedHeaderVisible(boolean visible){
     table.getWidget(0, 4).setVisible(visible);
-  }
-
-  public void setDateCreatedVisible(boolean visible) {
-    dateCreatedVisible = visible;
-    table.getWidget(0, 2).setVisible(dateCreatedVisible);
-//    refreshTable(false);
-  }
-
-  public void setDateModifiedVisible(boolean visible) {
-    dateModifiedVisible = visible;
-    table.getWidget(0, 3).setVisible(dateModifiedVisible);
-//    refreshTable(false);
   }
 }

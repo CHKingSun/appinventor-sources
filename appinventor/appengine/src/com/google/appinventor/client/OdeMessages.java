@@ -58,6 +58,10 @@ public interface OdeMessages extends Messages {
   @Description("Text on \"Import To Me\" button")
   String importToMeButton();
 
+  @DefaultMessage("All Projects")
+  @Description("Text on \"All Projects\" button")
+  String allProjectsButton();
+
   @DefaultMessage("Delete")
   @Description("Text on \"Delete\" button")
   String deleteButton();
@@ -89,6 +93,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Name")
   @Description("Header for name column of project table")
   String projectNameHeader();
+
+  @DefaultMessage("Score")
+  @Description("Header for score column of project table")
+  String projectScoreHeader();
 
   @DefaultMessage("Date Created")
   @Description("Header for date created column of project table.")
@@ -856,6 +864,12 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("My Profile")
   @Description("Caption for profile page box.")
   String profilePageBoxCaption();
+
+  // Used in boxes/ProjectListBox.java
+
+  @DefaultMessage("All Projects")
+  @Description("Caption for admin project list box.")
+  String allProjectListBoxCaption();
 
   // Used in boxes/ModerationPageBox.java
 

@@ -1,15 +1,9 @@
 package com.google.appinventor.client;
 
+import com.google.appinventor.client.boxes.AdminProjectListBox;
 import com.google.appinventor.client.boxes.PaletteBox;
-import com.google.appinventor.client.boxes.ProjectListBox;
-import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.explorer.youngandroid.AdminProjectToolbar;
-import com.google.appinventor.client.explorer.youngandroid.ProjectList;
-import com.google.gwt.event.dom.client.ScrollEvent;
-import com.google.gwt.event.dom.client.ScrollHandler;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class OdeAdmin extends Ode {
@@ -27,9 +21,8 @@ public class OdeAdmin extends Ode {
     protected void initializeUi() {
         super.initializeUi();
 
-        ProjectListBox.getProjectListBox().getProjectList().setDateCreatedVisible(false);
-        ProjectListBox.getProjectListBox().getProjectList().setDateModifiedVisible(false);
         PaletteBox.getPaletteBox().setHide(true);
+        AdminProjectListBox.getAdminProjectListBox().getAdminProjectList().setScoreHeaderVisible(false);
 
         adminPanel = new HorizontalPanel();
 
@@ -39,7 +32,7 @@ public class OdeAdmin extends Ode {
         pVertPanel.setSpacing(0);
         projectToolbar = new AdminProjectToolbar();
         pVertPanel.add(projectToolbar);
-        pVertPanel.add(ProjectListBox.getProjectListBox());
+        pVertPanel.add(AdminProjectListBox.getAdminProjectListBox());
         adminPanel.add(pVertPanel);
         adminPanel.setCellWidth(pVertPanel, "24%");
 
@@ -55,11 +48,6 @@ public class OdeAdmin extends Ode {
 
         setProjectView(adminPanel);
         switchToProjectsView();
-    }
-
-    @Override
-    public void openYoungAndroidProjectInDesigner(Project project) {
-        super.openYoungAndroidProjectInDesigner(project);
     }
 
     @Override
