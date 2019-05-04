@@ -5,14 +5,20 @@
 package com.google.appinventor.client;
 
 import com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidIntegerRangePropertyEditor;
+import com.google.appinventor.client.utils.SubmitDialog;
 import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.client.widgets.properties.EditableProperties;
 import com.google.appinventor.client.widgets.properties.EditableProperty;
 import com.google.appinventor.client.widgets.properties.PropertyEditor;
+import com.google.appinventor.shared.rpc.project.CourseInfo;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
+
+import java.util.List;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -34,10 +40,13 @@ public class ScorePanel extends Composite {
         submitButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (Ode.getInstance().isAdminMode()) {
-                    new MarkScoreAction().execute();
-                } else {
-                    new SubmitProjectAction().execute();
+                long currentProjectId = Ode.getInstance().getCurrentYoungAndroidProjectId();
+                if (currentProjectId != 0) {
+                    if (Ode.getInstance().isAdminMode()) {
+                        new MarkScoreAction(currentProjectId).execute();
+                    } else {
+                        new SubmitProjectAction(currentProjectId).execute();
+                    }
                 }
             }
         });
@@ -66,18 +75,40 @@ public class ScorePanel extends Composite {
     }
 
     private class MarkScoreAction implements Command {
+        private long projectId;
+
+        MarkScoreAction(long projectId) {
+            this.projectId = projectId;
+        }
 
         @Override
         public void execute() {
-            setScore(100);
+            setScore((int)projectId);
         }
     }
 
     private class SubmitProjectAction implements Command {
+        private long projectId;
+
+        SubmitProjectAction(long projectId) {
+            this.projectId = projectId;
+        }
 
         @Override
         public void execute() {
+            Ode.getInstance().getAdminProjectService().getAllCourses(
+                    new AsyncCallback<List<CourseInfo>>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            Window.alert("Get course message failed with error: " + caught.getLocalizedMessage());
+                        }
 
+                        @Override
+                        public void onSuccess(List<CourseInfo> result) {
+                            new SubmitDialog(result, projectId).show();
+                        }
+                    }
+            );
         }
     }
 

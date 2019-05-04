@@ -11,6 +11,7 @@ import com.google.appinventor.shared.rpc.Motd;
 import com.google.appinventor.shared.rpc.Nonce;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
 import com.google.appinventor.shared.rpc.AdminInterfaceException;
+import com.google.appinventor.shared.rpc.project.CourseInfo;
 import com.google.appinventor.shared.rpc.project.Project;
 import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
 import com.google.appinventor.shared.rpc.project.UserProject;
@@ -733,4 +734,9 @@ public interface StorageIo {
 
   public int getBuildStatus(String userId, long projectId);
 
+  // Modified by KingSun on 2019/04/29
+  // For admin functions.
+  CourseInfo getCourse(int courseId);
+  List<CourseInfo> getAllCourses(String userId);
+  boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
 }

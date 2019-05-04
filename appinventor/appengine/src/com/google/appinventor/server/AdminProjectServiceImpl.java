@@ -1,11 +1,14 @@
 package com.google.appinventor.server;
 
+import com.google.appinventor.common.utils.StringUtils;
+import com.google.appinventor.server.properties.json.ServerJsonParser;
 import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
-import com.google.appinventor.shared.rpc.project.AdminProjectService;
-import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
-import com.google.appinventor.shared.rpc.project.RawFile;
-import com.google.appinventor.shared.rpc.project.UserProject;
+import com.google.appinventor.shared.properties.json.JSONParser;
+import com.google.appinventor.shared.rpc.project.*;
+import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
+import com.google.appinventor.shared.settings.Settings;
+import com.google.appinventor.shared.settings.SettingsConstants;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -23,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.google.appinventor.server.project.youngandroid.YoungAndroidProjectService.*;
 
 /**
  * The implementation of the RPC service which runs on the server.
@@ -101,5 +106,112 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
             LOG.log(Level.SEVERE, "Network error", e);
             return -1;
         }
+    }
+
+    @Override
+    public List<CourseInfo> getAllCourses() {
+        return storageIo.getAllCourses(userInfoProvider.getUserId());
+    }
+
+    @Override
+    public boolean submitProject(CourseInfo info, long projectId) {
+        long newProjectId = copyProjectToAdmin(userInfoProvider.getUserId(), projectId, info.getAdminId());
+        return storageIo.addScore(info, userInfoProvider.getUserId(), newProjectId);
+    }
+
+    public long copyProjectToAdmin(String userId, long oldProjectId, String adminId) {
+        String oldProjectSettings = storageIo.loadProjectSettings(userId, oldProjectId);
+        String oldProjectHistory = storageIo.getProjectHistory(userId, oldProjectId);
+        Settings oldSettings = new Settings(new ServerJsonParser(), oldProjectSettings);
+        String icon = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_ICON);
+        String vcode = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_VERSION_CODE);
+        String vname = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_VERSION_NAME);
+        String useslocation = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_USES_LOCATION);
+        String aname = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_APP_NAME);
+        String sizing = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_SIZING);
+        String showListsAsJson = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_SHOW_LISTS_AS_JSON);
+        String tutorialURL = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_TUTORIAL_URL);
+        String actionBar = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_ACTIONBAR);
+        String theme = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_THEME);
+        String primaryColor = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_PRIMARY_COLOR);
+        String primaryColorDark = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_PRIMARY_COLOR_DARK);
+        String accentColor = oldSettings.getSetting(
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_ACCENT_COLOR);
+
+        String newName = storageIo.getProjectName(userId, oldProjectId);
+        Project newProject = new Project(newName);
+        newProject.setProjectType(YoungAndroidProjectNode.YOUNG_ANDROID_PROJECT_TYPE);
+        newProject.setProjectHistory(oldProjectHistory);
+
+        // Get the old project's source files and add them to new project, modifying where necessary.
+        for (String oldSourceFileName : storageIo.getProjectSourceFiles(userId, oldProjectId)) {
+            // String newSourceFileName = oldSourceFileName;
+
+            String newContents = null;
+            if (oldSourceFileName.equals(PROJECT_PROPERTIES_FILE_NAME)) {
+                // This is the project properties file. The name of the file doesn't contain the old
+                // project name.
+                // newSourceFileName = oldSourceFileName;
+                // For the contents of the project properties file, generate the file with the new project
+                // name and qualified name.
+                String qualifiedFormName = StringUtils.getQualifiedFormName(
+                        storageIo.getUser(userId).getUserEmail(), newName);
+                newContents = getProjectPropertiesFileContents(newName, qualifiedFormName, icon, vcode,
+                        vname, useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar,
+                        theme, primaryColor, primaryColorDark, accentColor);
+            }
+            // else {
+            //     // This is some file other than the project properties file.
+            //     // oldSourceFileName may contain the old project name as a path segment, surrounded by /.
+            //     // Replace the old name with the new name.
+            //     newSourceFileName = StringUtils.replaceLastOccurrence(oldSourceFileName,
+            //             "/" + oldName + "/", "/" + newName + "/");
+            // }
+
+            if (newContents != null) {
+                // We've determined (above) that the contents of the file must change for the new project.
+                // Use newContents when adding the file to the new project.
+                // newProject.addTextFile(new TextFile(newSourceFileName, newContents));
+                newProject.addTextFile(new TextFile(oldSourceFileName, newContents));
+            } else {
+                // If we get here, we know that the contents of the file can just be copied from the old
+                // project. Since it might be a binary file, we copy it as a raw file (that works for both
+                // text and binary files).
+                // byte[] contents = storageIo.downloadRawFile(userId, oldProjectId, oldSourceFileName);
+                // newProject.addRawFile(new RawFile(newSourceFileName, contents));
+                byte[] contents = storageIo.downloadRawFile(userId, oldProjectId, oldSourceFileName);
+                newProject.addRawFile(new RawFile(oldSourceFileName, contents));
+            }
+        }
+
+        // Create the new project for adminId and return the new project's id.
+        return storageIo.createProject(adminId, newProject, getProjectSettings(icon, vcode, vname,
+                useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar, theme, primaryColor,
+                primaryColorDark, accentColor));
     }
 }

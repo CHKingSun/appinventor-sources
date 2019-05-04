@@ -615,7 +615,9 @@ public class SQLStorageIo implements StorageIo {
             String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
             JSONObject json = new JSONObject(data);
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
-            r_history = project.getString("history");
+            if (project.has("history")) {
+                r_history = project.getString("history");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1536,5 +1538,71 @@ public class SQLStorageIo implements StorageIo {
         }
 
         return r_progress;
+    }
+
+    @Override
+    public CourseInfo getCourse(int courseId) {
+        CourseInfo info = null;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from courses where courseId=?");
+            statement.setInt(1, courseId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                info = new CourseInfo(
+                  result.getInt("courseId"),
+                  result.getString("courseName"),
+                  result.getString("adminId"),
+                  getUser(result.getString("adminId")).getUserEmail()
+                );
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return info;
+    }
+
+    @Override
+    public List<CourseInfo> getAllCourses(String userId) {
+        List<CourseInfo> infos = new LinkedList<>();
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select courseId from classes where userId=?");
+            statement.setString(1, userId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                infos.add(getCourse(result.getInt("courseId")));
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return infos;
+    }
+
+    @Override
+    public boolean addScore(CourseInfo courseInfo, String submitterId, long projectId) {
+        boolean status = false;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "insert into scores (adminId, projectId, submitterId, courseId) values (?, ?, ?, ?)"
+            );
+            statement.setString(1, courseInfo.getAdminId());
+            statement.setLong(2, projectId);
+            statement.setString(3, submitterId);
+            statement.setInt(4, courseInfo.getCourseId());
+            status = statement.executeUpdate() > 0;
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return status;
     }
 }

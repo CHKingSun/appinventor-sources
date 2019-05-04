@@ -4,6 +4,8 @@ import com.google.appinventor.shared.rpc.ServerLayout;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
+import java.util.List;
+
 /**
  * Interface for the service providing admin project information.
  *
@@ -22,7 +24,7 @@ public interface AdminProjectService extends RemoteService {
     String testLogin(String host, int port, String userName, String passwd);
 
     /**
-     * Upload a project to remote main server
+     * Upload a project to remote main server.
      * @param projectId project ID to upload
      * @param host host of the server
      * @param port port of the server
@@ -30,4 +32,18 @@ public interface AdminProjectService extends RemoteService {
      * @return status of upload
      */
     int uploadProject(long projectId, String host, int port, String cookie);
+
+    /**
+     * Get all the courses info of the user.
+     * @return all the courses info of the user
+     */
+    List<CourseInfo> getAllCourses();
+
+    /**
+     * Submit the project to the course's admin.
+     * @param info the info of the course
+     * @param projectId the project ID to submit
+     * @return whether submitted successfully
+     */
+    boolean submitProject(CourseInfo info, long projectId);
 }
