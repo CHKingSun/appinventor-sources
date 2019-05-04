@@ -14,12 +14,14 @@ import com.google.appinventor.client.boxes.ProjectListBox;
 import com.google.appinventor.client.boxes.ViewerBox;
 import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.tracking.Tracking;
+import com.google.appinventor.client.utils.UploadToServerDialog;
 import com.google.appinventor.client.widgets.Toolbar;
 import com.google.appinventor.client.wizards.youngandroid.NewYoungAndroidProjectWizard;
 import com.google.appinventor.shared.rpc.project.GalleryApp;
 import com.google.appinventor.shared.rpc.project.GallerySettings;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ import static com.google.appinventor.client.Ode.MESSAGES;
 public class ProjectToolbar extends Toolbar {
   private static final String WIDGET_NAME_NEW = "New";
   private static final String WIDGET_NAME_DELETE = "Delete";
+  private static final String WIDGET_NAME_UPLOAD_TO_SERVER = "Upload To Server";
   private static final String WIDGET_NAME_PUBLISH_OR_UPDATE = "PublishOrUpdate";
 
   private boolean isReadOnly;
@@ -51,6 +54,8 @@ public class ProjectToolbar extends Toolbar {
         new DeleteAction()));
     addButton(new ToolbarItem(WIDGET_NAME_PUBLISH_OR_UPDATE, MESSAGES.publishToGalleryButton(),
         new PublishOrUpdateAction()));
+    addButton(new ToolbarItem(WIDGET_NAME_UPLOAD_TO_SERVER, MESSAGES.uploadToServerButton(),
+            new UploadToServerAction()));
 
     updateButtons();
   }
@@ -229,6 +234,16 @@ public class ProjectToolbar extends Toolbar {
     }
   }
 
+  private class UploadToServerAction implements Command {
+
+    @Override
+    public void execute() {
+      new UploadToServerDialog(
+              ProjectListBox.getProjectListBox().getProjectList().getSelectedProjects()
+      ).show();
+    }
+  }
+
   /**
    * Enables and/or disables buttons based on how many projects exist
    * (in the case of "Download All Projects") or are selected (in the case
@@ -250,6 +265,7 @@ public class ProjectToolbar extends Toolbar {
       return;
     }
     setButtonEnabled(WIDGET_NAME_DELETE, numSelectedProjects > 0);
+    setButtonEnabled(WIDGET_NAME_UPLOAD_TO_SERVER, numSelectedProjects > 0);
     setButtonEnabled(WIDGET_NAME_PUBLISH_OR_UPDATE, numSelectedProjects == 1);
     if(numSelectedProjects == 1 && ProjectListBox.getProjectListBox().getProjectList()
         .getSelectedProjects().get(0).isPublished()){

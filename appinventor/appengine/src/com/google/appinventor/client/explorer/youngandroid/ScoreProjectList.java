@@ -29,7 +29,7 @@ import static com.google.appinventor.client.Ode.MESSAGES;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class AdminProjectList extends Composite implements ProjectManagerEventListener {
+public class ScoreProjectList extends Composite implements ProjectManagerEventListener {
     private enum SortField {
         NAME,
         SCORE,
@@ -53,7 +53,7 @@ public class AdminProjectList extends Composite implements ProjectManagerEventLi
     /**
      * Creates a new ProjectList
      */
-    public AdminProjectList() {
+    public ScoreProjectList() {
         projects = new ArrayList<>();
         selectedProjects = new ArrayList<>();
         projectWidgets = new HashMap<>();

@@ -6,7 +6,7 @@ package com.google.appinventor.client.boxes;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
-import com.google.appinventor.client.explorer.youngandroid.AdminProjectList;
+import com.google.appinventor.client.explorer.youngandroid.ScoreProjectList;
 import com.google.appinventor.client.widgets.boxes.Box;
 
 
@@ -14,33 +14,33 @@ import com.google.appinventor.client.widgets.boxes.Box;
  * Box implementation for project list.
  *
  */
-public final class AdminProjectListBox extends Box {
+public final class ScoreProjectListBox extends Box {
 
     // Singleton project explorer box instance (only one project explorer allowed)
-    private static final AdminProjectListBox INSTANCE = new AdminProjectListBox();
+    private static final ScoreProjectListBox INSTANCE = new ScoreProjectListBox();
 
     // Project list for young android
-    private final AdminProjectList plist;
+    private final ScoreProjectList plist;
 
     /**
      * Returns the singleton projects list box.
      *
      * @return  project list box
      */
-    public static AdminProjectListBox getAdminProjectListBox() {
+    public static ScoreProjectListBox getAdminProjectListBox() {
         return INSTANCE;
     }
 
     /**
      * Creates new project list box.
      */
-    private AdminProjectListBox() {
+    private ScoreProjectListBox() {
         super(MESSAGES.projectListBoxCaption(),
                 300,    // height
                 false,  // minimizable
                 false); // removable
 
-        plist = new AdminProjectList();
+        plist = new ScoreProjectList();
         setContent(plist);
     }
 
@@ -49,7 +49,7 @@ public final class AdminProjectListBox extends Box {
      *
      * @return  project list
      */
-    public AdminProjectList getAdminProjectList() {
+    public ScoreProjectList getAdminProjectList() {
         return plist;
     }
 }

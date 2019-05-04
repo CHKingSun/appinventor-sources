@@ -41,7 +41,7 @@ public final class Project {
    *
    * @param projectInfo information about the project
    */
-  Project(UserProject projectInfo) {
+  public Project(UserProject projectInfo) {
     this.projectInfo = projectInfo;
 
     projectChangeListeners = new ArrayList<ProjectChangeListener>();

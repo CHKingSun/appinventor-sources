@@ -50,6 +50,13 @@ public class ServerLayout {
 
   /**
    * Relative path of the
+   * {@link com.google.appinventor.shared.rpc.project.AdminProjectService} within
+   * the ODE GWT module.
+   */
+  public static final String ADMIN_PROJECT_SERVICE = "adminprojects";
+
+  /**
+   * Relative path of the
    * {@link com.google.appinventor.shared.rpc.project.GalleryService} within
    * the ODE GWT module.
    */

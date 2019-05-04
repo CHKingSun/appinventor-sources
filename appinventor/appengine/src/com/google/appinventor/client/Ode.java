@@ -56,36 +56,27 @@ import com.google.appinventor.client.wizards.NewProjectWizard.NewProjectCommand;
 import com.google.appinventor.client.wizards.TemplateUploadWizard;
 import com.google.appinventor.common.version.AppInventorFeatures;
 import com.google.appinventor.components.common.YaVersion;
-  import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthService;
-  import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthServiceAsync;
-  import com.google.appinventor.shared.rpc.component.ComponentService;
-  import com.google.appinventor.shared.rpc.component.ComponentServiceAsync;
-  import com.google.appinventor.shared.rpc.GetMotdService;
-  import com.google.appinventor.shared.rpc.GetMotdServiceAsync;
-  import com.google.appinventor.shared.rpc.RpcResult;
-  import com.google.appinventor.shared.rpc.ServerLayout;
-  import com.google.appinventor.shared.rpc.admin.AdminInfoService;
-  import com.google.appinventor.shared.rpc.admin.AdminInfoServiceAsync;
-  import com.google.appinventor.shared.rpc.help.HelpService;
-  import com.google.appinventor.shared.rpc.help.HelpServiceAsync;
-  import com.google.appinventor.shared.rpc.project.FileNode;
-  import com.google.appinventor.shared.rpc.project.GalleryAppListResult;
-  import com.google.appinventor.shared.rpc.project.GalleryComment;
-  import com.google.appinventor.shared.rpc.project.GallerySettings;
-  import com.google.appinventor.shared.rpc.project.ProjectRootNode;
-  import com.google.appinventor.shared.rpc.project.ProjectService;
-  import com.google.appinventor.shared.rpc.project.ProjectServiceAsync;
-  import com.google.appinventor.shared.rpc.project.UserProject;
-  import com.google.appinventor.shared.rpc.project.GalleryService;
-  import com.google.appinventor.shared.rpc.project.GalleryServiceAsync;
-  import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSourceNode;
-  import com.google.appinventor.shared.rpc.user.Config;
-  import com.google.appinventor.shared.rpc.user.SplashConfig;
-  import com.google.appinventor.shared.rpc.user.User;
-  import com.google.appinventor.shared.rpc.user.UserInfoService;
-  import com.google.appinventor.shared.rpc.user.UserInfoServiceAsync;
-  import com.google.appinventor.shared.settings.SettingsConstants;
-  import com.google.gwt.core.client.Callback;
+import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthService;
+import com.google.appinventor.shared.rpc.cloudDB.CloudDBAuthServiceAsync;
+import com.google.appinventor.shared.rpc.component.ComponentService;
+import com.google.appinventor.shared.rpc.component.ComponentServiceAsync;
+import com.google.appinventor.shared.rpc.GetMotdService;
+import com.google.appinventor.shared.rpc.GetMotdServiceAsync;
+import com.google.appinventor.shared.rpc.RpcResult;
+import com.google.appinventor.shared.rpc.ServerLayout;
+import com.google.appinventor.shared.rpc.admin.AdminInfoService;
+import com.google.appinventor.shared.rpc.admin.AdminInfoServiceAsync;
+import com.google.appinventor.shared.rpc.help.HelpService;
+import com.google.appinventor.shared.rpc.help.HelpServiceAsync;
+import com.google.appinventor.shared.rpc.project.*;
+import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSourceNode;
+import com.google.appinventor.shared.rpc.user.Config;
+import com.google.appinventor.shared.rpc.user.SplashConfig;
+import com.google.appinventor.shared.rpc.user.User;
+import com.google.appinventor.shared.rpc.user.UserInfoService;
+import com.google.appinventor.shared.rpc.user.UserInfoServiceAsync;
+import com.google.appinventor.shared.settings.SettingsConstants;
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -107,7 +98,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.*;
-import com.google.appinventor.shared.rpc.project.GalleryApp;
 
 /**
  * Main entry point for Ode. Defines the startup UI elements in
@@ -160,6 +150,9 @@ public class Ode implements EntryPoint {
   // write requests
 
   private boolean isReadOnly;
+
+  // Admin mode
+  private boolean isAdminMode;
 
   private String sessionId = generateUuid(); // Create new session id
   private Random random = new Random(); // For generating random nonce
@@ -237,6 +230,9 @@ public class Ode implements EntryPoint {
 
   // Web service for project related information
   private final ProjectServiceAsync projectService = GWT.create(ProjectService.class);
+
+  // Web service for admin project related information
+  private final AdminProjectServiceAsync adminProjectService = GWT.create(AdminProjectService.class);
 
   // Web service for gallery related information
   private final GalleryServiceAsync galleryService = GWT.create(GalleryService.class);
@@ -937,6 +933,7 @@ public class Ode implements EntryPoint {
 
       // Initialize global Ode instance
       instance = odeAdmin;
+      isAdminMode = true;
 
       // Let's see if we were started with a repo= parameter which points to a template
       templatePath = Window.Location.getParameter("repo");
@@ -1570,6 +1567,15 @@ public class Ode implements EntryPoint {
    */
   public ProjectServiceAsync getProjectService() {
     return projectService;
+  }
+
+  /**
+   * Get an instance of the admin project information web service.
+   *
+   * @return admin project web service instance
+   */
+  public AdminProjectServiceAsync getAdminProjectService() {
+    return adminProjectService;
   }
 
   /**
@@ -2459,6 +2465,8 @@ public class Ode implements EntryPoint {
   public void setReadOnly() {
     isReadOnly = true;
   }
+
+  public boolean isAdminMode() { return isAdminMode; }
 
   // Code to lock out certain screen and project switching code
   // These are locked out while files are being saved

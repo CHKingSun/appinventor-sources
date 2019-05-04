@@ -23,6 +23,7 @@ import com.google.appinventor.client.tracking.Tracking;
 
 import com.google.appinventor.client.widgets.DropDownButton.DropDownItem;
 
+import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.client.widgets.Toolbar;
 
 import com.google.appinventor.common.version.AppInventorFeatures;
@@ -136,6 +137,8 @@ public class DesignToolbar extends Toolbar {
 
   public Label projectNameLabel;
 
+  private ScorePanel scorePanel;
+
   // Project currently displayed in designer
   private DesignProject currentProject;
 
@@ -175,6 +178,10 @@ public class DesignToolbar extends Toolbar {
     List<DropDownItem> screenItems = Lists.newArrayList();
     addDropDownButton(WIDGET_NAME_SCREENS_DROPDOWN, MESSAGES.screensButton(), screenItems);
 
+    scorePanel = new ScorePanel();
+    toolbar.insert(scorePanel, 2);
+    toolbar.setCellHorizontalAlignment(scorePanel, HorizontalPanel.ALIGN_CENTER);
+
     if (AppInventorFeatures.allowMultiScreenApplications() && !isReadOnly) {
       addButton(new ToolbarItem(WIDGET_NAME_ADDFORM, MESSAGES.addFormButton(),
           new AddFormAction()));
@@ -190,6 +197,10 @@ public class DesignToolbar extends Toolbar {
     // Gray out the Designer button and enable the blocks button
     toggleEditor(false);
     Ode.getInstance().getTopToolbar().updateFileMenuButtons(0);
+  }
+
+  public ScorePanel getScorePanel() {
+    return scorePanel;
   }
 
   private class ToogleTutorialAction implements Command {

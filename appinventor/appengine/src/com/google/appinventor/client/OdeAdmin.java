@@ -1,17 +1,24 @@
 package com.google.appinventor.client;
 
-import com.google.appinventor.client.boxes.AdminProjectListBox;
+import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.boxes.PaletteBox;
-import com.google.appinventor.client.explorer.youngandroid.AdminProjectToolbar;
+import com.google.appinventor.client.explorer.youngandroid.ScoreProjectToolbar;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class OdeAdmin extends Ode {
 
     //Just something changed in Admin page
-    private AdminProjectToolbar projectToolbar;
+    private ScoreProjectToolbar projectToolbar;
 
-    private HorizontalPanel adminPanel;
+    /**
+     * Returns global instance of OdeAdmin.
+     *
+     * @return  global OdeAdmin instance
+     */
+    public static OdeAdmin getInstance() {
+        return (OdeAdmin)Ode.getInstance();
+    }
 
     public void onModuleLoad() {
         onAdminModuleLoad(this);
@@ -22,17 +29,17 @@ public class OdeAdmin extends Ode {
         super.initializeUi();
 
         PaletteBox.getPaletteBox().setHide(true);
-        AdminProjectListBox.getAdminProjectListBox().getAdminProjectList().setScoreHeaderVisible(false);
+        ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().setScoreHeaderVisible(false);
 
-        adminPanel = new HorizontalPanel();
+        HorizontalPanel adminPanel = new HorizontalPanel();
 
         // Projects tab
         VerticalPanel pVertPanel = new VerticalPanel();
         pVertPanel.setWidth("100%");
         pVertPanel.setSpacing(0);
-        projectToolbar = new AdminProjectToolbar();
+        projectToolbar = new ScoreProjectToolbar();
         pVertPanel.add(projectToolbar);
-        pVertPanel.add(AdminProjectListBox.getAdminProjectListBox());
+        pVertPanel.add(ScoreProjectListBox.getAdminProjectListBox());
         adminPanel.add(pVertPanel);
         adminPanel.setCellWidth(pVertPanel, "24%");
 

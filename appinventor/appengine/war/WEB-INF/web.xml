@@ -185,6 +185,21 @@
     <servlet-name>projectService</servlet-name>
   </filter-mapping>
 
+  <!-- admin projects -->
+  <servlet>
+    <servlet-name>adminProjectService</servlet-name>
+    <servlet-class>com.google.appinventor.server.AdminProjectServiceImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>adminProjectService</servlet-name>
+    <url-pattern>/ode/adminprojects</url-pattern>
+    <url-pattern>/ode_admin/adminprojects</url-pattern>
+  </servlet-mapping>
+  <filter-mapping>
+    <filter-name>odeAuthFilter</filter-name>
+    <servlet-name>adminProjectService</servlet-name>
+  </filter-mapping>
+
   <!-- gallery -->
   <servlet>
     <servlet-name>galleryService</servlet-name>

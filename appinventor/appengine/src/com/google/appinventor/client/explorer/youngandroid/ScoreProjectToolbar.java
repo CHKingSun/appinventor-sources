@@ -5,7 +5,8 @@
 package com.google.appinventor.client.explorer.youngandroid;
 
 import com.google.appinventor.client.Ode;
-import com.google.appinventor.client.boxes.AdminProjectListBox;
+import com.google.appinventor.client.boxes.ScoreProjectListBox;
+import com.google.appinventor.client.utils.UploadToServerDialog;
 import com.google.appinventor.client.widgets.Toolbar;
 import com.google.gwt.user.client.Command;
 
@@ -15,15 +16,15 @@ import static com.google.appinventor.client.Ode.MESSAGES;
  * The project toolbar houses command buttons in the Young Android Project tab.
  *
  */
-public class AdminProjectToolbar extends Toolbar {
+public class ScoreProjectToolbar extends Toolbar {
     private static final String WIDGET_NAME_SELECT_ALL = "Select All";
     private static final String WIDGET_NAME_DESELECT_ALL = "Deselect All";
-    private static final String WIDGET_NAME_IMPORT_TO_ME = "Import to me";
+    private static final String WIDGET_NAME_UPLOAD_TO_SERVER = "Upload To Server";
 
     /**
      * Initializes and assembles all commands into buttons in the toolbar.
      */
-    public AdminProjectToolbar() {
+    public ScoreProjectToolbar() {
         super();
         getWidget().setStylePrimaryName("ya-ProjectToolbar");
 
@@ -31,8 +32,8 @@ public class AdminProjectToolbar extends Toolbar {
                 new SelectAllAction()));
         addButton(new ToolbarItem(WIDGET_NAME_DESELECT_ALL, MESSAGES.deselectAllButton(),
                 new DeselectAllAction()));
-        addButton(new ToolbarItem(WIDGET_NAME_IMPORT_TO_ME, MESSAGES.importToMeButton(),
-                new ImportToMeAction()));
+        addButton(new ToolbarItem(WIDGET_NAME_UPLOAD_TO_SERVER, MESSAGES.uploadToServerButton(),
+                new UploadToServerAction()));
 
         updateButtons();
     }
@@ -41,7 +42,7 @@ public class AdminProjectToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            AdminProjectListBox.getAdminProjectListBox().getAdminProjectList().setlectAllProjects();
+            ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().setlectAllProjects();
         }
     }
 
@@ -49,15 +50,17 @@ public class AdminProjectToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            AdminProjectListBox.getAdminProjectListBox().getAdminProjectList().DesetlectAllProjects();
+            ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().DesetlectAllProjects();
         }
     }
 
-    private static class ImportToMeAction implements Command {
+    private class UploadToServerAction implements Command {
 
         @Override
         public void execute() {
-
+            new UploadToServerDialog(
+                    ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().getSelectedProjects()
+            ).show();
         }
     }
 
@@ -67,9 +70,9 @@ public class AdminProjectToolbar extends Toolbar {
      * of "Delete" and "Download Source").
      */
     public void updateButtons() {
-        AdminProjectList projectList = AdminProjectListBox.getAdminProjectListBox().getAdminProjectList();
+        ScoreProjectList projectList = ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList();
         int numSelectedProjects = projectList.getNumSelectedProjects();
-        setButtonEnabled(WIDGET_NAME_IMPORT_TO_ME, numSelectedProjects > 0);
+        setButtonEnabled(WIDGET_NAME_UPLOAD_TO_SERVER, numSelectedProjects > 0);
         Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.deleteProjectMenuItem(),
                 numSelectedProjects > 0);
         Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.exportProjectMenuItem(),

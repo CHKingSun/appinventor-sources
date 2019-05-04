@@ -54,9 +54,17 @@ public interface OdeMessages extends Messages {
   @Description("Text on \"Deselect All\" button")
   String deselectAllButton();
 
-  @DefaultMessage("Import To Me")
-  @Description("Text on \"Import To Me\" button")
-  String importToMeButton();
+  @DefaultMessage("Upload To Server")
+  @Description("Text on \"Upload To Server\" button")
+  String uploadToServerButton();
+
+  @DefaultMessage("Submit")
+  @Description("Text on \"Submit\" button")
+  String submitButton();
+
+  @DefaultMessage("Score")
+  @Description("Text on \"Score\" button")
+  String scoreButton();
 
   @DefaultMessage("All Projects")
   @Description("Text on \"All Projects\" button")
