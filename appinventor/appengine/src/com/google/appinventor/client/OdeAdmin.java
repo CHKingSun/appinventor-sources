@@ -16,6 +16,7 @@ public class OdeAdmin extends Ode {
     private ScoreProjectManager scoreProjectManager;
 
     private ScoreProjectToolbar scoreProjectToolbar;
+    private HorizontalPanel adminPanel;
 
     /**
      * Returns global instance of OdeAdmin.
@@ -40,14 +41,13 @@ public class OdeAdmin extends Ode {
         scoreProjectManager = new ScoreProjectManager();
     }
 
-
     @Override
     protected void initializeUi() {
         super.initializeUi();
 
         PaletteBox.getPaletteBox().setHide(true);
 
-        HorizontalPanel adminPanel = new HorizontalPanel();
+        adminPanel = new HorizontalPanel();
 
         // Projects tab
         VerticalPanel pVertPanel = new VerticalPanel();
@@ -75,5 +75,10 @@ public class OdeAdmin extends Ode {
 
         setProjectView(adminPanel);
         switchToProjectsView();
+    }
+
+    public void setAdminPanelWidth(String projectTabWidth, String designTabWidth) {
+        adminPanel.setCellWidth(adminPanel.getWidget(0), projectTabWidth);
+        adminPanel.setCellWidth(adminPanel.getWidget(2), designTabWidth);
     }
 }

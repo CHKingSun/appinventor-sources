@@ -46,6 +46,10 @@ public interface OdeMessages extends Messages {
   @Description("Caption for None entry")
   String noneCaption();
 
+  @DefaultMessage("Course")
+  @Description("Text on \"Course\" button")
+  String courseButton();
+
   @DefaultMessage("Select All")
   @Description("Text on \"Select All\" button")
   String selectAllButton();
@@ -57,6 +61,22 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Upload To Server")
   @Description("Text on \"Upload To Server\" button")
   String uploadToServerButton();
+
+  @DefaultMessage("Hide Score")
+  @Description("Text on \"Hide Score\" button")
+  String hideScoreLabel();
+
+  @DefaultMessage("Hide Submitter")
+  @Description("Text on \"Hide Submitter\" button")
+  String hideSubmitterLabel();
+
+  @DefaultMessage("Hide Submit Time")
+  @Description("Text on \"Hide Submit Time\" button")
+  String hideSubmitTimeLabel();
+
+  @DefaultMessage("Hide Scored Time")
+  @Description("Text on \"Hide Scored Time\" button")
+  String hideScoredTimeLabel();
 
   @DefaultMessage("Submit")
   @Description("Text on \"Submit\" button")

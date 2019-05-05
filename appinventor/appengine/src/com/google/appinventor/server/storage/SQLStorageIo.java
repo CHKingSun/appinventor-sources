@@ -1620,7 +1620,7 @@ public class SQLStorageIo implements StorageIo {
                 int courseId = result.getInt("courseId");
                 infos.add(new ScoreInfo(
                         getUserProject(adminId, projectId),
-                        submitterId, getUser(adminId).getUserEmail(),
+                        submitterId, getUser(submitterId).getUserEmail(),
                         courseId, getCourse(courseId).getCourseName(),
                         result.getTimestamp("submitTime").getTime(),
                         result.getInt("score"),

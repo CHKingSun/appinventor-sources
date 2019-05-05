@@ -4,7 +4,6 @@
 
 package com.google.appinventor.client.explorer.score;
 
-import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAdmin;
 import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.explorer.project.Project;
@@ -47,6 +46,7 @@ public final class ScoreProjectManager {
                         }
 
                         OdeAdmin.getInstance().getProjectManager().reloadProjects(projects);
+                        fireScoreProjectsLoaded();
                     }
                 }
         );

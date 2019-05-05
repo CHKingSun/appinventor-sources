@@ -195,7 +195,7 @@ public class Toolbar extends Composite {
    *
    * @param item the button to add
    */
-  protected void addButton(ToolbarItem item) {
+  public void addButton(ToolbarItem item) {
     addButton(item, false);
   }
 
@@ -247,7 +247,7 @@ public class Toolbar extends Composite {
    * @param dropDownName name used for internal map
    * @param item item to add to drop down
    */
-  protected void addDropDownButtonItem(String dropDownName, DropDownButton.DropDownItem item) {
+  public void addDropDownButtonItem(String dropDownName, DropDownButton.DropDownItem item) {
     final DropDownButton button = dropDownButtonMap.get(dropDownName);
     if (button != null && item != null) {
       button.addItem(item);
@@ -284,7 +284,7 @@ public class Toolbar extends Composite {
    * @param caption name of button
    * @param items list of items to add to drop down
    */
-  protected void addDropDownButton(String dropDownName, String caption, List<DropDownButton.DropDownItem> items) {
+  public void addDropDownButton(String dropDownName, String caption, List<DropDownButton.DropDownItem> items) {
     addDropDownButton(dropDownName, caption, items, false);
   }
 

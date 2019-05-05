@@ -233,6 +233,13 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         }
     }
 
+    private void refreshRowHeader() {
+        table.getWidget(0, 2).setVisible(!isHideScoreColumn);
+        table.getWidget(0, 3).setVisible(!isHideSubmitterColumn);
+        table.getWidget(0, 4).setVisible(!isHideSubmitTimeColumn);
+        table.getWidget(0, 5).setVisible(!isHideScoredTimeColumn);
+    }
+
     private class ScoreProjectWidgets {
         private final CheckBox checkBox;
         private final Label nameLabel;
@@ -329,6 +336,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         }
 
         refreshSortIndicators();
+        refreshRowHeader();
 
         // Refill the table.
         table.resize(1 + projects.size(), 6);
@@ -346,14 +354,29 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
             table.setWidget(row, 0, pw.checkBox);
             table.setWidget(row, 1, pw.nameLabel);
             if (!isHideScoreColumn) table.setWidget(row, 2, pw.scoreLabel);
+            else table.setWidget(row, 2, null);
             if (!isHideSubmitterColumn) table.setWidget(row, 3, pw.submitterLabel);
+            else table.setWidget(row, 3, null);
             if (!isHideSubmitTimeColumn) table.setWidget(row, 4, pw.submitTimeLabel);
+            else table.setWidget(row, 4, null);
             if (!isHideScoredTimeColumn) table.setWidget(row, 5, pw.scoredTimeLabel);
+            else table.setWidget(row, 5, null);
 
             ++row;
         }
 
         OdeAdmin.getInstance().getScoreProjectToolbar().updateButtons();
+    }
+
+    // Trigger when some column hide
+    public void refreshWidgetWidth() {
+        int width = 30;
+        if (!isHideScoreColumn) width += 10;
+        if (!isHideSubmitterColumn) width += 20;
+        if (!isHideSubmitTimeColumn) width += 20;
+        if (!isHideScoredTimeColumn) width += 20;
+        width = (int)(width * 0.36);
+        OdeAdmin.getInstance().setAdminPanelWidth(width + "%", (99 - width) + "%");
     }
 
     public void changeCourse(int courseId) {
@@ -433,21 +456,25 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
 
     public void setHideScoreColumn(boolean hideScoreColumn) {
         isHideScoreColumn = hideScoreColumn;
+        refreshWidgetWidth();
         refreshTable(false);
     }
 
     public void setHideSubmitterColumn(boolean hideSubmitterColumn) {
         isHideSubmitterColumn = hideSubmitterColumn;
+        refreshWidgetWidth();
         refreshTable(false);
     }
 
     public void setHideSubmitTimeColumn(boolean hideSubmitTimeColumn) {
         isHideSubmitTimeColumn = hideSubmitTimeColumn;
+        refreshWidgetWidth();
         refreshTable(false);
     }
 
     public void setHideScoredTimeColumn(boolean hideScoredTimeColumn) {
         isHideScoredTimeColumn = hideScoredTimeColumn;
+        refreshWidgetWidth();
         refreshTable(false);
     }
 }
