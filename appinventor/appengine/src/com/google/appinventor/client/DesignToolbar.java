@@ -17,6 +17,7 @@ import com.google.appinventor.client.explorer.commands.AddFormCommand;
 import com.google.appinventor.client.explorer.commands.ChainableCommand;
 import com.google.appinventor.client.explorer.commands.DeleteFileCommand;
 
+import com.google.appinventor.client.explorer.score.ScoreProject;
 import com.google.appinventor.client.output.OdeLog;
 
 import com.google.appinventor.client.tracking.Tracking;
@@ -427,6 +428,12 @@ public class DesignToolbar extends Toolbar {
             screen.screenName, new SwitchScreenAction(projectId, screen.screenName)));
       }
       projectNameLabel.setText(projectName);
+      if (Ode.getInstance().isAdminMode()) {
+        ScoreProject scoreProject = OdeAdmin.getInstance().getScoreProjectManager()
+                .getScoreProject(projectId);
+        projectNameLabel.setText(scoreProject.getSubmitter() + ": " + projectName);
+        scorePanel.setScore(scoreProject.getScore());
+      }
     } else {
       ErrorReporter.reportError("Design toolbar doesn't know about project " + projectName +
           " with id " + projectId);

@@ -220,4 +220,9 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
         if (!userInfoProvider.getIsAdmin()) return null;
         return storageIo.getAllScoreInfos(userInfoProvider.getUserId());
     }
+
+    @Override
+    public long updateProjectScore(long projectId, int score) {
+        return storageIo.updateProjectScore(userInfoProvider.getUserId(), projectId, score);
+    }
 }

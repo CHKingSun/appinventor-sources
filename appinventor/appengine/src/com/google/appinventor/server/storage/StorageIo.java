@@ -738,4 +738,5 @@ public interface StorageIo {
   boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
 
   List<ScoreInfo> getAllScoreInfos(String adminId);
+  long updateProjectScore(String adminId, long projectId, int score);
 }

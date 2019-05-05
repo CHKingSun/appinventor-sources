@@ -4,7 +4,9 @@
 
 package com.google.appinventor.client;
 
+import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidIntegerRangePropertyEditor;
+import com.google.appinventor.client.explorer.score.ScoreProject;
 import com.google.appinventor.client.utils.SubmitDialog;
 import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.client.widgets.properties.EditableProperties;
@@ -23,14 +25,9 @@ import java.util.List;
 import static com.google.appinventor.client.Ode.MESSAGES;
 
 public class ScorePanel extends Composite {
-    private Label userNameLabel;
     private EditableProperty scoreProperty;
 
     ScorePanel() {
-        this("", 0);
-    }
-
-    ScorePanel(String userName, int score) {
         HorizontalPanel panel = new HorizontalPanel();
         panel.setSpacing(4);
         panel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
@@ -43,20 +40,18 @@ public class ScorePanel extends Composite {
                 long currentProjectId = Ode.getInstance().getCurrentYoungAndroidProjectId();
                 if (currentProjectId != 0) {
                     if (Ode.getInstance().isAdminMode()) {
-                        new MarkScoreAction(currentProjectId).execute();
+                        new MarkScoreAction().execute();
                     } else {
-                        new SubmitProjectAction(currentProjectId).execute();
+                        new SubmitProjectAction().execute();
                     }
                 }
             }
         });
 
         if (Ode.getInstance().isAdminMode()) {
-            userNameLabel = new Label(userName);
-            panel.add(userNameLabel);
             PropertyEditor scoreEditor = new YoungAndroidIntegerRangePropertyEditor(-1, 150);
             scoreProperty = new EditableProperty(new EditableProperties(true), "Score",
-                    Integer.toString(score), "Score", scoreEditor, EditableProperty.TYPE_NORMAL);
+                    "0", "Score", scoreEditor, EditableProperty.TYPE_NORMAL);
             scoreEditor.setStyleName("ode-ScoreEditor");
             panel.add(scoreEditor);
             submitButton.setText(MESSAGES.scoreButton());
@@ -66,33 +61,35 @@ public class ScorePanel extends Composite {
         initWidget(panel);
     }
 
-    public void setUserName(String userName) {
-        userNameLabel.setText(userName);
-    }
-
     public void setScore(int score) {
         scoreProperty.setValue(Integer.toString(score));
     }
 
     private class MarkScoreAction implements Command {
-        private long projectId;
-
-        MarkScoreAction(long projectId) {
-            this.projectId = projectId;
-        }
 
         @Override
         public void execute() {
-            setScore((int)projectId);
+            final ScoreProject scoreProject = OdeAdmin.getInstance().getScoreProjectManager()
+                    .getScoreProject(OdeAdmin.getInstance().getCurrentYoungAndroidProjectId());
+            final int score = Integer.parseInt(scoreProperty.getValue());
+            OdeAdmin.getInstance().getAdminProjectService().updateProjectScore(
+                    scoreProject.getProjectId(), score, new OdeAsyncCallback<Long>() {
+                        @Override
+                        public void onSuccess(Long result) {
+                            Ode.CLog("Updated!");
+                            scoreProject.setScore(score);
+                            scoreProject.setScoredTime(result);
+                            ScoreProjectListBox.getScoreProjectListBox()
+                                    .getScoreProjectList().updateScoreProjectWidgets(scoreProject);
+                            ScoreProjectListBox.getScoreProjectListBox()
+                                    .getScoreProjectList().refreshTable(false);
+                        }
+                    }
+            );
         }
     }
 
     private class SubmitProjectAction implements Command {
-        private long projectId;
-
-        SubmitProjectAction(long projectId) {
-            this.projectId = projectId;
-        }
 
         @Override
         public void execute() {
@@ -105,11 +102,12 @@ public class ScorePanel extends Composite {
 
                         @Override
                         public void onSuccess(List<CourseInfo> result) {
-                            new SubmitDialog(result, projectId).show();
+                            new SubmitDialog(result,
+                                    Ode.getInstance().getCurrentYoungAndroidProjectId()
+                            ).show();
                         }
                     }
             );
         }
     }
-
 }

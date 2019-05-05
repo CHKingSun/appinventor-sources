@@ -37,5 +37,13 @@ public interface AdminProjectServiceAsync {
      */
     void submitProject(CourseInfo info, long projectId, AsyncCallback<Boolean> callback);
 
+    /**
+     * @see AdminProjectService#getAllScoreInfos()
+     */
     void getAllScoreInfos(AsyncCallback<List<ScoreInfo>> callback);
+
+    /**
+     * @see AdminProjectService#updateProjectScore(long, int)
+     */
+    void updateProjectScore(long projectId, int score, AsyncCallback<Long> callback);
 }

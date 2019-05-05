@@ -52,4 +52,12 @@ public interface AdminProjectService extends RemoteService {
      * @return all the score info of the admin
      */
     List<ScoreInfo> getAllScoreInfos();
+
+    /**
+     * Update the score of the project.
+     * @param projectId the project ID
+     * @param score the new score
+     * @return 0 if update failed, scored time if update success
+     */
+    long updateProjectScore(long projectId, int score);
 }

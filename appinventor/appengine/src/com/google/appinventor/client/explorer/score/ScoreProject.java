@@ -37,5 +37,7 @@ public final class ScoreProject {
 
     public long getSubmitTime() { return scoreInfo.getSubmitTime(); }
 
+    public void setScoredTime(long scoredTime) { scoreInfo.setScoredTime(scoredTime); }
+
     public long getScoredTime() { return scoreInfo.getScoredTime(); }
 }

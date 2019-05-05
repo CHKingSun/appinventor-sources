@@ -20,8 +20,11 @@ import java.util.Map;
  */
 public final class ScoreProjectManager {
 
-    // Map to get all the score infos by course ID
-    private final Map<Integer, List<ScoreProject>> scoreProjectsMap;
+    // Map to get all the score infos by project ID.
+    // Project ID is unique for one admin.
+    private final Map<Long, ScoreProject> scoreProjectsMap;
+
+    private final Map<Integer, String> coursesMap;
 
     // List of listeners for any project manager events.
     private final List<ScoreProjectManagerEventListener> scoreProjectManagerEventListeners;
@@ -31,6 +34,7 @@ public final class ScoreProjectManager {
      */
     public ScoreProjectManager() {
         scoreProjectsMap = new HashMap<>();
+        coursesMap = new HashMap<>();
         scoreProjectManagerEventListeners = new ArrayList<>();
         OdeAdmin.getInstance().getAdminProjectService().getAllScoreInfos(
                 new OdeAsyncCallback<List<ScoreInfo>>() {
@@ -48,30 +52,22 @@ public final class ScoreProjectManager {
         );
     }
 
-    public int coursesCount() {
-        return scoreProjectsMap.size();
+    public Map<Integer, String> getAllCoursesInfos() {
+        return new HashMap<>(coursesMap);
     }
 
-    public List<Integer> getAllCourseIds() {
-        return new ArrayList<>(scoreProjectsMap.keySet());
+    public List<ScoreProject> getAllScoreProjects() {
+        return new ArrayList<>(scoreProjectsMap.values());
     }
 
-    public List<Project> getAllProjects() {
-        List<Project> projects = new ArrayList<>();
-        for (List<ScoreProject> scoreProjects : scoreProjectsMap.values()) {
-            for (ScoreProject scoreProject : scoreProjects) {
-                projects.add(scoreProject.getProject());
-            }
-        }
-        return projects;
+    public ScoreProject getScoreProject(long projectId) {
+        return scoreProjectsMap.get(projectId);
     }
 
     public ScoreProject addScoreProject(ScoreInfo scoreInfo) {
         ScoreProject project = new ScoreProject(scoreInfo);
-        if (!scoreProjectsMap.containsKey(scoreInfo.getCourseId())) {
-            scoreProjectsMap.put(project.getCourseId(), new ArrayList<ScoreProject>());
-        }
-        scoreProjectsMap.get(scoreInfo.getCourseId()).add(project);
+        scoreProjectsMap.put(project.getProjectId(), project);
+        coursesMap.put(scoreInfo.getCourseId(), scoreInfo.getCourseName());
         fireScoreProjectAdded(project);
         return project;
     }

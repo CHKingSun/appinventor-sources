@@ -45,9 +45,11 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     private final Set<ScoreProject> selectedProjects;
     private final Map<ScoreProject, ScoreProjectWidgets> projectWidgets;
     private int currentCourse;
-    private ScoreProject currentProject;
     private SortField sortField;
     private SortOrder sortOrder;
+
+    private final static DateTimeFormat dateTimeFormat =
+            DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_SHORT);
 
     // UI elements
     private final Grid table;
@@ -232,12 +234,12 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     }
 
     private class ScoreProjectWidgets {
-        final CheckBox checkBox;
-        final Label nameLabel;
-        final Label scoreLabel;
-        final Label submitterLabel;
-        final Label submitTimeLabel;
-        final Label scoredTimeLabel;
+        private final CheckBox checkBox;
+        private final Label nameLabel;
+        private final Label scoreLabel;
+        private final Label submitterLabel;
+        private final Label submitTimeLabel;
+        private final Label scoredTimeLabel;
 
         private ScoreProjectWidgets(final ScoreProject project) {
             checkBox = new CheckBox();
@@ -266,18 +268,28 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                         return;             // i/o in progress, ignore request
                     }
                     ode.openYoungAndroidProjectInDesigner(project.getProject());
-                    currentProject = project;
                 }
             });
             nameLabel.addStyleName("ode-ProjectNameLabel");
 
-            DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM);
-
-            scoreLabel = new Label(Integer.toString(project.getScore()));
+            scoreLabel = new Label("-");
             submitterLabel = new Label(project.getSubmitter());
             submitTimeLabel = new Label(dateTimeFormat.format(new Date(project.getSubmitTime())));
-            scoredTimeLabel = new Label(dateTimeFormat.format(new Date(project.getScoredTime())));
+            scoredTimeLabel = new Label("-");
+
+            updateLabels(project);
         }
+
+        private void updateLabels(ScoreProject project) {
+            if (project.getScore() >= 0)
+                scoreLabel.setText(Integer.toString(project.getScore()));
+            if (project.getScoredTime() > 1000)
+                scoredTimeLabel.setText(dateTimeFormat.format(new Date(project.getScoredTime())));
+        }
+    }
+
+    public void updateScoreProjectWidgets(ScoreProject project) {
+        projectWidgets.get(project).updateLabels(project);
     }
 
     public void refreshTable(boolean needToSort) {
@@ -376,10 +388,6 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
      */
     public List<ScoreProject> getSelectedProjects() {
         return new ArrayList<>(selectedProjects);
-    }
-
-    public ScoreProject getCurrentProject() {
-        return currentProject;
     }
 
     public void selectAllProjects() {

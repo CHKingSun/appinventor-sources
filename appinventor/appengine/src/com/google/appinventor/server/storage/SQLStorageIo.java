@@ -1635,4 +1635,28 @@ public class SQLStorageIo implements StorageIo {
 
         return infos;
     }
+
+    @Override
+    public long updateProjectScore(String adminId, long projectId, int score) {
+        long scoredTime = System.currentTimeMillis();
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "update scores set score=?, scoredTime=? where adminId=? and projectId=?"
+            );
+            statement.setInt(1, score);
+            statement.setTimestamp(2, new Timestamp(scoredTime));
+            statement.setString(3, adminId);
+            statement.setLong(4, projectId);
+            if (statement.executeUpdate() == 0) {
+                scoredTime = 0;
+            }
+            statement.close();
+        } catch (Exception e) {
+            scoredTime = 0;
+            throw new RuntimeException(e);
+        }
+
+        return scoredTime;
+    }
 }

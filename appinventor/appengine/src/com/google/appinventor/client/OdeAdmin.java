@@ -46,7 +46,6 @@ public class OdeAdmin extends Ode {
         super.initializeUi();
 
         PaletteBox.getPaletteBox().setHide(true);
-//        ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList().setScoreHeaderVisible(false);
 
         HorizontalPanel adminPanel = new HorizontalPanel();
 
@@ -58,17 +57,21 @@ public class OdeAdmin extends Ode {
         pVertPanel.add(scoreProjectToolbar);
         pVertPanel.add(ScoreProjectListBox.getScoreProjectListBox());
         adminPanel.add(pVertPanel);
-        adminPanel.setCellWidth(pVertPanel, "30%");
+        adminPanel.setCellWidth(pVertPanel, "36%");
+
+        VerticalPanel spacePanel = new VerticalPanel();
+        spacePanel.setSpacing(0);
+        adminPanel.add(spacePanel);
+        adminPanel.setCellWidth(spacePanel, "1%");
 
         // Design tab
         VerticalPanel dVertPanel = new VerticalPanel();
         dVertPanel.setWidth("100%");
-        pVertPanel.setSpacing(0);
-//        dVertPanel.setHeight("100%");
+        dVertPanel.setSpacing(0);
         dVertPanel.add(Ode.getInstance().getDesignToolbar());
         dVertPanel.add(Ode.getInstance().getWorkColumns());
         adminPanel.add(dVertPanel);
-        adminPanel.setCellWidth(dVertPanel, "70%");
+        adminPanel.setCellWidth(dVertPanel, "63%");
 
         setProjectView(adminPanel);
         switchToProjectsView();
