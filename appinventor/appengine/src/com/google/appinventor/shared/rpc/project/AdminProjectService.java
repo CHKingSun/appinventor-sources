@@ -46,4 +46,10 @@ public interface AdminProjectService extends RemoteService {
      * @return whether submitted successfully
      */
     boolean submitProject(CourseInfo info, long projectId);
+
+    /**
+     * Get all the score info of the admin.
+     * @return all the score info of the admin
+     */
+    List<ScoreInfo> getAllScoreInfos();
 }

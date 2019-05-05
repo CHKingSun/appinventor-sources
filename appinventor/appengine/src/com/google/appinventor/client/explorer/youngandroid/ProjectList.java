@@ -240,7 +240,7 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
             table.getRowFormatter().setStyleName(row, "ode-ProjectRowUnHighlighted");
             selectedProjects.remove(project);
           }
-          Ode.getInstance().updateProjectToolbarButtons();
+          Ode.getInstance().getProjectToolbar().updateButtons();
         }
       });
 
@@ -337,7 +337,7 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
       row++;
     }
 
-    Ode.getInstance().updateProjectToolbarButtons();
+      Ode.getInstance().getProjectToolbar().updateButtons();
   }
 
   /**
@@ -383,7 +383,7 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
     refreshTable(false);
 
     selectedProjects.remove(project);
-    Ode.getInstance().updateProjectToolbarButtons();
+    Ode.getInstance().getProjectToolbar().updateButtons();
   }
 
   @Override

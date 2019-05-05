@@ -214,4 +214,10 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
                 useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar, theme, primaryColor,
                 primaryColorDark, accentColor));
     }
+
+    @Override
+    public List<ScoreInfo> getAllScoreInfos() {
+        if (!userInfoProvider.getIsAdmin()) return null;
+        return storageIo.getAllScoreInfos(userInfoProvider.getUserId());
+    }
 }

@@ -103,8 +103,20 @@ public interface OdeMessages extends Messages {
   String projectNameHeader();
 
   @DefaultMessage("Score")
-  @Description("Header for score column of project table")
+  @Description("Header for score column of score project table")
   String projectScoreHeader();
+
+  @DefaultMessage("Submitter")
+  @Description("Header for submitter column of score project table")
+  String projectSubmitterHeader();
+
+  @DefaultMessage("Submit Time")
+  @Description("Header for submitTime column of score project table")
+  String projectSubmitTimeHeader();
+
+  @DefaultMessage("Scored Time")
+  @Description("Header for scoredTime column of score project table")
+  String projectScoredTimeHeader();
 
   @DefaultMessage("Date Created")
   @Description("Header for date created column of project table.")

@@ -25,9 +25,13 @@ public final class ScoreProject {
 
     public Project getProject() { return project; }
 
+    public int getCourseId() { return scoreInfo.getCourseId(); }
+
     public String getSubmitter() { return scoreInfo.getSubmitter(); }
 
     public String getCourseName() { return  scoreInfo.getCourseName(); }
+
+    public void setScore(int score) { scoreInfo.setScore(score); }
 
     public int getScore() { return  scoreInfo.getScore(); }
 

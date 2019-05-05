@@ -1078,6 +1078,8 @@ public class Ode implements EntryPoint {
               });
               editorManager = new EditorManager();
 
+              loadAdminModule();
+
               // Initialize UI
               initializeUi();
               Window.setTitle("App Inventor Admin");
@@ -1162,14 +1164,16 @@ public class Ode implements EntryPoint {
       //History.fireCurrentHistoryState();
   }
 
+  // Just for AdminOde to load moudle.
+  // This will do nothing in Ode class.
+  protected void loadAdminModule() {
+
+  }
+
   protected void setProjectView(Panel panel) {
     projectsTabIndex = deckPanel.getWidgetCount();
     designTabIndex = deckPanel.getWidgetCount();
     deckPanel.add(panel);
-  }
-
-  public void updateProjectToolbarButtons() {
-    Ode.getInstance().getProjectToolbar().updateButtons();
   }
 
   /*

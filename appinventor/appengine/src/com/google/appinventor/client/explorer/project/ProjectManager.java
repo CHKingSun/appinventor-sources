@@ -40,6 +40,7 @@ public final class ProjectManager {
   public ProjectManager() {
     projectsMap = new HashMap<Long, Project>();
     projectManagerEventListeners = new ArrayList<ProjectManagerEventListener>();
+    if (Ode.getInstance().isAdminMode()) return;
     Ode.getInstance().getProjectService().getProjectInfos(
         new OdeAsyncCallback<List<UserProject>>(
         MESSAGES.projectInformationRetrievalError()) {
@@ -51,6 +52,13 @@ public final class ProjectManager {
 //        fireProjectsLoaded();
       }
     });
+  }
+
+  public void reloadProjects(List<Project> projects) {
+    for (Project project : projects) {
+      projectsMap.put(project.getProjectId(), project);
+      fireProjectAdded(project);
+    }
   }
 
   /**

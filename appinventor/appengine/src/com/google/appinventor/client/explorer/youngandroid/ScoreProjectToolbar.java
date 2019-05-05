@@ -6,9 +6,14 @@ package com.google.appinventor.client.explorer.youngandroid;
 
 import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.boxes.ScoreProjectListBox;
+import com.google.appinventor.client.explorer.project.Project;
+import com.google.appinventor.client.explorer.score.ScoreProject;
 import com.google.appinventor.client.utils.UploadToServerDialog;
 import com.google.appinventor.client.widgets.Toolbar;
 import com.google.gwt.user.client.Command;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -42,7 +47,7 @@ public class ScoreProjectToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().setlectAllProjects();
+            ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList().selectAllProjects();
         }
     }
 
@@ -50,7 +55,7 @@ public class ScoreProjectToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().DesetlectAllProjects();
+            ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList().deselectAllProjects();
         }
     }
 
@@ -58,9 +63,13 @@ public class ScoreProjectToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            new UploadToServerDialog(
-                    ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().getSelectedProjects()
-            ).show();
+            List<ScoreProject> scoreProjects = ScoreProjectListBox.getScoreProjectListBox()
+                    .getScoreProjectList().getSelectedProjects();
+            List<Project> projects = new ArrayList<>(scoreProjects.size());
+            for (ScoreProject scoreProject : scoreProjects) {
+                projects.add(scoreProject.getProject());
+            }
+            new UploadToServerDialog(projects).show();
         }
     }
 
@@ -70,7 +79,7 @@ public class ScoreProjectToolbar extends Toolbar {
      * of "Delete" and "Download Source").
      */
     public void updateButtons() {
-        ScoreProjectList projectList = ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList();
+        ScoreProjectList projectList = ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList();
         int numSelectedProjects = projectList.getNumSelectedProjects();
         setButtonEnabled(WIDGET_NAME_UPLOAD_TO_SERVER, numSelectedProjects > 0);
         Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.deleteProjectMenuItem(),

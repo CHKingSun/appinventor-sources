@@ -1605,4 +1605,34 @@ public class SQLStorageIo implements StorageIo {
 
         return status;
     }
+
+    @Override
+    public List<ScoreInfo> getAllScoreInfos(String adminId) {
+        List<ScoreInfo> infos = new LinkedList<>();
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from scores where adminId=?");
+            statement.setString(1, adminId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                long projectId = result.getLong("projectId");
+                String submitterId = result.getString("submitterId");
+                int courseId = result.getInt("courseId");
+                infos.add(new ScoreInfo(
+                        getUserProject(adminId, projectId),
+                        submitterId, getUser(adminId).getUserEmail(),
+                        courseId, getCourse(courseId).getCourseName(),
+                        result.getTimestamp("submitTime").getTime(),
+                        result.getInt("score"),
+                        result.getTimestamp("scoredTime").getTime()
+                ));
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return infos;
+    }
 }

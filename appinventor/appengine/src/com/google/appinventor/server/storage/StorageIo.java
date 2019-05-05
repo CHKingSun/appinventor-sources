@@ -11,10 +11,7 @@ import com.google.appinventor.shared.rpc.Motd;
 import com.google.appinventor.shared.rpc.Nonce;
 import com.google.appinventor.shared.rpc.admin.AdminUser;
 import com.google.appinventor.shared.rpc.AdminInterfaceException;
-import com.google.appinventor.shared.rpc.project.CourseInfo;
-import com.google.appinventor.shared.rpc.project.Project;
-import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
-import com.google.appinventor.shared.rpc.project.UserProject;
+import com.google.appinventor.shared.rpc.project.*;
 import com.google.appinventor.shared.rpc.user.User;
 import com.google.appinventor.shared.rpc.user.SplashConfig;
 
@@ -739,4 +736,6 @@ public interface StorageIo {
   CourseInfo getCourse(int courseId);
   List<CourseInfo> getAllCourses(String userId);
   boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
+
+  List<ScoreInfo> getAllScoreInfos(String adminId);
 }

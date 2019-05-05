@@ -2,14 +2,20 @@ package com.google.appinventor.client;
 
 import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.boxes.PaletteBox;
+import com.google.appinventor.client.explorer.score.ScoreProject;
+import com.google.appinventor.client.explorer.score.ScoreProjectManager;
+import com.google.appinventor.client.explorer.score.ScoreProjectManagerEventListener;
 import com.google.appinventor.client.explorer.youngandroid.ScoreProjectToolbar;
+import com.google.appinventor.client.wizards.TemplateUploadWizard;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class OdeAdmin extends Ode {
 
     //Just something changed in Admin page
-    private ScoreProjectToolbar projectToolbar;
+    private ScoreProjectManager scoreProjectManager;
+
+    private ScoreProjectToolbar scoreProjectToolbar;
 
     /**
      * Returns global instance of OdeAdmin.
@@ -20,16 +26,27 @@ public class OdeAdmin extends Ode {
         return (OdeAdmin)Ode.getInstance();
     }
 
+    public ScoreProjectManager getScoreProjectManager() { return scoreProjectManager; }
+
+    public ScoreProjectToolbar getScoreProjectToolbar() {
+        return scoreProjectToolbar;
+    }
+
     public void onModuleLoad() {
         onAdminModuleLoad(this);
     }
+
+    protected void loadAdminModule() {
+        scoreProjectManager = new ScoreProjectManager();
+    }
+
 
     @Override
     protected void initializeUi() {
         super.initializeUi();
 
         PaletteBox.getPaletteBox().setHide(true);
-        ScoreProjectListBox.getAdminProjectListBox().getAdminProjectList().setScoreHeaderVisible(false);
+//        ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList().setScoreHeaderVisible(false);
 
         HorizontalPanel adminPanel = new HorizontalPanel();
 
@@ -37,11 +54,11 @@ public class OdeAdmin extends Ode {
         VerticalPanel pVertPanel = new VerticalPanel();
         pVertPanel.setWidth("100%");
         pVertPanel.setSpacing(0);
-        projectToolbar = new ScoreProjectToolbar();
-        pVertPanel.add(projectToolbar);
-        pVertPanel.add(ScoreProjectListBox.getAdminProjectListBox());
+        scoreProjectToolbar = new ScoreProjectToolbar();
+        pVertPanel.add(scoreProjectToolbar);
+        pVertPanel.add(ScoreProjectListBox.getScoreProjectListBox());
         adminPanel.add(pVertPanel);
-        adminPanel.setCellWidth(pVertPanel, "24%");
+        adminPanel.setCellWidth(pVertPanel, "30%");
 
         // Design tab
         VerticalPanel dVertPanel = new VerticalPanel();
@@ -51,14 +68,9 @@ public class OdeAdmin extends Ode {
         dVertPanel.add(Ode.getInstance().getDesignToolbar());
         dVertPanel.add(Ode.getInstance().getWorkColumns());
         adminPanel.add(dVertPanel);
-        adminPanel.setCellWidth(dVertPanel, "76%");
+        adminPanel.setCellWidth(dVertPanel, "70%");
 
         setProjectView(adminPanel);
         switchToProjectsView();
-    }
-
-    @Override
-    public void updateProjectToolbarButtons() {
-        projectToolbar.updateButtons();
     }
 }

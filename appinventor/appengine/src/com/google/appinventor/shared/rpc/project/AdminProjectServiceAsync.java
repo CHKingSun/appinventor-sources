@@ -32,5 +32,10 @@ public interface AdminProjectServiceAsync {
      */
     void getAllCourses(AsyncCallback<List<CourseInfo>> callback);
 
+    /**
+     * @see AdminProjectService#submitProject(CourseInfo, long)
+     */
     void submitProject(CourseInfo info, long projectId, AsyncCallback<Boolean> callback);
+
+    void getAllScoreInfos(AsyncCallback<List<ScoreInfo>> callback);
 }

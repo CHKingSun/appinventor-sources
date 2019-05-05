@@ -27,7 +27,7 @@ public final class ScoreProjectListBox extends Box {
      *
      * @return  project list box
      */
-    public static ScoreProjectListBox getAdminProjectListBox() {
+    public static ScoreProjectListBox getScoreProjectListBox() {
         return INSTANCE;
     }
 
@@ -49,7 +49,7 @@ public final class ScoreProjectListBox extends Box {
      *
      * @return  project list
      */
-    public ScoreProjectList getAdminProjectList() {
+    public ScoreProjectList getScoreProjectList() {
         return plist;
     }
 }
