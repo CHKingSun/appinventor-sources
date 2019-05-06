@@ -36,7 +36,7 @@ public final class ProjectListBox extends Box {
    * Creates new project list box.
    */
   private ProjectListBox() {
-    super(MESSAGES.allProjectListBoxCaption(),
+    super(MESSAGES.projectListBoxCaption(),
         300,    // height
         false,  // minimizable
         false); // removable

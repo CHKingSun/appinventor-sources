@@ -337,7 +337,7 @@ public class ProjectList extends Composite implements ProjectManagerEventListene
       row++;
     }
 
-      Ode.getInstance().getProjectToolbar().updateButtons();
+    Ode.getInstance().getProjectToolbar().updateButtons();
   }
 
   /**

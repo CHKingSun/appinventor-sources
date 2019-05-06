@@ -1,12 +1,9 @@
 package com.google.appinventor.client;
 
-import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.boxes.PaletteBox;
-import com.google.appinventor.client.explorer.score.ScoreProject;
+import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.explorer.score.ScoreProjectManager;
-import com.google.appinventor.client.explorer.score.ScoreProjectManagerEventListener;
 import com.google.appinventor.client.explorer.youngandroid.ScoreProjectToolbar;
-import com.google.appinventor.client.wizards.TemplateUploadWizard;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 

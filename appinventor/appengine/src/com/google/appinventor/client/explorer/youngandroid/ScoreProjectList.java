@@ -19,6 +19,8 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -44,6 +46,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     private final Map<Integer, List<ScoreProject>> projectsMap;
     private final Set<ScoreProject> selectedProjects;
     private final Map<ScoreProject, ScoreProjectWidgets> projectWidgets;
+    private List<ScoreProject> currentProjects;
     private int currentCourse;
     private SortField sortField;
     private SortOrder sortOrder;
@@ -71,6 +74,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         projectsMap = new HashMap<>();
         currentCourse = -1;
         projectsMap.put(currentCourse, new ArrayList<ScoreProject>());
+        currentProjects = new ArrayList<>();
         selectedProjects = new HashSet<>();
         projectWidgets = new HashMap<>();
 
@@ -254,7 +258,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 @Override
                 public void onValueChange(ValueChangeEvent<Boolean> event) {
                     boolean isChecked = event.getValue(); // auto-unbox from Boolean to boolean
-                    int row = 1 + projectsMap.get(currentCourse).indexOf(project);
+                    int row = 1 + currentProjects.indexOf(project);
                     if (isChecked) {
                         table.getRowFormatter().setStyleName(row, "ode-ProjectRowHighlighted");
                         selectedProjects.add(project);
@@ -300,7 +304,6 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     }
 
     public void refreshTable(boolean needToSort) {
-        List<ScoreProject> projects = projectsMap.get(currentCourse);
         if (needToSort) {
             // Sort the projects.
             Comparator<ScoreProject> comparator;
@@ -332,16 +335,16 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                             : ScoreProjectComparators.COMPARE_BY_SCORED_TIME_DESC;
                     break;
             }
-            projects.sort(comparator);
+            currentProjects.sort(comparator);
         }
 
         refreshSortIndicators();
         refreshRowHeader();
 
         // Refill the table.
-        table.resize(1 + projects.size(), 6);
+        table.resize(1 + currentProjects.size(), 6);
         int row = 1;
-        for (ScoreProject project : projects) {
+        for (ScoreProject project : currentProjects) {
             ScoreProjectWidgets pw = projectWidgets.get(project);
             if (selectedProjects.contains(project)) {
                 table.getRowFormatter().setStyleName(row, "ode-ProjectRowHighlighted");
@@ -375,7 +378,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         if (!isHideSubmitterColumn) width += 20;
         if (!isHideSubmitTimeColumn) width += 20;
         if (!isHideScoredTimeColumn) width += 20;
-        width = (int)(width * 0.36);
+        width = (int)((width < 70 ? 70 : width) * 0.36);
         OdeAdmin.getInstance().setAdminPanelWidth(width + "%", (99 - width) + "%");
     }
 
@@ -383,6 +386,13 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         if (currentCourse == courseId || !projectsMap.containsKey(courseId)) return;
         deselectAllProjects();
         currentCourse = courseId;
+        currentProjects = projectsMap.get(currentCourse);
+        refreshTable(true);
+    }
+
+    public void filterTime(Predicate<ScoreProject> predicate) {
+        if (predicate == null) return;
+        currentProjects = projectsMap.get(currentCourse).stream().filter(predicate).collect(Collectors.toList());
         refreshTable(true);
     }
 
@@ -392,7 +402,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
      * @return the number of projects
      */
     public int getNumProjects() {
-        return projectsMap.get(currentCourse).size();
+        return currentProjects.size();
     }
 
     /**
@@ -414,7 +424,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     }
 
     public void selectAllProjects() {
-        for (ScoreProject project : projectsMap.get(currentCourse)) {
+        for (ScoreProject project : currentProjects) {
             ScoreProjectWidgets widget = projectWidgets.get(project);
             if (!widget.checkBox.getValue()) {
                 widget.checkBox.setValue(true, true);
@@ -423,7 +433,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     }
 
     public void deselectAllProjects() {
-        for (ScoreProject project : projectsMap.get(currentCourse)) {
+        for (ScoreProject project : currentProjects) {
             ScoreProjectWidgets widget = projectWidgets.get(project);
             if (widget.checkBox.getValue()) {
                 widget.checkBox.setValue(false, true);
@@ -441,9 +451,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         projectsMap.get(project.getCourseId()).add(project);
         projectWidgets.put(project, new ScoreProjectWidgets(project));
         if (currentCourse == project.getCourseId()) {
-            refreshTable(true);
-        } else {
-            currentCourse = project.getCourseId();
+            currentProjects.add(project);
             refreshTable(true);
         }
     }
@@ -451,7 +459,12 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
 
     @Override
     public void onScoreProjectsLoaded() {
-        // This can be empty
+        for (int courseId : projectsMap.keySet()) {
+            if (courseId != -1) {
+                changeCourse(courseId);
+                break;
+            }
+        }
     }
 
     public void setHideScoreColumn(boolean hideScoreColumn) {

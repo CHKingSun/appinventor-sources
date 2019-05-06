@@ -24,7 +24,6 @@ import com.google.appinventor.client.tracking.Tracking;
 
 import com.google.appinventor.client.widgets.DropDownButton.DropDownItem;
 
-import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.client.widgets.Toolbar;
 
 import com.google.appinventor.common.version.AppInventorFeatures;

@@ -219,10 +219,4 @@ public class DropDownButton extends TextButton {
   public ContextMenu getContextMenu() {
     return menu;
   }
-
-  public MenuItem getItem(int index) {
-    if (0 <= index && index < items.size())
-      return items.get(index);
-    return null;
-  }
 }

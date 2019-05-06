@@ -4,7 +4,6 @@
 
 package com.google.appinventor.client.explorer.youngandroid;
 
-import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAdmin;
 import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.explorer.project.Project;
@@ -12,16 +11,24 @@ import com.google.appinventor.client.explorer.score.ScoreProject;
 import com.google.appinventor.client.explorer.score.ScoreProjectManagerEventListener;
 import com.google.appinventor.client.utils.UploadToServerDialog;
 import com.google.appinventor.client.widgets.DropDownButton;
+import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.client.widgets.Toolbar;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DatePicker;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -36,6 +43,8 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
     private static final String WIDGET_NAME_UPLOAD_TO_SERVER = "Upload To Server";
 
     private Toolbar toolbar;
+    private DateBox fromDateBox;
+    private DateBox toDateBox;
 
     /**
      * Initializes and assembles all commands into buttons in the toolbar.
@@ -57,6 +66,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
 
         add(toolbar);
 
+        HorizontalPanel panel = new HorizontalPanel();
         CheckBox scoreCheckBox = new CheckBox(MESSAGES.hideScoreLabel());
         scoreCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
             @Override
@@ -66,7 +76,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
             }
         });
         scoreCheckBox.setStyleName("ode-ProjectNameLabel");
-        add(scoreCheckBox);
+        panel.add(scoreCheckBox);
 
         CheckBox submitterCheckBox = new CheckBox(MESSAGES.hideSubmitterLabel());
         submitterCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -77,8 +87,10 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
             }
         });
         submitterCheckBox.setStyleName("ode-ProjectNameLabel");
-        add(submitterCheckBox);
+        panel.add(submitterCheckBox);
+        add(panel);
 
+        panel = new HorizontalPanel();
         CheckBox submitTimeCheckBox = new CheckBox(MESSAGES.hideSubmitTimeLabel());
         submitTimeCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
             @Override
@@ -88,7 +100,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
             }
         });
         submitTimeCheckBox.setStyleName("ode-ProjectNameLabel");
-        add(submitTimeCheckBox);
+        panel.add(submitTimeCheckBox);
 
         CheckBox scoreTimeCheckBox = new CheckBox(MESSAGES.hideScoredTimeLabel());
         scoreTimeCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -99,7 +111,29 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
             }
         });
         scoreTimeCheckBox.setStyleName("ode-ProjectNameLabel");
-        add(scoreTimeCheckBox);
+        panel.add(scoreTimeCheckBox);
+        add(panel);
+
+        panel = new HorizontalPanel();
+        panel.setSpacing(4);
+        panel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        panel.add(new Label("From: "));
+        fromDateBox = new DateBox(new DatePicker(), null,
+                new DateBox.DefaultFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)));
+        panel.add(fromDateBox);
+        panel.add(new Label(" - To: "));
+        toDateBox = new DateBox(new DatePicker(), null,
+                new DateBox.DefaultFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)));
+        panel.add(toDateBox);
+        TextButton okButton = new TextButton(MESSAGES.okButton());
+        okButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                new FilterTimeAction().execute();
+            }
+        });
+        panel.add(okButton);
+        add(panel);
 
         updateButtons();
 
@@ -150,6 +184,38 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         }
     }
 
+    private class FilterTimeAction implements Command {
+
+        @Override
+        public void execute() {
+            if (fromDateBox.getValue() == null) {
+                Window.alert("Please set from time first!");
+                return;
+            }
+            if (toDateBox.getValue() == null) {
+                Window.alert("Please set to time first!");
+                return;
+            }
+            final long fromTime = fromDateBox.getValue().getTime();
+            final long toTime = toDateBox.getValue().getTime() + 86400000L;
+            OdeAdmin.CLog(new Date(fromTime));
+            OdeAdmin.CLog(new Date(toTime));
+            if (toTime <= fromTime) {
+                Window.alert("FromDate is lager than toDate");
+                return;
+            }
+            ScoreProjectListBox.getScoreProjectListBox()
+                    .getScoreProjectList().filterTime(new Predicate<ScoreProject>() {
+                @Override
+                public boolean test(ScoreProject project) {
+                    OdeAdmin.CLog(new Date(project.getSubmitTime()));
+                    return fromTime <= project.getSubmitTime()
+                            && project.getSubmitTime() <= toTime;
+                }
+            });
+        }
+    }
+
     /**
      * Enables and/or disables buttons based on how many projects exist
      * (in the case of "Download All Projects") or are selected (in the case
@@ -159,11 +225,11 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         ScoreProjectList projectList = ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList();
         int numSelectedProjects = projectList.getNumSelectedProjects();
         toolbar.setButtonEnabled(WIDGET_NAME_UPLOAD_TO_SERVER, numSelectedProjects > 0);
-        Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.deleteProjectMenuItem(),
+        OdeAdmin.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.deleteProjectMenuItem(),
                 numSelectedProjects > 0);
-        Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.exportProjectMenuItem(),
+        OdeAdmin.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.exportProjectMenuItem(),
                 numSelectedProjects > 0);
-        Ode.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.exportAllProjectsMenuItem(),
+        OdeAdmin.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.exportAllProjectsMenuItem(),
                 numSelectedProjects > 0);
     }
 
