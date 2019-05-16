@@ -4,6 +4,7 @@
 
 package com.google.appinventor.client.explorer.youngandroid;
 
+import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAdmin;
 import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.explorer.project.Project;
@@ -40,6 +41,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
     private static final String WIDGET_NAME_COURSE = "Course";
     private static final String WIDGET_NAME_SELECT_ALL = "Select All";
     private static final String WIDGET_NAME_DESELECT_ALL = "Deselect All";
+    private static final String WIDGET_NAME_SIMILARITY_ANALYSE = "Similarity Analyse";
     private static final String WIDGET_NAME_UPLOAD_TO_SERVER = "Upload To Server";
 
     private Toolbar toolbar;
@@ -61,23 +63,14 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
                 new SelectAllAction()));
         toolbar.addButton(new Toolbar.ToolbarItem(WIDGET_NAME_DESELECT_ALL, MESSAGES.deselectAllButton(),
                 new DeselectAllAction()));
+        toolbar.addButton(new Toolbar.ToolbarItem(WIDGET_NAME_SIMILARITY_ANALYSE, MESSAGES.similarityAnalyseButton(),
+                new SimilarityAnalyseAction()));
         toolbar.addButton(new Toolbar.ToolbarItem(WIDGET_NAME_UPLOAD_TO_SERVER, MESSAGES.uploadToServerButton(),
                 new UploadToServerAction()));
 
         add(toolbar);
 
         HorizontalPanel panel = new HorizontalPanel();
-        CheckBox scoreCheckBox = new CheckBox(MESSAGES.hideScoreLabel());
-        scoreCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-            @Override
-            public void onValueChange(ValueChangeEvent<Boolean> event) {
-                ScoreProjectListBox.getScoreProjectListBox()
-                        .getScoreProjectList().setHideScoreColumn(event.getValue());
-            }
-        });
-        scoreCheckBox.setStyleName("ode-ProjectNameLabel");
-        panel.add(scoreCheckBox);
-
         CheckBox submitterCheckBox = new CheckBox(MESSAGES.hideSubmitterLabel());
         submitterCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
             @Override
@@ -88,9 +81,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         });
         submitterCheckBox.setStyleName("ode-ProjectNameLabel");
         panel.add(submitterCheckBox);
-        add(panel);
 
-        panel = new HorizontalPanel();
         CheckBox submitTimeCheckBox = new CheckBox(MESSAGES.hideSubmitTimeLabel());
         submitTimeCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
             @Override
@@ -101,6 +92,19 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         });
         submitTimeCheckBox.setStyleName("ode-ProjectNameLabel");
         panel.add(submitTimeCheckBox);
+        add(panel);
+
+        panel = new HorizontalPanel();
+        CheckBox scoreCheckBox = new CheckBox(MESSAGES.hideSimilarityLabel());
+        scoreCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+                ScoreProjectListBox.getScoreProjectListBox()
+                        .getScoreProjectList().setHideSimilarityColumn(event.getValue());
+            }
+        });
+        scoreCheckBox.setStyleName("ode-ProjectNameLabel");
+        panel.add(scoreCheckBox);
 
         CheckBox scoreTimeCheckBox = new CheckBox(MESSAGES.hideScoredTimeLabel());
         scoreTimeCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -120,10 +124,12 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         panel.add(new Label("From: "));
         fromDateBox = new DateBox(new DatePicker(), null,
                 new DateBox.DefaultFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)));
+        fromDateBox.setStyleName("ode-DateBox");
         panel.add(fromDateBox);
         panel.add(new Label(" - To: "));
         toDateBox = new DateBox(new DatePicker(), null,
                 new DateBox.DefaultFormat(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)));
+        toDateBox.setStyleName("ode-DateBox");
         panel.add(toDateBox);
         TextButton okButton = new TextButton(MESSAGES.okButton());
         okButton.addClickHandler(new ClickHandler() {
@@ -157,6 +163,14 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         }
     }
 
+    private static class SimilarityAnalyseAction implements Command {
+
+        @Override
+        public void execute() {
+
+        }
+    }
+
     private static class UploadToServerAction implements Command {
 
         @Override
@@ -171,15 +185,18 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         }
     }
 
-    private static class SwitchCourseAction implements Command {
+    private class SwitchCourseAction implements Command {
         private int courseId;
+        private String courseName;
 
-        SwitchCourseAction(int courseId) {
+        SwitchCourseAction(int courseId, String courseName) {
             this.courseId = courseId;
+            this.courseName = courseName;
         }
 
         @Override
         public void execute() {
+            toolbar.setDropDownButtonCaption(WIDGET_NAME_COURSE, courseName);
             ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList().changeCourse(courseId);
         }
     }
@@ -240,12 +257,18 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
 
     @Override
     public void onScoreProjectsLoaded() {
-        List<DropDownButton.DropDownItem> items = new ArrayList<>();
+        int courseId = -1;
+        String courseName = null;
         for (Map.Entry<Integer, String> entry : OdeAdmin.getInstance().
                 getScoreProjectManager().getAllCoursesInfos().entrySet()) {
+            courseId = entry.getKey();
+            courseName = entry.getValue();
             toolbar.addDropDownButtonItem(WIDGET_NAME_COURSE,
-                    new DropDownButton.DropDownItem(entry.getValue(), entry.getValue(),
-                    new SwitchCourseAction(entry.getKey())));
+                    new DropDownButton.DropDownItem(courseName, courseName,
+                    new SwitchCourseAction(courseId, courseName)));
+        }
+        if (courseId != -1) {
+            new SwitchCourseAction(courseId, courseName).execute();
         }
     }
 

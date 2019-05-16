@@ -46,4 +46,9 @@ public interface AdminProjectServiceAsync {
      * @see AdminProjectService#updateProjectScore(long, int)
      */
     void updateProjectScore(long projectId, int score, AsyncCallback<Long> callback);
+
+    /**
+     * @see AdminProjectService#similarity(List, long)
+     */
+    void similarity(List<ScoreInfo> infos, long targetProjectId, AsyncCallback<float[]> callback);
 }

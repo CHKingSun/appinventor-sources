@@ -60,4 +60,13 @@ public interface AdminProjectService extends RemoteService {
      * @return 0 if update failed, scored time if update success
      */
     long updateProjectScore(long projectId, int score);
+
+    /**
+     * Similarity analysis
+     * @param infos the score projects to analyse
+     * @param targetProjectId the target project ID to analyse
+     * @return the similarities between target project and score project,
+     * order by parameter in.
+     */
+    float[] similarity(List<ScoreInfo> infos, long targetProjectId);
 }

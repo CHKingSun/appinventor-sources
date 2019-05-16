@@ -34,6 +34,8 @@ public class ScoreInfo implements IsSerializable {
     // The date when the project scored, default is 1.
     private long scoredTime;
 
+    private float similarity;
+
     /**
      * Default constructor. This constructor is required by GWT.
      */
@@ -41,7 +43,8 @@ public class ScoreInfo implements IsSerializable {
     private ScoreInfo() {}
 
     public ScoreInfo(UserProject projectInfo, String submitterId, String submitter,
-                     int courseId, String courseName, long submitTime, int score, long scoredTime) {
+                     int courseId, String courseName, long submitTime, int score,
+                     long scoredTime, float similarity) {
         this.projectInfo = projectInfo;
         this.submitterId = submitterId;
         this.submitter = submitter;
@@ -50,6 +53,7 @@ public class ScoreInfo implements IsSerializable {
         this.submitTime = submitTime;
         this.score = score;
         this.scoredTime = scoredTime;
+        this.similarity = similarity;
     }
 
     public UserProject getProjectInfo() {
@@ -114,6 +118,14 @@ public class ScoreInfo implements IsSerializable {
 
     public void setScoredTime(long scoredTime) {
         this.scoredTime = scoredTime;
+    }
+
+    public float getSimilarity() {
+        return similarity;
+    }
+
+    public void setSimilarity(float similarity) {
+        this.similarity = similarity;
     }
 
     @Override

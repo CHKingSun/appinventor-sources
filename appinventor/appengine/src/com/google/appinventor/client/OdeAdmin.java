@@ -4,6 +4,8 @@ import com.google.appinventor.client.boxes.PaletteBox;
 import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.explorer.score.ScoreProjectManager;
 import com.google.appinventor.client.explorer.youngandroid.ScoreProjectToolbar;
+import com.google.appinventor.shared.rpc.user.User;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -30,10 +32,34 @@ public class OdeAdmin extends Ode {
         return scoreProjectToolbar;
     }
 
-    public void onModuleLoad() {
-        onAdminModuleLoad(this);
+    @Override
+    protected boolean initializeAdmin(User user) {
+        if (!user.getIsAdmin()) {
+            String locale = Window.Location.getParameter("locale");
+            String repo = Window.Location.getParameter("repo");
+            String galleryId = Window.Location.getParameter("galleryId");
+            String separator = "?";
+            String uri = "/";
+            if (locale != null && !locale.equals("")) {
+                uri += separator + "locale=" + locale;
+                separator = "&";
+            }
+            if (repo != null && !repo.equals("")) {
+                uri += separator + "repo=" + repo;
+                separator = "&";
+            }
+            if (galleryId != null && !galleryId.equals("")) {
+                uri += separator + "galleryId=" + galleryId;
+            }
+            Window.Location.replace(uri);
+            Window.alert("You are not admin!");
+            return false;           // likely not reached
+        }
+        isAdminMode = true;
+        return true;
     }
 
+    @Override
     protected void loadAdminModule() {
         scoreProjectManager = new ScoreProjectManager();
     }
@@ -72,6 +98,8 @@ public class OdeAdmin extends Ode {
 
         setProjectView(adminPanel);
         switchToProjectsView();
+
+        Window.setTitle("App Inventor Admin");
     }
 
     public void setAdminPanelWidth(String projectTabWidth, String designTabWidth) {

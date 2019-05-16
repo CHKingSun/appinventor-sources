@@ -37,6 +37,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         SUBMITTER,
         SUBMIT_TIME,
         SCORED_TIME,
+        SIMILARITY,
     }
     private enum SortOrder {
         ASCENDING,
@@ -61,11 +62,12 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     private final Label submitterSortIndicator;
     private final Label submitTimeSortIndicator;
     private final Label scoredTimeSortIndicator;
+    private final Label similaritySortIndicator;
 
-    private boolean isHideScoreColumn = false;
     private boolean isHideSubmitterColumn = false;
     private boolean isHideSubmitTimeColumn = false;
     private boolean isHideScoredTimeColumn = false;
+    private boolean isHideSimilarityColumn = false;
 
     /**
      * Creates a new ProjectList
@@ -82,7 +84,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         sortOrder = SortOrder.ASCENDING;
 
         // Initialize UI
-        table = new Grid(1, 6); // The table initially contains just the header row.
+        table = new Grid(1, 7); // The table initially contains just the header row.
         table.addStyleName("ode-ProjectTable");
         table.setWidth("100%");
         table.setCellSpacing(0);
@@ -91,6 +93,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         submitterSortIndicator = new Label("");
         submitTimeSortIndicator = new Label("");
         scoredTimeSortIndicator = new Label("");
+        similaritySortIndicator = new Label("");
         refreshSortIndicators();
         setHeaderRow();
 
@@ -152,6 +155,14 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         scoredTimeHeader.add(scoredTimeSortIndicator);
         table.setWidget(0, 5, scoredTimeHeader);
 
+        HorizontalPanel similarityHeader = new HorizontalPanel();
+        final Label similarityHeaderLabel = new Label(MESSAGES.projectSimlarityHeader());
+        similarityHeaderLabel.addStyleName("ode-ProjectHeaderLabel");
+        similarityHeader.add(similarityHeaderLabel);
+        similaritySortIndicator.addStyleName("ode-ProjectHeaderLabel");
+        similarityHeader.add(similaritySortIndicator);
+        table.setWidget(0, 6, similarityHeader);
+
         MouseDownHandler mouseDownHandler = new MouseDownHandler() {
             @Override
             public void onMouseDown(MouseDownEvent e) {
@@ -164,6 +175,8 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                     clickedSortField = SortField.SUBMIT_TIME;
                 } else if (e.getSource() == scoredTimeHeaderLabel || e.getSource() == scoredTimeSortIndicator) {
                     clickedSortField = SortField.SCORED_TIME;
+                } else if (e.getSource() == similarityHeaderLabel || e.getSource() == similaritySortIndicator) {
+                    clickedSortField = SortField.SIMILARITY;
                 }
                 changeSortOrder(clickedSortField);
             }
@@ -178,6 +191,8 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         submitTimeSortIndicator.addMouseDownHandler(mouseDownHandler);
         scoredTimeHeaderLabel.addMouseDownHandler(mouseDownHandler);
         scoredTimeSortIndicator.addMouseDownHandler(mouseDownHandler);
+        similarityHeaderLabel.addMouseDownHandler(mouseDownHandler);
+        similaritySortIndicator.addMouseDownHandler(mouseDownHandler);
     }
 
     private void changeSortOrder(SortField clickedSortField) {
@@ -205,6 +220,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 submitterSortIndicator.setText("");
                 submitTimeSortIndicator.setText("");
                 scoredTimeSortIndicator.setText("");
+                similaritySortIndicator.setText("");
                 break;
             case SCORE:
                 nameSortIndicator.setText("");
@@ -212,6 +228,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 submitterSortIndicator.setText("");
                 submitTimeSortIndicator.setText("");
                 scoredTimeSortIndicator.setText("");
+                similaritySortIndicator.setText("");
                 break;
             case SUBMITTER:
                 nameSortIndicator.setText("");
@@ -219,6 +236,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 submitterSortIndicator.setText(text);
                 submitTimeSortIndicator.setText("");
                 scoredTimeSortIndicator.setText("");
+                similaritySortIndicator.setText("");
                 break;
             case SUBMIT_TIME:
                 nameSortIndicator.setText("");
@@ -226,6 +244,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 submitterSortIndicator.setText("");
                 submitTimeSortIndicator.setText(text);
                 scoredTimeSortIndicator.setText("");
+                similaritySortIndicator.setText("");
                 break;
             case SCORED_TIME:
                 nameSortIndicator.setText("");
@@ -233,15 +252,24 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 submitterSortIndicator.setText("");
                 submitTimeSortIndicator.setText("");
                 scoredTimeSortIndicator.setText(text);
+                similaritySortIndicator.setText("");
+                break;
+            case SIMILARITY:
+                nameSortIndicator.setText("");
+                scoreSortIndicator.setText("");
+                submitterSortIndicator.setText("");
+                submitTimeSortIndicator.setText("");
+                scoredTimeSortIndicator.setText("");
+                similaritySortIndicator.setText(text);
                 break;
         }
     }
 
     private void refreshRowHeader() {
-        table.getWidget(0, 2).setVisible(!isHideScoreColumn);
         table.getWidget(0, 3).setVisible(!isHideSubmitterColumn);
         table.getWidget(0, 4).setVisible(!isHideSubmitTimeColumn);
         table.getWidget(0, 5).setVisible(!isHideScoredTimeColumn);
+        table.getWidget(0, 6).setVisible(!isHideSimilarityColumn);
     }
 
     private class ScoreProjectWidgets {
@@ -251,6 +279,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         private final Label submitterLabel;
         private final Label submitTimeLabel;
         private final Label scoredTimeLabel;
+        private final Label similarityLabel;
 
         private ScoreProjectWidgets(final ScoreProject project) {
             checkBox = new CheckBox();
@@ -287,6 +316,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
             submitterLabel = new Label(project.getSubmitter());
             submitTimeLabel = new Label(dateTimeFormat.format(new Date(project.getSubmitTime())));
             scoredTimeLabel = new Label("-");
+            similarityLabel = new Label("-");
 
             updateLabels(project);
         }
@@ -296,6 +326,8 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 scoreLabel.setText(Integer.toString(project.getScore()));
             if (project.getScoredTime() > 1000)
                 scoredTimeLabel.setText(dateTimeFormat.format(new Date(project.getScoredTime())));
+            if (project.getSimilarity() > 0)
+                similarityLabel.setText(Float.toString(project.getSimilarity()));
         }
     }
 
@@ -334,6 +366,11 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                             ? ScoreProjectComparators.COMPARE_BY_SCORED_TIME_ASC
                             : ScoreProjectComparators.COMPARE_BY_SCORED_TIME_DESC;
                     break;
+                case SIMILARITY:
+                    comparator = (sortOrder == SortOrder.ASCENDING)
+                            ? ScoreProjectComparators.COMPARE_BY_SIMILARITY_ASC
+                            : ScoreProjectComparators.COMPARE_BY_SIMILARITY_DESC;
+                    break;
             }
             currentProjects.sort(comparator);
         }
@@ -342,7 +379,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         refreshRowHeader();
 
         // Refill the table.
-        table.resize(1 + currentProjects.size(), 6);
+        table.resize(1 + currentProjects.size(), 7);
         int row = 1;
         for (ScoreProject project : currentProjects) {
             ScoreProjectWidgets pw = projectWidgets.get(project);
@@ -356,14 +393,15 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
 
             table.setWidget(row, 0, pw.checkBox);
             table.setWidget(row, 1, pw.nameLabel);
-            if (!isHideScoreColumn) table.setWidget(row, 2, pw.scoreLabel);
-            else table.setWidget(row, 2, null);
+            table.setWidget(row, 2, pw.scoreLabel);
             if (!isHideSubmitterColumn) table.setWidget(row, 3, pw.submitterLabel);
             else table.setWidget(row, 3, null);
             if (!isHideSubmitTimeColumn) table.setWidget(row, 4, pw.submitTimeLabel);
             else table.setWidget(row, 4, null);
             if (!isHideScoredTimeColumn) table.setWidget(row, 5, pw.scoredTimeLabel);
             else table.setWidget(row, 5, null);
+            if (!isHideSimilarityColumn) table.setWidget(row, 6, pw.similarityLabel);
+            else table.setWidget(row, 6, null);
 
             ++row;
         }
@@ -374,10 +412,10 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
     // Trigger when some column hide
     public void refreshWidgetWidth() {
         int width = 30;
-        if (!isHideScoreColumn) width += 10;
         if (!isHideSubmitterColumn) width += 20;
         if (!isHideSubmitTimeColumn) width += 20;
         if (!isHideScoredTimeColumn) width += 20;
+        if (!isHideSimilarityColumn) width += 10;
         width = (int)((width < 70 ? 70 : width) * 0.36);
         OdeAdmin.getInstance().setAdminPanelWidth(width + "%", (99 - width) + "%");
     }
@@ -459,16 +497,11 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
 
     @Override
     public void onScoreProjectsLoaded() {
-        for (int courseId : projectsMap.keySet()) {
-            if (courseId != -1) {
-                changeCourse(courseId);
-                break;
-            }
-        }
+
     }
 
-    public void setHideScoreColumn(boolean hideScoreColumn) {
-        isHideScoreColumn = hideScoreColumn;
+    public void setHideSimilarityColumn(boolean hideSimilarityColumn) {
+        isHideSimilarityColumn = hideSimilarityColumn;
         refreshWidgetWidth();
         refreshTable(false);
     }

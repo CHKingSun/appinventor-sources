@@ -53,3 +53,48 @@ create table `build_status`(
     progress tinyint,
     primary key(userId, projectId)
 );
+
+create table courses
+(
+    courseId   int auto_increment primary key,
+    courseName varchar(64) not null,
+    adminId    varchar(64) not null,
+    constraint course_users_userId_fk
+        foreign key (adminId) references users (userId)
+            on update cascade on delete cascade
+);
+
+create table classes
+(
+    courseId int         not null,
+    userId   varchar(64) not null,
+    primary key (courseId, userId),
+    constraint class_course_courseId_fk
+        foreign key (courseId) references courses (courseId)
+            on update cascade on delete cascade,
+    constraint class_users_userId_fk
+        foreign key (userId) references users (userId)
+            on update cascade on delete cascade
+);
+
+create table scores
+(
+    adminId     varchar(64)                             not null,
+    projectId   int                                     not null,
+    submitterId varchar(64)                             not null,
+    courseId    int                                     not null,
+    submitTime  timestamp default CURRENT_TIMESTAMP     null,
+    score       int       default -1                    null,
+    scoredTime  timestamp default '1970-01-01 08:00:01' null,
+    similarity  float     default -1                    not null,
+    primary key (adminId, projectId),
+    constraint scores_courses_courseId_fk
+        foreign key (courseId) references courses (courseId)
+            on update cascade on delete cascade,
+    constraint scores_users_userId_fk
+        foreign key (adminId) references users (userId)
+            on update cascade on delete cascade,
+    constraint scores_users_userId_fk_2
+        foreign key (submitterId) references users (userId)
+            on update cascade on delete cascade
+);

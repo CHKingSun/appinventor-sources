@@ -739,4 +739,5 @@ public interface StorageIo {
 
   List<ScoreInfo> getAllScoreInfos(String adminId);
   long updateProjectScore(String adminId, long projectId, int score);
+  int updateProjectsSimilarity(List<ScoreInfo> infos, String adminId);
 }

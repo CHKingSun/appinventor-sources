@@ -158,6 +158,10 @@ select {
   padding: 10px;
 }
 
+.ode-DateBox {
+  width: 9.6em;
+}
+
 /*
  * MessagesOutputBox
  */

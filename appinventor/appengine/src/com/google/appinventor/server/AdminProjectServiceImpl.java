@@ -22,6 +22,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
+import org.freedom.analysis.SimilarityAnalysis;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -180,7 +182,7 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
                 // For the contents of the project properties file, generate the file with the new project
                 // name and qualified name.
                 String qualifiedFormName = StringUtils.getQualifiedFormName(
-                        storageIo.getUser(userId).getUserEmail(), newName);
+                        storageIo.getUser(adminId).getUserEmail(), newName);
                 newContents = getProjectPropertiesFileContents(newName, qualifiedFormName, icon, vcode,
                         vname, useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar,
                         theme, primaryColor, primaryColorDark, accentColor);
@@ -225,4 +227,10 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
     public long updateProjectScore(long projectId, int score) {
         return storageIo.updateProjectScore(userInfoProvider.getUserId(), projectId, score);
     }
+
+    @Override
+    public float[] similarity(List<ScoreInfo> infos, long targetProjectId) {
+        return new float[0];
+    }
+
 }

@@ -200,6 +200,8 @@
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/slf4j/slf4j-api-1.7.25.jar" />
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/slf4j/slf4j-simple-1.7.25.jar" />
     <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/hikaricp/HikariCP-3.1.0.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/similarity/ansj_seg-5.1.5.jar" />
+    <copy todir="${build.war.dir}/WEB-INF/lib" file="${lib.dir}/similarity/SimilarityAnalysis.jar" />
   </target>
 
   <!-- =====================================================================

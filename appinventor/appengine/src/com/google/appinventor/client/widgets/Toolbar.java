@@ -6,6 +6,7 @@
 
 package com.google.appinventor.client.widgets;
 
+import com.google.appinventor.client.Ode;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -304,7 +305,7 @@ public class Toolbar extends Composite {
    * @param widgetName name of button
    * @param caption the new caption
    */
-  protected void setDropDownButtonCaption(String widgetName, String caption) {
+  public void setDropDownButtonCaption(String widgetName, String caption) {
     dropDownButtonMap.get(widgetName).setText(caption + " " + DROP_DOWN_TRIANGLE);
   }
 }

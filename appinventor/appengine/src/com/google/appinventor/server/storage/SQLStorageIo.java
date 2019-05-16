@@ -1624,7 +1624,8 @@ public class SQLStorageIo implements StorageIo {
                         courseId, getCourse(courseId).getCourseName(),
                         result.getTimestamp("submitTime").getTime(),
                         result.getInt("score"),
-                        result.getTimestamp("scoredTime").getTime()
+                        result.getTimestamp("scoredTime").getTime(),
+                        result.getFloat("similarity")
                 ));
             }
             result.close();
@@ -1658,5 +1659,27 @@ public class SQLStorageIo implements StorageIo {
         }
 
         return scoredTime;
+    }
+
+    @Override
+    public int updateProjectsSimilarity(List<ScoreInfo> infos, String adminId) {
+        int successNum = 0;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "update scores set similarity=? where adminId=? and projectId=?"
+            );
+            for (ScoreInfo info : infos) {
+                statement.setFloat(1, info.getSimilarity());
+                statement.setString(2, adminId);
+                statement.setLong(3, info.getProjectInfo().getProjectId());
+                successNum += statement.executeUpdate();
+            }
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return successNum;
     }
 }

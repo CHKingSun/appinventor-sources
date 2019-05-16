@@ -58,24 +58,28 @@ public interface OdeMessages extends Messages {
   @Description("Text on \"Deselect All\" button")
   String deselectAllButton();
 
+  @DefaultMessage("Similarity Analyse")
+  @Description("Text on \"Similarity Analyse\" button")
+  String similarityAnalyseButton();
+
   @DefaultMessage("Upload To Server")
   @Description("Text on \"Upload To Server\" button")
   String uploadToServerButton();
 
-  @DefaultMessage("Hide Score")
-  @Description("Text on \"Hide Score\" button")
-  String hideScoreLabel();
+  @DefaultMessage("Hide Similarity")
+  @Description("Text on \"Hide Similarity\" Label")
+  String hideSimilarityLabel();
 
   @DefaultMessage("Hide Submitter")
-  @Description("Text on \"Hide Submitter\" button")
+  @Description("Text on \"Hide Submitter\" Label")
   String hideSubmitterLabel();
 
   @DefaultMessage("Hide Submit Time")
-  @Description("Text on \"Hide Submit Time\" button")
+  @Description("Text on \"Hide Submit Time\" Label")
   String hideSubmitTimeLabel();
 
   @DefaultMessage("Hide Scored Time")
-  @Description("Text on \"Hide Scored Time\" button")
+  @Description("Text on \"Hide Scored Time\" Label")
   String hideScoredTimeLabel();
 
   @DefaultMessage("Submit")
@@ -137,6 +141,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Scored Time")
   @Description("Header for scoredTime column of score project table")
   String projectScoredTimeHeader();
+
+  @DefaultMessage("Similarity")
+  @Description("Header for similarity column of score project table")
+  String projectSimlarityHeader();
 
   @DefaultMessage("Date Created")
   @Description("Header for date created column of project table.")

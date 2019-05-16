@@ -40,4 +40,6 @@ public final class ScoreProject {
     public void setScoredTime(long scoredTime) { scoreInfo.setScoredTime(scoredTime); }
 
     public long getScoredTime() { return scoreInfo.getScoredTime(); }
+
+    public float getSimilarity() { return scoreInfo.getSimilarity(); }
 }

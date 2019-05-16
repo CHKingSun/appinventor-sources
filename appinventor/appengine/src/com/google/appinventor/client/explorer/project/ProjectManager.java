@@ -59,6 +59,17 @@ public final class ProjectManager {
       projectsMap.put(project.getProjectId(), project);
       fireProjectAdded(project);
     }
+    Ode.getInstance().getProjectService().getProjectInfos(
+            new OdeAsyncCallback<List<UserProject>>(
+                    MESSAGES.projectInformationRetrievalError()) {
+              @Override
+              public void onSuccess(List<UserProject> projectInfos) {
+                for (UserProject projectInfo : projectInfos) {
+                  if (projectsMap.containsKey(projectInfo.getProjectId())) continue;
+                  addProject(projectInfo);
+                }
+              }
+    });
   }
 
   /**
