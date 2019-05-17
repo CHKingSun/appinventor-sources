@@ -90,7 +90,7 @@ public final class ScoreProjectManager {
         scoreProjectManagerEventListeners.remove(listener);
     }
 
-    private List<ScoreProjectManagerEventListener> copyProjectManagerEventListeners() {
+    private List<ScoreProjectManagerEventListener> copyScoreProjectManagerEventListeners() {
         return new ArrayList<>(scoreProjectManagerEventListeners);
     }
 
@@ -98,7 +98,7 @@ public final class ScoreProjectManager {
      * Triggers a 'score project added' event to be sent to the listener on the listener list.
      */
     private void fireScoreProjectAdded(ScoreProject scoreProject) {
-        for (ScoreProjectManagerEventListener listener : copyProjectManagerEventListeners()) {
+        for (ScoreProjectManagerEventListener listener : copyScoreProjectManagerEventListeners()) {
             listener.onScoreProjectAdded(scoreProject);
         }
     }
@@ -107,7 +107,7 @@ public final class ScoreProjectManager {
      * Triggers a 'score projects loaded' event to be sent to the listener on the listener list.
      */
     private void fireScoreProjectsLoaded() {
-        for (ScoreProjectManagerEventListener listener : copyProjectManagerEventListeners()) {
+        for (ScoreProjectManagerEventListener listener : copyScoreProjectManagerEventListeners()) {
             listener.onScoreProjectsLoaded();
         }
     }

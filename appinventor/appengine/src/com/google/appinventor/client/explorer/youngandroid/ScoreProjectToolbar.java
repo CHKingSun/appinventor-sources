@@ -10,6 +10,7 @@ import com.google.appinventor.client.boxes.ScoreProjectListBox;
 import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.explorer.score.ScoreProject;
 import com.google.appinventor.client.explorer.score.ScoreProjectManagerEventListener;
+import com.google.appinventor.client.utils.ProjectSearchDialog;
 import com.google.appinventor.client.utils.UploadToServerDialog;
 import com.google.appinventor.client.widgets.DropDownButton;
 import com.google.appinventor.client.widgets.TextButton;
@@ -21,6 +22,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DatePicker;
@@ -167,7 +169,39 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
 
         @Override
         public void execute() {
+            List<ScoreProject> projects = ScoreProjectListBox.getScoreProjectListBox()
+                    .getScoreProjectList().getSelectedProjects();
+            if (projects.size() == 0) {
+                Window.alert("No projects are selected!");
+                return;
+            }
+            List<Long> projectsId = new ArrayList<>(projects.size());
+            for (ScoreProject project : projects) {
+                projectsId.add(project.getProjectId());
+            }
+            new ProjectSearchDialog(new ProjectSearchDialog.SearchAction() {
+                @Override
+                public void onProjectSelected(long projectId) {
+                    OdeAdmin.getInstance().getAdminProjectService().similarity(
+                            projectsId, projectId,
+                            new AsyncCallback<Map<Long, Float>>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                    Window.alert("Similarity analyse failed with error: " + caught.getLocalizedMessage());
+                                }
 
+                                @Override
+                                public void onSuccess(Map<Long, Float> result) {
+                                    for (ScoreProject project : projects) {
+                                        project.setSimilarity(result.get(project.getProjectId()));
+                                    }
+                                    ScoreProjectListBox.getScoreProjectListBox()
+                                            .getScoreProjectList().updateSimilarityWidgets(projects);
+                                }
+                            }
+                    );
+                }
+            }).show();
         }
     }
 

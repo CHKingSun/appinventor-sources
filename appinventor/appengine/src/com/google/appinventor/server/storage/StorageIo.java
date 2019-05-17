@@ -6,6 +6,7 @@
 
 package com.google.appinventor.server.storage;
 
+import com.google.appinventor.server.flags.Flag;
 import com.google.appinventor.shared.rpc.BlocksTruncatedException;
 import com.google.appinventor.shared.rpc.Motd;
 import com.google.appinventor.shared.rpc.Nonce;
@@ -735,9 +736,11 @@ public interface StorageIo {
   // For admin functions.
   CourseInfo getCourse(int courseId);
   List<CourseInfo> getAllCourses(String userId);
+  List<CourseInfo> getAllAdminCourses(String adminId);
+  List<ClassInfo> getClassInfos(int courseId);
   boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
 
   List<ScoreInfo> getAllScoreInfos(String adminId);
   long updateProjectScore(String adminId, long projectId, int score);
-  int updateProjectsSimilarity(List<ScoreInfo> infos, String adminId);
+  int updateProjectsSimilarity(Map<Long, Float> similarities, String adminId);
 }

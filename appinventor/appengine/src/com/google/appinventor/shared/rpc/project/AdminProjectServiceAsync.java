@@ -7,6 +7,7 @@ package com.google.appinventor.shared.rpc.project;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for the service providing admin project information. All declarations
@@ -50,5 +51,20 @@ public interface AdminProjectServiceAsync {
     /**
      * @see AdminProjectService#similarity(List, long)
      */
-    void similarity(List<ScoreInfo> infos, long targetProjectId, AsyncCallback<float[]> callback);
+    void similarity(List<Long> projectsId, long targetProjectId, AsyncCallback<Map<Long, Float>> callback);
+
+    /**
+     * @see AdminProjectService#getAllAdminCourses()
+     */
+    void getAllAdminCourses(AsyncCallback<List<CourseInfo>> callback);
+
+    /**
+     * @see AdminProjectService#getClassInfos(int)
+     */
+    void getClassInfos(int courseId, AsyncCallback<List<ClassInfo>> callback);
+
+    /**
+     * @see AdminProjectService#getAllClassInfos(List)
+     */
+    void getAllClassInfos(List<Integer> courseIds, AsyncCallback<Map<Integer, List<ClassInfo>>> callback);
 }

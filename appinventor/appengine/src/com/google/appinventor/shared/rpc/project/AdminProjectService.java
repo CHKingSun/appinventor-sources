@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for the service providing admin project information.
@@ -63,10 +64,19 @@ public interface AdminProjectService extends RemoteService {
 
     /**
      * Similarity analysis
-     * @param infos the score projects to analyse
+     * @param projectsId the score projects ID to analyse
      * @param targetProjectId the target project ID to analyse
-     * @return the similarities between target project and score project,
-     * order by parameter in.
+     * @return the similarities between target project and score project.
      */
-    float[] similarity(List<ScoreInfo> infos, long targetProjectId);
+    Map<Long, Float> similarity(List<Long> projectsId, long targetProjectId);
+
+    /**
+     * Get all the courses the admin created.
+     * @return all the courses the admin created.
+     */
+    List<CourseInfo> getAllAdminCourses();
+
+    List<ClassInfo> getClassInfos(int courseId);
+
+    Map<Integer, List<ClassInfo>> getAllClassInfos(List<Integer> courseIds);
 }

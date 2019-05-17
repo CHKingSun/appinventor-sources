@@ -190,6 +190,7 @@ select {
   text-align: center;
 }
 .ode-ProjectNameLabel {
+  padding: 3px;
   font-weight: bold;
   font-size: small;
   color: #555;

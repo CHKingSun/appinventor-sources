@@ -1586,6 +1586,56 @@ public class SQLStorageIo implements StorageIo {
     }
 
     @Override
+    public List<CourseInfo> getAllAdminCourses(String adminId) {
+        List<CourseInfo> infos = new LinkedList<>();
+        String adminName = getUser(adminId).getUserEmail();
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from courses where adminId=?");
+            statement.setString(1, adminId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                infos.add(new CourseInfo(
+                    result.getInt("courseId"),
+                    result.getString("courseName"),
+                    result.getString("adminId"),
+                    adminName
+                ));
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return infos;
+    }
+
+    @Override
+    public List<ClassInfo> getClassInfos(int courseId) {
+        List<ClassInfo> infos = new LinkedList<>();
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select * from classes where courseId=?");
+            statement.setInt(1, courseId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                String userId = result.getString("userId");
+                infos.add(new ClassInfo(
+                        courseId, userId,
+                        getUser(userId).getUserEmail()
+                ));
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return infos;
+    }
+
+    @Override
     public boolean addScore(CourseInfo courseInfo, String submitterId, long projectId) {
         boolean status = false;
 
@@ -1662,17 +1712,17 @@ public class SQLStorageIo implements StorageIo {
     }
 
     @Override
-    public int updateProjectsSimilarity(List<ScoreInfo> infos, String adminId) {
+    public int updateProjectsSimilarity(Map<Long, Float> similarities, String adminId) {
         int successNum = 0;
 
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement(
                     "update scores set similarity=? where adminId=? and projectId=?"
             );
-            for (ScoreInfo info : infos) {
-                statement.setFloat(1, info.getSimilarity());
+            for (Map.Entry<Long, Float> entry : similarities.entrySet()) {
+                statement.setFloat(1, entry.getValue());
                 statement.setString(2, adminId);
-                statement.setLong(3, info.getProjectInfo().getProjectId());
+                statement.setLong(3, entry.getKey());
                 successNum += statement.executeUpdate();
             }
             statement.close();

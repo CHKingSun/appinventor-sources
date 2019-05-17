@@ -156,7 +156,7 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
         table.setWidget(0, 5, scoredTimeHeader);
 
         HorizontalPanel similarityHeader = new HorizontalPanel();
-        final Label similarityHeaderLabel = new Label(MESSAGES.projectSimlarityHeader());
+        final Label similarityHeaderLabel = new Label(MESSAGES.projectSimilarityHeader());
         similarityHeaderLabel.addStyleName("ode-ProjectHeaderLabel");
         similarityHeader.add(similarityHeaderLabel);
         similaritySortIndicator.addStyleName("ode-ProjectHeaderLabel");
@@ -326,13 +326,21 @@ public class ScoreProjectList extends Composite implements ScoreProjectManagerEv
                 scoreLabel.setText(Integer.toString(project.getScore()));
             if (project.getScoredTime() > 1000)
                 scoredTimeLabel.setText(dateTimeFormat.format(new Date(project.getScoredTime())));
-            if (project.getSimilarity() > 0)
+            if (project.getSimilarity() >= 0)
                 similarityLabel.setText(Float.toString(project.getSimilarity()));
         }
     }
 
     public void updateScoreProjectWidgets(ScoreProject project) {
         projectWidgets.get(project).updateLabels(project);
+        refreshTable(false);
+    }
+
+    public void updateSimilarityWidgets(List<ScoreProject> projects) {
+        for (ScoreProject project : projects) {
+            projectWidgets.get(project).updateLabels(project);
+        }
+        refreshTable(false);
     }
 
     public void refreshTable(boolean needToSort) {

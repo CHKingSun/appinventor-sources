@@ -1,6 +1,7 @@
 package com.google.appinventor.server;
 
 import com.google.appinventor.common.utils.StringUtils;
+import com.google.appinventor.server.flags.Flag;
 import com.google.appinventor.server.properties.json.ServerJsonParser;
 import com.google.appinventor.server.storage.StorageIo;
 import com.google.appinventor.server.storage.StorageIoInstanceHolder;
@@ -24,8 +25,11 @@ import org.apache.http.message.BasicNameValuePair;
 
 import org.freedom.analysis.SimilarityAnalysis;
 
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -229,8 +233,41 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
     }
 
     @Override
-    public float[] similarity(List<ScoreInfo> infos, long targetProjectId) {
-        return new float[0];
+    public Map<Long, Float> similarity(List<Long> projectsId, long targetProjectId) {
+        Map<Long, String> dirsMap = new HashMap<>();
+        String storageRoot = Flag.createFlag("storage.root", "").get();
+        for (long projectId : projectsId) {
+            dirsMap.put(projectId, Paths.get(storageRoot, userInfoProvider.getUserId(),
+                            Long.toString(projectId), "src").normalize().toString());
+        }
+        dirsMap.put(targetProjectId,
+                Paths.get(storageRoot, userInfoProvider.getUserId(),
+                        Long.toString(targetProjectId), "src").normalize().toString());
+        Map<Long, Float> res = SimilarityAnalysis.getProjectsSimilarity(dirsMap, targetProjectId);
+        if (projectsId.contains(targetProjectId)) res.put(targetProjectId, 100.f);
+        storageIo.updateProjectsSimilarity(res, userInfoProvider.getUserId());
+        return res;
+    }
+
+    @Override
+    public List<CourseInfo> getAllAdminCourses() {
+        return storageIo.getAllAdminCourses(userInfoProvider.getUserId());
+    }
+
+    @Override
+    public List<ClassInfo> getClassInfos(int courseId) {
+        return storageIo.getClassInfos(courseId);
+    }
+
+    @Override
+    public Map<Integer, List<ClassInfo>> getAllClassInfos(List<Integer> courseIds) {
+        Map<Integer, List<ClassInfo>> res = new HashMap<>(courseIds.size());
+
+        for (int courseId : courseIds) {
+            res.put(courseId, storageIo.getClassInfos(courseId));
+        }
+
+        return res;
     }
 
 }

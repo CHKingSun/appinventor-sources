@@ -66,6 +66,26 @@ public interface OdeMessages extends Messages {
   @Description("Text on \"Upload To Server\" button")
   String uploadToServerButton();
 
+  @DefaultMessage("Create Course")
+  @Description("Text on \"Create Course\" button")
+  String createCourseButton();
+
+  @DefaultMessage("Delete Course")
+  @Description("Text on \"Delete Course\" button")
+  String deleteCourseButton();
+
+  @DefaultMessage("Add Student")
+  @Description("Text on \"Add Student\" button")
+  String addStudentButton();
+
+  @DefaultMessage("Import Student")
+  @Description("Text on \"Import Student\" button")
+  String importStudentButton();
+
+  @DefaultMessage("Delete Student")
+  @Description("Text on \"Delete Student\" button")
+  String deleteStudentButton();
+
   @DefaultMessage("Hide Similarity")
   @Description("Text on \"Hide Similarity\" Label")
   String hideSimilarityLabel();
@@ -144,7 +164,15 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("Similarity")
   @Description("Header for similarity column of score project table")
-  String projectSimlarityHeader();
+  String projectSimilarityHeader();
+
+  @DefaultMessage("Student Name")
+  @Description("Header for class column of user name table")
+  String studentNameHeader();
+
+  @DefaultMessage("Course Name")
+  @Description("Header for course column of course name table")
+  String courseNameHeader();
 
   @DefaultMessage("Date Created")
   @Description("Header for date created column of project table.")
@@ -818,6 +846,10 @@ public interface OdeMessages extends Messages {
   @Description("Name of My Projects tab")
   String myProjectsTabName();
 
+  @DefaultMessage("My Courses")
+  @Description("Name of My Courses tab")
+  String myCoursesTabName();
+
   @DefaultMessage("Guide")
   @Description("Name of Guide link")
   String guideTabName();
@@ -960,6 +992,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Blocks")
   @Description("Caption for block selector box.")
   String blockSelectorBoxCaption();
+
+  @DefaultMessage("Student")
+  @Description("Caption for block class list box.")
+  String classListBoxCaption();
+
+  @DefaultMessage("Course")
+  @Description("Caption for block course list box.")
+  String courseListBoxCaption();
 
   @DefaultMessage("Built-in")
   @Description("Label on built-in-blocks branch of block selector tree")

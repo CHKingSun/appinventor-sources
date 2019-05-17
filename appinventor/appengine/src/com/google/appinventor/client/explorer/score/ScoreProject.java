@@ -41,5 +41,7 @@ public final class ScoreProject {
 
     public long getScoredTime() { return scoreInfo.getScoredTime(); }
 
+    public void setSimilarity(float similarity) { scoreInfo.setSimilarity(similarity); }
+
     public float getSimilarity() { return scoreInfo.getSimilarity(); }
 }

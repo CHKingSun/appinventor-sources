@@ -81,8 +81,6 @@ public class ScorePanel extends Composite {
                             scoreProject.setScoredTime(result);
                             ScoreProjectListBox.getScoreProjectListBox()
                                     .getScoreProjectList().updateScoreProjectWidgets(scoreProject);
-                            ScoreProjectListBox.getScoreProjectListBox()
-                                    .getScoreProjectList().refreshTable(false);
                         }
                     }
             );

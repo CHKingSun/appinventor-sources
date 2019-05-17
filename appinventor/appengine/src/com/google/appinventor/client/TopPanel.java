@@ -108,16 +108,28 @@ public class TopPanel extends Composite {
 
     // My Projects Link
     TextButton myProjects = new TextButton(MESSAGES.myProjectsTabName());
+    if (Ode.getInstance().isAdminMode()) myProjects.setText(MESSAGES.myCoursesTabName());
     myProjects.setStyleName("ode-TopPanelButton");
 
     myProjects.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        ode.switchToProjectsView();
+        if (!Ode.getInstance().isAdminMode()) {
+          ode.switchToProjectsView();
+        } else {
+          if (myProjects.getText().equals(MESSAGES.myProjectsTabName())) {
+            ode.switchToProjectsView();
+            myProjects.getUpFace().setText(MESSAGES.myCoursesTabName());
+            myProjects.setText(MESSAGES.myCoursesTabName());
+          } else {
+            OdeAdmin.getInstance().switchToCourseView();
+            myProjects.getUpFace().setText(MESSAGES.myProjectsTabName());
+            myProjects.setText(MESSAGES.myProjectsTabName());
+          }
+        }
       }
     });
 
-    myProjects.setStyleName("ode-TopPanelButton");
     links.add(myProjects);
 
     // Code on gallerydev branch

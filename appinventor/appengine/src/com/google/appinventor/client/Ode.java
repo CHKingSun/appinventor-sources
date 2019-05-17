@@ -195,7 +195,7 @@ public class Ode implements EntryPoint {
    *  |+-------------------------------------------+|
    *  +---------------------------------------------+
    */
-  private DeckPanel deckPanel;
+  protected DeckPanel deckPanel;
   private HorizontalPanel overDeckPanel;
   private Frame tutorialPanel;
   private int projectsTabIndex;
