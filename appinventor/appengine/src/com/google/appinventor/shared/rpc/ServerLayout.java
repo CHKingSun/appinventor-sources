@@ -180,6 +180,12 @@ public class ServerLayout {
 
   /**
    * Relative path within {@link com.google.appinventor.server.UploadServlet}
+   * for uploading student accounts
+   */
+  public static final String UPLOAD_STUDENTS = "students";
+
+  /**
+   * Relative path within {@link com.google.appinventor.server.UploadServlet}
    * for uploading a user file
    */
   public static final String UPLOAD_USERFILE = "userfile";
@@ -243,6 +249,11 @@ public class ServerLayout {
    * Name of the form element to upload component archives.
    */
   public static final String UPLOAD_COMPONENT_ARCHIVE_FORM_ELEMENT = "uploadComponentArchive";
+
+  /**
+   * Name of the form element to upload component archives.
+   */
+  public static final String UPLOAD_STUDENTS_FORM_ELEMENT = "uploadStudents";
 
   /**
    * Name of the form element to upload user files.

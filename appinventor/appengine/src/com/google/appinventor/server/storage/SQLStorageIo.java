@@ -862,7 +862,6 @@ public class SQLStorageIo implements StorageIo {
         try {
             Files.createDirectories(path.getParent());
             Files.write(path, content);
-            setProjectDateModified(userId, projectId, System.currentTimeMillis());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1730,7 +1729,7 @@ public class SQLStorageIo implements StorageIo {
             res = statement.executeUpdate() > 0;
             statement.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         return res;
@@ -1749,7 +1748,8 @@ public class SQLStorageIo implements StorageIo {
             res = statement.executeUpdate() > 0;
             statement.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         return res;

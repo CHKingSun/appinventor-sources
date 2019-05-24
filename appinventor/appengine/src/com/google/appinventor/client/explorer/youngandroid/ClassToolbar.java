@@ -1,9 +1,12 @@
 package com.google.appinventor.client.explorer.youngandroid;
 
+import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAdmin;
 import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.boxes.ClassListBox;
 import com.google.appinventor.client.utils.DeleteConfirmDialog;
+import com.google.appinventor.client.utils.StudentAddDialog;
+import com.google.appinventor.client.utils.StudentImportDialog;
 import com.google.appinventor.client.widgets.Toolbar;
 import com.google.appinventor.shared.rpc.project.ClassInfo;
 import com.google.gwt.user.client.Command;
@@ -57,7 +60,16 @@ public class ClassToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            // TODO dialog
+            int courseId = ClassListBox.getClassListBox().getClassList().getCurrentCourseId();
+            if (courseId == -1) return;
+            new StudentAddDialog(courseId,
+                    new StudentAddDialog.StudentAction() {
+                        @Override
+                        public void onStudentAdded(ClassInfo info) {
+                            OdeAdmin.getInstance().getClassManager().addClass(info);
+                        }
+                    }
+            );
         }
     }
 
@@ -65,7 +77,18 @@ public class ClassToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            // TODO dialog
+            int courseId = ClassListBox.getClassListBox().getClassList().getCurrentCourseId();
+            if (courseId == -1) return;
+            new StudentImportDialog(courseId,
+                    new StudentImportDialog.StudentAction() {
+                        @Override
+                        public void onStudentImported(List<ClassInfo> infos) {
+                            for (ClassInfo info : infos) {
+                                OdeAdmin.getInstance().getClassManager().addClass(info);
+                            }
+                        }
+                    }
+            );
         }
     }
 

@@ -2325,6 +2325,7 @@ public class Ode implements EntryPoint {
    **/
 
   public void screenShot(FileEditor editor) {
+    if (true) return;
     if (editor == null || editor instanceof YaFormEditor) {
       CLog("No editor!");
       return;

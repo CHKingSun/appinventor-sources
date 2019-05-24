@@ -25,6 +25,8 @@ import org.apache.http.message.BasicNameValuePair;
 
 import org.freedom.analysis.SimilarityAnalysis;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
@@ -290,14 +292,24 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
     }
 
     @Override
-    public List<ClassInfo> addStudents(int courseId, List<String> userNames) {
-        List<ClassInfo> res = new ArrayList<>(userNames.size());
-        for (String userName : userNames) {
-            String userId = storageIo.getUserIdByEmail(userName);
-            if (userId != null && storageIo.addStudent(courseId, userId)) {
-                res.add(new ClassInfo(courseId, userId, userName));
+    public List<ClassInfo> addStudents(int courseId, String filename) {
+        List<ClassInfo> res = new ArrayList<>();
+
+        try {
+            Scanner scanner = new Scanner(storageIo.openTempFile(filename));
+            while (scanner.hasNextLine()) {
+                String userName = scanner.nextLine().trim();
+                String userId = storageIo.getUserIdByEmail(userName);
+                if (userId != null && storageIo.addStudent(courseId, userId)) {
+                    res.add(new ClassInfo(courseId, userId, userName));
+                }
             }
+            scanner.close();
+            storageIo.deleteTempFile(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
         return res;
     }
 

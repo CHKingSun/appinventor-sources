@@ -113,6 +113,10 @@ public class ClassList extends Composite implements ClassManagerEventListener {
         refreshTable();
     }
 
+    public int getCurrentCourseId() {
+        return currentCourse;
+    }
+
     public int getNumSelectedClassInfos() {
         return selectedInfos.size();
     }

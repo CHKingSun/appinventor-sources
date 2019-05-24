@@ -86,7 +86,7 @@ public interface AdminProjectService extends RemoteService {
 
     ClassInfo addStudent(int courseId, String userName);
 
-    List<ClassInfo> addStudents(int courseId, List<String> userNames);
+    List<ClassInfo> addStudents(int courseId, String filename);
 
     boolean deleteStudent(int courseId, String userId);
 }

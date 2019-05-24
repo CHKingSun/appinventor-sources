@@ -84,9 +84,12 @@ public interface AdminProjectServiceAsync {
     void addStudent(int courseId, String userName, AsyncCallback<ClassInfo> callback);
 
     /**
-     * @see AdminProjectService#addStudents(int, List)
+     * @see AdminProjectService#addStudents(int, String)
      */
-    void addStudents(int courseId, List<String> userNames, AsyncCallback<List<ClassInfo>> callback);
+    void addStudents(int courseId, String filename, AsyncCallback<List<ClassInfo>> callback);
 
+    /**
+     * @see AdminProjectService#deleteStudent(int, String)
+     */
     void deleteStudent(int courseId, String userId, AsyncCallback<Boolean> callback);
 }

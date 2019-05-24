@@ -65,6 +65,11 @@ public class UploadServlet extends OdeServlet {
   private static final int COMPONENT_PATH_INDEX = 4;
   private static final int SPLIT_LIMIT_COMPONENT = 5;
 
+  // Constants used when upload kind is "students".
+  // Since the file path may contain slashes, it must be the last component in the URI.
+  private static final int STUDENTS_PATH_INDEX = 4;
+  private static final int SPLIT_LIMIT_STUDENTS = 5;
+
 
   // Logging support
   private static final Logger LOG = Logger.getLogger(UploadServlet.class.getName());
@@ -158,6 +163,23 @@ public class UploadServlet extends OdeServlet {
 
         uploadResponse = new UploadResponse(UploadResponse.Status.SUCCESS, 0,
           fileImporter.importTempFile(uploadedStream));
+      } else if (uploadKind.equals(ServerLayout.UPLOAD_STUDENTS)) {
+        uriComponents = uri.split("/", SPLIT_LIMIT_STUDENTS);
+        if (STUDENTS_PATH_INDEX >= uriComponents.length) {
+          throw CrashReport.createAndLogError(LOG, req, null,
+                  new IllegalArgumentException("Missing component file path."));
+        }
+
+        InputStream uploadedStream;
+        try {
+          uploadedStream = getRequestStream(req,
+                  ServerLayout.UPLOAD_STUDENTS_FORM_ELEMENT);
+        } catch (Exception e) {
+          throw CrashReport.createAndLogError(LOG, req, null, e);
+        }
+
+        uploadResponse = new UploadResponse(UploadResponse.Status.SUCCESS, 0,
+                fileImporter.importTempFile(uploadedStream));
       } else {
         throw CrashReport.createAndLogError(LOG, req, null,
             new IllegalArgumentException("Unknown upload kind: " + uploadKind));
