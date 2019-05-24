@@ -5,8 +5,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class ClassInfo implements IsSerializable {
     private int courseId;
 
+    // Student ID
     private String userId;
 
+    // Student Name
     private String userName;
 
     /**

@@ -1,9 +1,15 @@
 package com.google.appinventor.client.explorer.youngandroid;
 
-import com.google.appinventor.client.Ode;
+import com.google.appinventor.client.OdeAdmin;
+import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.boxes.CourseListBox;
+import com.google.appinventor.client.utils.CourseCreateDialog;
+import com.google.appinventor.client.utils.DeleteConfirmDialog;
 import com.google.appinventor.client.widgets.Toolbar;
+import com.google.appinventor.shared.rpc.project.CourseInfo;
 import com.google.gwt.user.client.Command;
+
+import java.util.List;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -49,7 +55,12 @@ public class CourseToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            // TODO dialog
+            new CourseCreateDialog(new CourseCreateDialog.CourseAction() {
+                @Override
+                public void onCourseCreated(CourseInfo courseInfo) {
+                    OdeAdmin.getInstance().getClassManager().addCourse(courseInfo);
+                }
+            }).show();
         }
     }
 
@@ -57,7 +68,31 @@ public class CourseToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            // TODO dialog
+            List<CourseInfo> infos = CourseListBox.getCourseListBox().getCourseList().getSelectedCourseInfos();
+            StringBuilder names = new StringBuilder();
+            for (CourseInfo info : infos) {
+                names.append(info.getCourseName());
+                names.append(", ");
+            }
+            new DeleteConfirmDialog("Delete Course",
+                    "Sure to delete " + names.substring(0, names.length() - 2),
+                    new Command() {
+                        @Override
+                        public void execute() {
+                            for (CourseInfo info : infos) {
+                                OdeAdmin.getInstance().getAdminProjectService().deleteCourse(info,
+                                        new OdeAsyncCallback<Boolean>() {
+                                            @Override
+                                            public void onSuccess(Boolean result) {
+                                                if (result) {
+                                                    OdeAdmin.getInstance().getClassManager().removeCourse(info);
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    }
+            ).show();
         }
     }
 

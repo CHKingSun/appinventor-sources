@@ -1,9 +1,14 @@
 package com.google.appinventor.client.explorer.youngandroid;
 
-import com.google.appinventor.client.Ode;
+import com.google.appinventor.client.OdeAdmin;
+import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.boxes.ClassListBox;
+import com.google.appinventor.client.utils.DeleteConfirmDialog;
 import com.google.appinventor.client.widgets.Toolbar;
+import com.google.appinventor.shared.rpc.project.ClassInfo;
 import com.google.gwt.user.client.Command;
+
+import java.util.List;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
@@ -68,7 +73,32 @@ public class ClassToolbar extends Toolbar {
 
         @Override
         public void execute() {
-            // TODO dialog
+            List<ClassInfo> infos = ClassListBox.getClassListBox().getClassList().getSelectedClassInfos();
+            StringBuilder names = new StringBuilder();
+            for (ClassInfo info : infos) {
+                names.append(info.getUserName());
+                names.append(", ");
+            }
+            new DeleteConfirmDialog("Remove Students",
+                    "Sure to remove " + names.substring(0, names.length() - 2),
+                    new Command() {
+                        @Override
+                        public void execute() {
+                            for (ClassInfo info : infos) {
+                                OdeAdmin.getInstance().getAdminProjectService().deleteStudent(
+                                        info.getCourseId(), info.getUserId(),
+                                        new OdeAsyncCallback<Boolean>() {
+                                            @Override
+                                            public void onSuccess(Boolean result) {
+                                                if (result) {
+                                                    OdeAdmin.getInstance().getClassManager().removeClass(info);
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    }
+            ).show();
         }
     }
 

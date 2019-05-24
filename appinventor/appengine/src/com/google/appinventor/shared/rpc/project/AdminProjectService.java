@@ -79,4 +79,14 @@ public interface AdminProjectService extends RemoteService {
     List<ClassInfo> getClassInfos(int courseId);
 
     Map<Integer, List<ClassInfo>> getAllClassInfos(List<Integer> courseIds);
+
+    CourseInfo createCourse(String courseName);
+
+    boolean deleteCourse(CourseInfo info);
+
+    ClassInfo addStudent(int courseId, String userName);
+
+    List<ClassInfo> addStudents(int courseId, List<String> userNames);
+
+    boolean deleteStudent(int courseId, String userId);
 }

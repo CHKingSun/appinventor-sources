@@ -23,9 +23,10 @@ public final class ScoreProjectManager {
     // Project ID is unique for one admin.
     private final Map<Long, ScoreProject> scoreProjectsMap;
 
+    // Map course ID to course name.
     private final Map<Integer, String> coursesMap;
 
-    // List of listeners for any project manager events.
+    // List of listeners for any score project manager events.
     private final List<ScoreProjectManagerEventListener> scoreProjectManagerEventListeners;
 
     /**

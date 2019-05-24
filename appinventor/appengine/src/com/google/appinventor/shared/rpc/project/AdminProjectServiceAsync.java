@@ -67,4 +67,26 @@ public interface AdminProjectServiceAsync {
      * @see AdminProjectService#getAllClassInfos(List)
      */
     void getAllClassInfos(List<Integer> courseIds, AsyncCallback<Map<Integer, List<ClassInfo>>> callback);
+
+    /**
+     * @see AdminProjectService#createCourse(String)
+     */
+    void createCourse(String courseName, AsyncCallback<CourseInfo> callback);
+
+    /**
+     * @see AdminProjectService#deleteCourse(CourseInfo)
+     */
+    void deleteCourse(CourseInfo info, AsyncCallback<Boolean> callback);
+
+    /**
+     * @see AdminProjectService#addStudent(int, String)
+     */
+    void addStudent(int courseId, String userName, AsyncCallback<ClassInfo> callback);
+
+    /**
+     * @see AdminProjectService#addStudents(int, List)
+     */
+    void addStudents(int courseId, List<String> userNames, AsyncCallback<List<ClassInfo>> callback);
+
+    void deleteStudent(int courseId, String userId, AsyncCallback<Boolean> callback);
 }

@@ -26,10 +26,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.freedom.analysis.SimilarityAnalysis;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,7 +98,8 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
                     userInfoProvider.getUserId(), projectId
             ));
             postReq.setHeader("Cookie", "AppInventor=" + cookie);
-            HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("uploadProjectArchive", content).build();
+            HttpEntity entity = MultipartEntityBuilder.create()
+                    .addBinaryBody("uploadProjectArchive", content).build();
             postReq.setEntity(entity);
 
             HttpResponse postResp = client.execute(httpHost, postReq);
@@ -270,4 +268,41 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
         return res;
     }
 
+    @Override
+    public CourseInfo createCourse(String courseName) {
+        int courseId = storageIo.addCourse(courseName, userInfoProvider.getUserId());
+        if (courseId < 0) return null;
+        return new CourseInfo(courseId, courseName, userInfoProvider.getUserId(), userInfoProvider.getUserEmail());
+    }
+
+    @Override
+    public boolean deleteCourse(CourseInfo info) {
+       return storageIo.deleteCourse(info);
+    }
+
+    @Override
+    public ClassInfo addStudent(int courseId, String userName) {
+        String userId = storageIo.getUserIdByEmail(userName);
+        if (userId != null && storageIo.addStudent(courseId, userId)) {
+            return new ClassInfo(courseId, userId, userName);
+        }
+        return null;
+    }
+
+    @Override
+    public List<ClassInfo> addStudents(int courseId, List<String> userNames) {
+        List<ClassInfo> res = new ArrayList<>(userNames.size());
+        for (String userName : userNames) {
+            String userId = storageIo.getUserIdByEmail(userName);
+            if (userId != null && storageIo.addStudent(courseId, userId)) {
+                res.add(new ClassInfo(courseId, userId, userName));
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public boolean deleteStudent(int courseId, String userId) {
+        return storageIo.deleteStudent(courseId, userId);
+    }
 }

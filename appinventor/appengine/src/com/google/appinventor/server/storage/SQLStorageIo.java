@@ -1541,6 +1541,25 @@ public class SQLStorageIo implements StorageIo {
     }
 
     @Override
+    public String getUserIdByEmail(String email) {
+        String res = null;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("select userId from users where email=?");
+            statement.setString(1, email);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                res = result.getString("userId");
+            }
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
+    }
+
+    @Override
     public CourseInfo getCourse(int courseId) {
         CourseInfo info = null;
 
@@ -1654,6 +1673,86 @@ public class SQLStorageIo implements StorageIo {
         }
 
         return status;
+    }
+
+    @Override
+    public int addCourse(String courseName, String adminId) {
+        int res = -1;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "insert into courses (courseName, adminId) values (?, ?)",
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
+            statement.setString(1, courseName);
+            statement.setString(2, adminId);
+            statement.executeUpdate();
+            ResultSet result = statement.getGeneratedKeys();
+            if (result.next()) {
+                res = result.getInt(1);
+            }
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
+    }
+
+    @Override
+    public boolean deleteCourse(CourseInfo courseInfo) {
+        boolean res = false;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "delete from courses where courseId=?"
+            );
+            statement.setInt(1, courseInfo.getCourseId());
+            res = statement.executeUpdate() > 0;
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
+    }
+
+    @Override
+    public boolean addStudent(int courseId, String userId) {
+        boolean res = false;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "insert into classes (courseId, userId) values (?, ?)"
+            );
+            statement.setInt(1, courseId);
+            statement.setString(2, userId);
+            res = statement.executeUpdate() > 0;
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
+    }
+
+    @Override
+    public boolean deleteStudent(int courseId, String userId) {
+        boolean res = false;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "delete from classes where courseId=? and userId=?"
+            );
+            statement.setInt(1, courseId);
+            statement.setString(2, userId);
+            res = statement.executeUpdate() > 0;
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
     }
 
     @Override

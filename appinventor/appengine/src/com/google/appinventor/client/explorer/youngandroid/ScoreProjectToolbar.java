@@ -171,10 +171,6 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
         public void execute() {
             List<ScoreProject> projects = ScoreProjectListBox.getScoreProjectListBox()
                     .getScoreProjectList().getSelectedProjects();
-            if (projects.size() == 0) {
-                Window.alert("No projects are selected!");
-                return;
-            }
             List<Long> projectsId = new ArrayList<>(projects.size());
             for (ScoreProject project : projects) {
                 projectsId.add(project.getProjectId());
@@ -275,6 +271,7 @@ public class ScoreProjectToolbar extends VerticalPanel implements ScoreProjectMa
     public void updateButtons() {
         ScoreProjectList projectList = ScoreProjectListBox.getScoreProjectListBox().getScoreProjectList();
         int numSelectedProjects = projectList.getNumSelectedProjects();
+        toolbar.setButtonEnabled(WIDGET_NAME_SIMILARITY_ANALYSE, numSelectedProjects > 0);
         toolbar.setButtonEnabled(WIDGET_NAME_UPLOAD_TO_SERVER, numSelectedProjects > 0);
         OdeAdmin.getInstance().getTopToolbar().fileDropDown.setItemEnabled(MESSAGES.deleteProjectMenuItem(),
                 numSelectedProjects > 0);

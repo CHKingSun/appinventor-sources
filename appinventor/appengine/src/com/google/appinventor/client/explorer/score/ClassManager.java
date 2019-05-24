@@ -12,16 +12,18 @@ import java.util.Map;
 
 public class ClassManager {
 
+    // Map course ID to course info
     private final Map<Integer, CourseInfo> coursesMap;
 
+    // Map course ID to class info
     private final Map<Integer, List<ClassInfo>> classesMap;
 
-    private final List<ClassManagerEventListener> listensers;
+    private final List<ClassManagerEventListener> listeners;
 
     public ClassManager() {
         coursesMap = new HashMap<>();
         classesMap = new HashMap<>();
-        listensers = new ArrayList<>();
+        listeners = new ArrayList<>();
 
         OdeAdmin.getInstance().getAdminProjectService().getAllAdminCourses(
                 new OdeAsyncCallback<List<CourseInfo>>() {
@@ -54,7 +56,7 @@ public class ClassManager {
         fireCourseAdded(info);
     }
 
-    public void deleteCourse(CourseInfo info) {
+    public void removeCourse(CourseInfo info) {
         coursesMap.remove(info.getCourseId());
         fireCourseRemoved(info);
     }
@@ -85,7 +87,7 @@ public class ClassManager {
      * @param listener  the {@code ClassManagerEventListener} to be added
      */
     public void addClassManagerEventListener(ClassManagerEventListener listener) {
-        listensers.add(listener);
+        listeners.add(listener);
     }
 
     /**
@@ -94,11 +96,11 @@ public class ClassManager {
      * @param listener  the {@code ClassManagerEventListener} to be removed
      */
     public void removeProjectManagerEventListener(ClassManagerEventListener listener) {
-        listensers.remove(listener);
+        listeners.remove(listener);
     }
 
     private List<ClassManagerEventListener> copyClassManagerEventListeners() {
-        return new ArrayList<>(listensers);
+        return new ArrayList<>(listeners);
     }
 
     private void fireCourseAdded(CourseInfo courseInfo) {

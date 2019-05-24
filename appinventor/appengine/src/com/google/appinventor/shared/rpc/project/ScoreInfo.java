@@ -31,7 +31,7 @@ public class ScoreInfo implements IsSerializable {
     // The score of the project, default is -1.
     private int score;
 
-    // The date when the project scored, default is 1.
+    // The date when the project scored, default is 1000.
     private long scoredTime;
 
     private float similarity;

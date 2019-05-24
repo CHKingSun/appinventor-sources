@@ -734,11 +734,18 @@ public interface StorageIo {
 
   // Modified by KingSun on 2019/04/29
   // For admin functions.
+  String getUserIdByEmail(String email);
   CourseInfo getCourse(int courseId);
   List<CourseInfo> getAllCourses(String userId);
   List<CourseInfo> getAllAdminCourses(String adminId);
   List<ClassInfo> getClassInfos(int courseId);
   boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
+
+  int addCourse(String courseName, String adminId);
+  boolean deleteCourse(CourseInfo courseInfo);
+
+  boolean addStudent(int courseId, String userId);
+  boolean deleteStudent(int courseId, String userId);
 
   List<ScoreInfo> getAllScoreInfos(String adminId);
   long updateProjectScore(String adminId, long projectId, int score);
