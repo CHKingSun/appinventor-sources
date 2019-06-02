@@ -1,6 +1,7 @@
 package com.google.appinventor.server.storage;
 
 import com.google.appinventor.server.flags.Flag;
+import com.google.appinventor.server.util.PasswordHash;
 import com.google.appinventor.shared.rpc.AdminInterfaceException;
 import com.google.appinventor.shared.rpc.BlocksTruncatedException;
 import com.google.appinventor.shared.rpc.Motd;
@@ -55,6 +56,7 @@ public class SQLStorageIo implements StorageIo {
         ds = new HikariDataSource(config);
 
         // createTables();
+        initializeAdmin();
     }
 
     private void createTables() {
@@ -95,6 +97,24 @@ public class SQLStorageIo implements StorageIo {
             endTransaction(conn);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initializeAdmin() {
+        if (getUserIdByEmail("Admin") != null) return;
+        User user = getUserFromEmail("Admin");
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "update users set name=?, isAdmin=?, password=? where userId=?"
+            );
+            statement.setString(1, user.getUserEmail());
+            statement.setBoolean(2, true);
+            statement.setString(3, PasswordHash.createHash("MyAdmin"));
+            statement.setString(4, user.getUserId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -451,6 +471,10 @@ public class SQLStorageIo implements StorageIo {
                 throw new RuntimeException(e);
             }
         }
+
+        if(getUser(userId).getIsAdmin()) {
+            deleteScore(userId, projectId);
+        }
     }
 
     @Override
@@ -598,6 +622,7 @@ public class SQLStorageIo implements StorageIo {
         Path projectsJSON = Paths.get(storageRoot.get(), userId, "projects.json");
         try {
             String data = new String(Files.readAllBytes(projectsJSON), "UTF-8");
+//            System.out.println(data);
             JSONObject json = new JSONObject(data);
             JSONObject project = json.getJSONObject(String.valueOf(projectId));
             project.put("modified", dateModified);
@@ -1190,12 +1215,48 @@ public class SQLStorageIo implements StorageIo {
 
     @Override
     public List<AdminUser> searchUsers(String partialEmail) {
-        return new ArrayList<>();
+        List<AdminUser> users = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "select * from users where email like ?"
+            );
+            statement.setString(1, "%" + partialEmail + "%");
+            ResultSet result = statement.executeQuery();
+            while (result.next()){
+                users.add(new AdminUser(
+                        result.getString("userId"),
+                        result.getString("name"),
+                        result.getString("email"),
+                        result.getBoolean("tosAccepted"),
+                        result.getBoolean("isAdmin"),
+                        false,
+                       new java.util.Date(result.getTimestamp("visited").getTime())
+                ));
+            }
+            result.close();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 
     @Override
     public void storeUser(AdminUser user) throws AdminInterfaceException {
-
+        String userId = getUserFromEmail(user.getName()).getUserId();
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "update users set name=?, isAdmin=?, password=? where userId=?"
+            );
+            statement.setString(1, user.getEmail());
+            statement.setBoolean(2, user.getIsAdmin());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, userId);
+            statement.executeUpdate();
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -1672,6 +1733,25 @@ public class SQLStorageIo implements StorageIo {
         }
 
         return status;
+    }
+
+    @Override
+    public boolean deleteScore(String userId, long projectId) {
+        boolean res = false;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "delete from scores where adminId=? and projectId=?"
+            );
+            statement.setString(1, userId);
+            statement.setLong(2, projectId);
+            res = statement.executeUpdate() > 0;
+            statement.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return res;
     }
 
     @Override

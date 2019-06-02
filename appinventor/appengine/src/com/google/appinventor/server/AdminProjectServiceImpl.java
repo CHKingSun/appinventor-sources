@@ -25,9 +25,12 @@ import org.apache.http.message.BasicNameValuePair;
 
 import org.freedom.analysis.SimilarityAnalysis;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -186,7 +189,7 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
                 // For the contents of the project properties file, generate the file with the new project
                 // name and qualified name.
                 String qualifiedFormName = StringUtils.getQualifiedFormName(
-                        storageIo.getUser(adminId).getUserEmail(), newName);
+                        storageIo.getUser(userId).getUserEmail(), newName);
                 newContents = getProjectPropertiesFileContents(newName, qualifiedFormName, icon, vcode,
                         vname, useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar,
                         theme, primaryColor, primaryColorDark, accentColor);

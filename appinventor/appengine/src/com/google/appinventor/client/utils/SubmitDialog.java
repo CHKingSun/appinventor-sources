@@ -1,8 +1,12 @@
 package com.google.appinventor.client.utils;
 
 import com.google.appinventor.client.Ode;
+import com.google.appinventor.client.explorer.commands.ChainableCommand;
+import com.google.appinventor.client.explorer.commands.SaveAllEditorsCommand;
+import com.google.appinventor.client.tracking.Tracking;
 import com.google.appinventor.client.widgets.TextButton;
 import com.google.appinventor.shared.rpc.project.CourseInfo;
+import com.google.appinventor.shared.rpc.project.ProjectRootNode;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -83,6 +87,11 @@ public class SubmitDialog extends DialogBox {
                 @Override
                 public void onClick(ClickEvent event) {
                     // TODO how to deal with repeat submit
+                    ProjectRootNode projectRootNode = Ode.getInstance().getCurrentYoungAndroidProjectRootNode();
+                    if (projectRootNode != null) {
+                        ChainableCommand cmd = new SaveAllEditorsCommand(null);
+                        cmd.startExecuteChain(Tracking.PROJECT_ACTION_SAVE_YA, projectRootNode);
+                    }
                     Ode.getInstance().getAdminProjectService().submitProject(
                             info, projectId, new AsyncCallback<Boolean>() {
                                 @Override

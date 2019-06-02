@@ -1,4 +1,7 @@
-create table `users`(
+create database if not exists `appinventor`;
+use appinventor;
+
+create table if not exists `users`(
     userId varchar(64) primary key,
     email varchar(255), name varchar(255),
     visited timestamp,
@@ -10,7 +13,7 @@ create table `users`(
 );
 create index `index_email` on users(email);
 
-create table `nonces`(
+create table if not exists `nonces`(
     nonceValue varchar(255) primary key,
     userId varchar(64),
     projectId int,
@@ -18,43 +21,43 @@ create table `nonces`(
 );
 create index `index_ndate` on nonces(time);
 
-create table `pwdata`(
+create table if not exists `pwdata`(
     userId varchar(64),
     email varchar(255),
     time timestamp
 );
 create index `index_pdate` on pwdata(time);
 
-create table `rendezvous`(
+create table if not exists `rendezvous`(
     rkey varchar(64) primary key,
     ipaddr varchar(64),
     time timestamp
 );
 
-create table `groups`(
+create table if not exists `groups`(
     groupId int primary key auto_increment,
     name varchar(255)
 );
 
-create table `gusers`(
+create table if not exists `gusers`(
     groupId int,
     userId varchar(64),
     primary key(groupId, userId)
 );
 
-create table `backpack`(
+create table if not exists `backpack`(
     backpackId varchar(255) primary key,
     content text
 );
 
-create table `build_status`(
+create table if not exists `build_status`(
     userId varchar(64),
     projectId int,
     progress tinyint,
     primary key(userId, projectId)
 );
 
-create table courses
+create table if not exists courses
 (
     courseId   int auto_increment primary key,
     courseName varchar(64) not null,
@@ -64,7 +67,7 @@ create table courses
             on update cascade on delete cascade
 );
 
-create table classes
+create table if not exists classes
 (
     courseId int         not null,
     userId   varchar(64) not null,
@@ -77,7 +80,7 @@ create table classes
             on update cascade on delete cascade
 );
 
-create table scores
+create table if not exists scores
 (
     adminId     varchar(64)                             not null,
     projectId   int                                     not null,

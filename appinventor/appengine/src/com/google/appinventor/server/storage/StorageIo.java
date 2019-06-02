@@ -740,6 +740,7 @@ public interface StorageIo {
   List<CourseInfo> getAllAdminCourses(String adminId);
   List<ClassInfo> getClassInfos(int courseId);
   boolean addScore(CourseInfo courseInfo, String submitterId, long projectId);
+  boolean deleteScore(String userId, long projectId);
 
   int addCourse(String courseName, String adminId);
   boolean deleteCourse(CourseInfo courseInfo);
