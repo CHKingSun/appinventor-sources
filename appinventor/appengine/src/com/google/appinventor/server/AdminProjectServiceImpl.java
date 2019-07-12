@@ -177,36 +177,37 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
         newProject.setProjectType(YoungAndroidProjectNode.YOUNG_ANDROID_PROJECT_TYPE);
         newProject.setProjectHistory(oldProjectHistory);
 
+        String oldEmail = storageIo.getUser(userId).getUserEmail();
+        String newEmail = storageIo.getUser(adminId).getUserEmail();
+
         // Get the old project's source files and add them to new project, modifying where necessary.
         for (String oldSourceFileName : storageIo.getProjectSourceFiles(userId, oldProjectId)) {
-            // String newSourceFileName = oldSourceFileName;
+             String newSourceFileName = oldSourceFileName;
 
             String newContents = null;
+            // Instead of changing the project name, we should change the emial of the new project.
             if (oldSourceFileName.equals(PROJECT_PROPERTIES_FILE_NAME)) {
                 // This is the project properties file. The name of the file doesn't contain the old
                 // project name.
-                // newSourceFileName = oldSourceFileName;
                 // For the contents of the project properties file, generate the file with the new project
                 // name and qualified name.
-                String qualifiedFormName = StringUtils.getQualifiedFormName(
-                        storageIo.getUser(userId).getUserEmail(), newName);
+                String qualifiedFormName = StringUtils.getQualifiedFormName(newEmail, newName);
                 newContents = getProjectPropertiesFileContents(newName, qualifiedFormName, icon, vcode,
                         vname, useslocation, aname, sizing, showListsAsJson, tutorialURL, actionBar,
                         theme, primaryColor, primaryColorDark, accentColor);
             }
-            // else {
-            //     // This is some file other than the project properties file.
-            //     // oldSourceFileName may contain the old project name as a path segment, surrounded by /.
-            //     // Replace the old name with the new name.
-            //     newSourceFileName = StringUtils.replaceLastOccurrence(oldSourceFileName,
-            //             "/" + oldName + "/", "/" + newName + "/");
-            // }
+             else {
+                 // This is some file other than the project properties file.
+                 // oldSourceFileName may contain the old project userId(email) as a path segment, surrounded by /.
+                 // Replace the old email with the new email.
+                 newSourceFileName = StringUtils.replaceLastOccurrence(oldSourceFileName,
+                         "/ai_" + oldEmail + "/", "/ai_" + newEmail + "/");
+             }
 
             if (newContents != null) {
                 // We've determined (above) that the contents of the file must change for the new project.
                 // Use newContents when adding the file to the new project.
-                // newProject.addTextFile(new TextFile(newSourceFileName, newContents));
-                newProject.addTextFile(new TextFile(oldSourceFileName, newContents));
+                newProject.addTextFile(new TextFile(newSourceFileName, newContents));
             } else {
                 // If we get here, we know that the contents of the file can just be copied from the old
                 // project. Since it might be a binary file, we copy it as a raw file (that works for both
@@ -214,7 +215,7 @@ public class AdminProjectServiceImpl extends OdeRemoteServiceServlet implements 
                 // byte[] contents = storageIo.downloadRawFile(userId, oldProjectId, oldSourceFileName);
                 // newProject.addRawFile(new RawFile(newSourceFileName, contents));
                 byte[] contents = storageIo.downloadRawFile(userId, oldProjectId, oldSourceFileName);
-                newProject.addRawFile(new RawFile(oldSourceFileName, contents));
+                newProject.addRawFile(new RawFile(newSourceFileName, contents));
             }
         }
 
